@@ -1,0 +1,15 @@
+from django import template
+
+register = template.Library()
+
+
+@register.filter(name='add_commas')
+def add_commas(value):
+    """
+    Add commas to a number string.
+    """
+    try:
+        value = int(value)
+        return "{:,}".format(value)
+    except (TypeError, ValueError):
+        return value
