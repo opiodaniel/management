@@ -91,8 +91,8 @@
                 </div>
                 <div class="navbar-nav w-100">
                     <a href="#" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
-                    <a href="{% url 'realestates:register' %}" class="nav-item nav-link"><i class="fa fa-user-plus"></i>Add Employee</a>
-                    <a href="{% url 'realestates:pay_employee' %}" class="nav-item nav-link"><i class="fa fa-credit-card custom"></i>Pay Employee</a>
+                    <a href="{% url 'realestates:register' %}" class="nav-item nav-link"><i class="fa fa-user-plus"></i>Add Distributor</a>
+                    <a href="{% url 'realestates:pay_employee' %}" class="nav-item nav-link"><i class="fa fa-credit-card custom"></i>Pay Distributor</a>
                 </div>
 
             </nav>
@@ -142,7 +142,7 @@
             <!-- Navbar End -->
 
 
-            <!-- Sale & Revenue Start -->
+            <!-- Monthly Sales  Start -->
             <div class="container-fluid pt-4 px-4">
                 <div class="row g-4">
                     <div class="col-sm-6 col-xl-3">
@@ -167,7 +167,7 @@
                         <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
                             <i class="fa fa-users text-warning" aria-hidden="true" style='font-size:50px;'></i>
                             <div class="ms-3">
-                                <p class="mb-2">Employees</p>
+                                <p class="mb-2">Distributors</p>
                                 <h6 class="mb-0">{{total_number_employees}}</h6>
                             </div>
                         </div>
@@ -183,9 +183,9 @@
                     </div>
                 </div>
             </div>
-            <!-- Sale & Revenue End -->
+            <!-- Monthly Sales Start End -->
 
-            <!-- Monthly Sales Start -->
+            <!-- All Monthly Sales Start -->
             <div class="container-fluid pt-4 px-4">
                 <div class="bg-secondary text-center rounded p-4">
                     <div class="d-flex align-items-center justify-content-between mb-4">
@@ -211,10 +211,11 @@
                                         <div style= "max-height: 200px; overflow-y: auto;">
                                         <table id="customers" style="max-height: 200px; overflow-y: auto;">
                                               <tr>
-                                                <th>Month:{{ data.date }}</th>
+                                                <th>{{ data.date }}</th>
                                                  <th>Amount</th>
                                                  <th>Client</th>
-                                                 <th>Phone Number</th>
+                                                 <th>Phone Number1</th>
+                                                 <th>Phone Number2</th>
                                                  <th>Location</th>
                                                  <th>Brought by:</th>
                                                  <th>Approved by:</th>
@@ -224,7 +225,8 @@
                                                 <td>{{ md.timestamp }}</td>
                                                 <td>{{md.amount_paid|add_commas}}</td>
                                                 <td>{{ md.client }}</td>
-                                                <td>{{ md.client.phone_number }}</td>
+                                                <td>{{ md.client.phoneNumber1 }}</td>
+                                                <td>{{ md.client.phoneNumber2 }}</td>
                                                 <td>{{ md.client.location }}</td>
                                                 <td>{{ md.client.employee }}</td>
                                                 <td>Mr.{{ md.approved_by }}</td>
@@ -242,33 +244,32 @@
                     </div>
                 </div>
             </div>
+            <!-- Monthly Sales  End -->
 
-            <!-- Recent Sales End -->
-
-            <!-- Sales Chart Start -->
+            <!-- Graph of Approved/pending Detail  -->
             <div class="container-fluid pt-4 px-4">
                 <div class="row g-4">
                     <div class="col-sm-12 col-xl-6">
                         <div class="bg-secondary text-center rounded p-4">
                             <div class="d-flex align-items-center justify-content-between mb-4">
-                                <h6 class="mb-0">Approved/pending Detail for each employee</h6>
+                                <h6 class="mb-0">Approved/pending Detail for each Distributor</h6>
                             </div>
                             <canvas id="worldwide-sales"></canvas>
                         </div>
                     </div>
                     <div class="col-sm-12 col-xl-6">
                         <div class="bg-secondary rounded h-100 p-4">
-                            <h6 class="mb-4">Total number clients brought by each Employee</h6>
+                            <h6 class="mb-4">Total number clients brought by each Distributor</h6>
                             <canvas id="bar-chart" width="838" height="418" style="display: block; box-sizing: border-box; height: 209px; width: 419px;"></canvas>
                         </div>
                     </div>
 
                 </div>
             </div>
-            <!-- Sales Chart End -->
+            <!-- Graph of Approved/pending Detail End -->
 
 
-            <!-- Recent Sales Start -->
+            <!-- client table data -->
            <div class="container-fluid pt-4 px-4">
                 <div class="bg-secondary text-center rounded p-4">
                     <h6 class="mb-3">Client Table</h6>
@@ -281,7 +282,7 @@
                             <thead>
                                 <tr class="text-success">
                                     <th scope="col">Date</th>
-                                    <th scope="col">Employee Name</th>
+                                    <th scope="col">Distributor Name</th>
                                     <th scope="col">Client Name</th>
                                     <th scope="col">Phone Number1</th>
                                     <th scope="col">Phone Number2</th>
@@ -316,8 +317,7 @@
                     </div>
                 </div>
            </div>
-
-            <!-- Recent Sales End -->
+            <!-- client table data End  -->
 
 
 
@@ -455,89 +455,6 @@
         employees_client()
       });
     </script>
-
-
-    <script>
-
-         var div1 = document.createElement('div')
-         //div1.setAttribute('class', 'container-fluid pt-4 px-4')
-         div1.setAttribute('style', 'position:absolute;z-index:200;top:200px;display:none;margin-left:500px')
-         div1.setAttribute('id', 'div1_table_container')
-         var div2 = document.createElement('div')
-         div2.setAttribute('class', 'bg-secondary text-center rounded p-4')
-         div1.appendChild(div2)
-         var div3 = document.createElement('div')
-         div3.setAttribute('class', 'd-flex align-items-center justify-content-between mb-4')
-         //var h6 = document.createElement('h6')
-        // h6.innerHTML = 'Monthly Sale detail'
-        // h6.setAttribute('class', 'mb-0')
-        // div3.appendChild(h6)
-         div2.appendChild(div3)
-         var div4 = document.createElement('div')
-         div4.setAttribute('class', 'table-responsive')
-         div4.setAttribute('id', 'div4_table')
-         //div4.setAttribute("style", "background-color:blue")
-         div3.appendChild(div4)
-         var body = document.getElementById('bdy')
-         body.appendChild(div1)
-
-
-         var detail_table = document.createElement('table')
-         detail_table.setAttribute("class", "table text-start align-middle table-bordered table-hover mb-0")
-         //detail_table.setAttribute("style", "margin-left:500px")
-         var thead = document.createElement('thead')
-         detail_table.appendChild(thead)
-         var tr = document.createElement('tr')
-         tr.setAttribute("class", "text-white")
-         var th1 = document.createElement('th')
-         th1.setAttribute("scope", "col")
-         th1.innerHTML = 'Date'
-         tr.appendChild(th1)
-
-         var th2 = document.createElement('th')
-         th2.setAttribute("scope", "col")
-         th2.innerHTML = 'Amount'
-         tr.appendChild(th2)
-         thead.appendChild(tr)
-         var tbody = document.createElement('tbody')
-         detail_table.appendChild(tbody)
-         trbody = document.createElement('tr')
-         tbody.appendChild(trbody)
-         td1 = document.createElement('td')
-         td1.innerHTML = 'March 3 2024'
-         td2 = document.createElement('td')
-         td2.innerHTML = '20000'
-         trbody.appendChild(td1)
-         trbody.appendChild(td2)
-
-         trbody2 = document.createElement('tr')
-         tbody.appendChild(trbody2)
-         td3 = document.createElement('td')
-         td3.innerHTML = 'March 4 2024'
-         td4 = document.createElement('td')
-         td4.innerHTML = '50000'
-         trbody2.appendChild(td3)
-         trbody2.appendChild(td4)
-
-
-
-
-        function getMonthlyInfo(event)
-        {
-
-
-
-         alert(detail_table.outerHTML)
-
-         var div4 = document.getElementById('div4_table')
-         div4.appendChild(detail_table)
-         var div1 = document.getElementById('div1_table_container')
-         div1.style.display = 'block'
-
-
-        }
-    </script>
-
     <script>
         function showSubTable(row) {
             // Extract the date value from the clicked row
@@ -558,7 +475,6 @@
 
 
     </script>
-
     <script>
         $(document).ready(function() {
             $('#searchInput').on('keyup', function() {
@@ -570,7 +486,5 @@
         });
     </script>
 
-
 </body>
-
 </html>

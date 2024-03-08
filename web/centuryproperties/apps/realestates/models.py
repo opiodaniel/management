@@ -152,7 +152,9 @@ class EmployeePaymentRecord(TruncateTableMixin, models.Model):
 @receiver(post_save, sender=Employees)
 def create_employee_payment_record(sender, instance, created, **kwargs):
     if created:
-        EmployeePaymentRecord.objects.create(employee=instance)
+        # Check if the associated user is not an admin
+        if not instance.user.is_superuser:
+            EmployeePaymentRecord.objects.create(employee=instance, id=instance.id)
 
 
 class MonthlyTotal(models.Model):

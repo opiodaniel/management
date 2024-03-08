@@ -37,7 +37,9 @@ from datetime import timedelta
 from decimal import Decimal
 from django.http import HttpResponse
 from .models import EmployeePaymentRecord
-
+from django.db import transaction
+from django.contrib.auth import logout
+from django.views.generic import View
 #Home page
 
 
@@ -124,7 +126,7 @@ def admin_dashboard(request, admin_id):
         "July": 7, "August": 8, "September": 9, "October": 10, "November": 11, "December": 12
     }
     for month, total_sales in total_sales_previous_months:
-        print(f"Total sales for {month.strftime('%B %Y')}: {total_sales}")
+        # print(f"Total sales for {month.strftime('%B %Y')}: {total_sales}")
         month_number = month_name_to_number[month.strftime('%B')]
         selected_year = month.strftime('%Y')
         amount_details_in_month = Payment.objects.filter(timestamp__month=month_number, timestamp__year=selected_year).filter(approved=True)
@@ -226,9 +228,7 @@ def admin_dashboard(request, admin_id):
 
 
 @login_required
-def employee_dashboard(request, employee_id, received_messages=''):
-
-    print(received_messages)
+def employee_dashboard(request, employee_id):
 
     # Retrieve the authenticated employee
     authenticated_employee = request.user.id
@@ -247,19 +247,14 @@ def employee_dashboard(request, employee_id, received_messages=''):
     payments = Payment.objects.filter(employee=employee).order_by('approved', '-client__date')
     profile_pic_url = employee.profile_pic.url
 
-    weekly_commission = employee.calculate_weekly_commission()
-    print('=======commission_earned=======', weekly_commission)
+    employee_payment_record = EmployeePaymentRecord.objects.get(employee=employee)
 
-    employee_payment_record, created = EmployeePaymentRecord.objects.get_or_create(employee=employee)
-    employee_payment_record.total_commission = weekly_commission
-    employee_payment_record.save()
-
-    all_employee_payment_record = EmployeePaymentRecord.objects.get(employee=employee)
-    print(all_employee_payment_record)
-
-    total_weekly_commission_ = int(weekly_commission)
-
-    total_weekly_commission = '{:,}'.format(total_weekly_commission_)
+    # weekly_commission = employee_payment_record.total_commission
+    # print(weekly_commission)
+    #
+    # total_weekly_commission_ = int(weekly_commission)
+    #
+    # total_weekly_commission = '{:,}'.format(total_weekly_commission_)
 
     total_number_of_clients = employee.total_clients()
     total_approved_clients = employee.total_approved_clients()
@@ -274,15 +269,14 @@ def employee_dashboard(request, employee_id, received_messages=''):
     context = {
         'employee': employee,
         'profile_pic_url': profile_pic_url,
-        'total_weekly_commission': total_weekly_commission,
+        # 'total_weekly_commission': total_weekly_commission,
         'clients': clients,
         'total_number_of_clients': total_number_of_clients,
         'total_approved_clients': total_approved_clients,
         'total_appending_clients': total_appending_clients,
         'payments': payments,
         'company_logo_url': company_logo_url,
-        'received_messages': received_messages,
-        'all_employee_payment_record': all_employee_payment_record,
+        'employee_payment_record': employee_payment_record,
     }
 
     # Render the employee dashboard template
@@ -316,8 +310,7 @@ def employees_client(request):
 
 def approve_payment(request, client_id):
 
-    print(client_id)
-
+    # print(client_id)
     payment_client_id = client_id
     client = Client.objects.get(id=client_id)
 
@@ -329,32 +322,31 @@ def approve_payment(request, client_id):
     return render(request, 'realestates/confirm_client_payment.html', context)
 
 
+@transaction.atomic
 def confirm_payment(request, client_id):
     if request.method == 'POST':
         # Get the amount paid from the form data
         amount_paid_str = request.POST.get('amount_paid', '0').replace(',', '')  # Remove commas
         amount_paid = int(amount_paid_str)
-        if amount_paid == "" or amount_paid is None:
-            message = 'You must enter an amount.'
+        if amount_paid <= 0:
+            message = 'You must enter a valid positive amount.'
             return render(request, 'realestates/confirm_client_payment.html', {'payment_client_id': client_id, 'message':message})
         else:
-
             # Assuming the request.user is the user making the request
             current_user = request.user
 
             # Check if the current user is a superuser (admin)
             if current_user.is_superuser:
                 # Get the associated employee record for the admin user
-                print(current_user, 'I am a superuser')
+                # print(current_user, 'I am a superuser')
                 try:
                     admin_employee = Employees.objects.get(user=current_user)
                 except Employees.DoesNotExist as ex:
-                    print('=======ex=============', ex)
+                    # print('=======ex=============', ex)
                     # Handle the case where the admin's employee record doesn't exist
                     # This might occur if the admin's employee record is not properly set up
                     # Log an error or handle the situation appropriately
                     return HttpResponse("Error: Admin employee record not found.")
-
                 # employee = get_object_or_404(Employees, id=employee_id)
                 # commission_earned = employee.calculate_commission()
 
@@ -371,6 +363,23 @@ def confirm_payment(request, client_id):
                 payment.approved = True
                 payment.approved_by = admin_employee
                 payment.save()
+
+                # Calculate commission for non-admin employees and update EmployeePaymentRecord
+                for employee in Employees.objects.filter(is_administrator=False):
+                    all_employee_payment_record = EmployeePaymentRecord.objects.get(employee=employee)
+                    all_employee_payment_record.total_commission = employee.calculate_weekly_commission()
+                    all_employee_payment_record.balance = employee.calculate_weekly_commission()-all_employee_payment_record.amount_paid
+                    all_employee_payment_record.save()
+
+                # # Calculate commission for non-admin employees
+                # for employee in Employees.objects.filter(is_administrator=False):  # Exclude superuser (admin)
+                #     commission_earned = employee.calculate_weekly_commission()  # Implement this function according to your logic
+                #
+                #     # Update EmployeePaymentRecord for the employee
+                #     employee_payment_record, _ = EmployeePaymentRecord.objects.get_or_create(employee=employee)
+                #     employee_payment_record.total_commission = commission_earned
+                #     employee_payment_record.save()
+
                 return redirect(reverse('realestates:admin_dashboard', args=[request.user.id]))
             else:
                 return HttpResponse("Error: You are not authorized to approve payments.")
@@ -382,12 +391,12 @@ def confirm_payment(request, client_id):
 
 def pay_employee(request):
 
-    all_employee_payment_record = EmployeePaymentRecord.objects.all()
     admin = Employees.objects.get(id=request.user.id)
     profile_pic_url = admin.profile_pic.url
     company = Company.objects.get(id=1)
     company_logo_url = company.company_logo.url
     employees = Employees.objects.all().filter(is_administrator=False)
+    all_employee_payment_record = EmployeePaymentRecord.objects.filter(employee__in=employees)
     context = {
         'employees': employees,
         'company_logo_url': company_logo_url,
@@ -401,6 +410,7 @@ def pay_employee(request):
 def approve_employee_payment(request, employee_id):
 
     employee_id_ = employee_id
+    # print(employee_id)
     employee = Employees.objects.get(id=employee_id)
 
     context = {
@@ -416,22 +426,36 @@ def confirm_employee_payment(request, employee_id):
         # Get the amount paid from the form data
         amount_paid_str = request.POST.get('amount_paid', '0').replace(',', '')  # Remove commas
         amount_paid = int(amount_paid_str)
-        if amount_paid == "" or amount_paid is None:
-            message = 'You must enter an amount.'
-            return render(request, 'realestates/confirm_employee_payment.html', {'employee_id': employee_id, 'message':message})
-        else:
-            print('==amount_paid==', amount_paid)
-            employee = Employees.objects.get(id=employee_id)
-            employee.calculate_weekly_commission()
-            employee_balance = employee.calculate_weekly_commission() - amount_paid
-            print('== employee_balance ==', employee_balance)
+        if amount_paid <= 0:
+            message = 'Amount must be greater than zero.'
+            return render(request, 'realestates/confirm_employee_payment.html',
+                          {'employee_id': employee_id, 'message': message})
 
-            all_employee_payment_record = EmployeePaymentRecord.objects.get(employee=employee)
-            all_employee_payment_record.amount_paid = amount_paid
-            all_employee_payment_record.balance = employee_balance
+        employee = Employees.objects.get(id=employee_id)
+        all_employee_payment_record = EmployeePaymentRecord.objects.get(employee=employee)
+        commission_earned = all_employee_payment_record.total_commission
+
+        if amount_paid > all_employee_payment_record.balance:
+            message = 'Amount cannot be greater than the balance.'
+            return render(request, 'realestates/confirm_employee_payment.html',
+                          {'employee_id': employee_id, 'message': message})
+        else:
+            all_employee_payment_record.amount_paid += amount_paid
+            all_employee_payment_record.save()
+            # print(all_employee_payment_record.amount_paid)
+            all_employee_payment_record.balance = commission_earned - all_employee_payment_record.amount_paid
             all_employee_payment_record.save()
 
-            return redirect(reverse('realestates:admin_dashboard', args=[request.user.id]))
+
+        # # Calculate balance
+        # employee_balance = commission_earned - amount_paid
+        # # Update EmployeePaymentRecord
+        # all_employee_payment_record = EmployeePaymentRecord.objects.get(employee=employee)
+        # all_employee_payment_record.amount_paid += amount_paid
+        # all_employee_payment_record.balance = employee_balance
+        # all_employee_payment_record.save()
+
+        return redirect(reverse('realestates:admin_dashboard', args=[request.user.id]))
 
     # Handle GET requests if needed
     # For example, you might display a confirmation page for approval
@@ -444,7 +468,7 @@ def add_client(request):
         form = ClientForm(request.POST)
         if form.is_valid():
             client = form.save(commit=False)
-            print(client)
+            # print(client)
             employee = Employees.objects.get(user=request.user)
             # print(employee)
             client.employee = employee
@@ -475,30 +499,45 @@ def email_message(semail, username,  type):
 def register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
-        # print("form====", form)
-        for field in form:
-            print("Field Error:", field.name, field.errors)
         if form.is_valid():
-            # print("00vvvvv", form)
             cd = form.cleaned_data
-            # print("0011111111111", cd)
             semail = cd['email']
             username = cd['username']
-            # print("00222222222", semail)
-            email_message(semail, username,  'register')
-            # print("003333333333")
+            email_message(semail, username, 'register')
             form.save()
             return redirect(reverse('realestates:admin_dashboard', args=[request.user.id]))
-        else:
-            # messages.error(request, field.errors)
-            form = RegistrationForm()
-            args = {'form': form}
-            messages.error(request, field.errors)
-            return render(request, 'realestates/registration/reg_form.html', args)
     else:
         form = RegistrationForm()
-        args = {'form': form}
-        return render(request, 'realestates/registration/reg_form.html', args)
+    return render(request, 'realestates/registration/reg_form.html', {'form': form})
+
+
+# def register(request):
+#     if request.method == 'POST':
+#         form = RegistrationForm(request.POST)
+#         # print("form====", form)
+#         for field in form:
+#             print("Field Error:", field.name, field.errors)
+#         if form.is_valid():
+#             # print("00vvvvv", form)
+#             cd = form.cleaned_data
+#             # print("0011111111111", cd)
+#             semail = cd['email']
+#             username = cd['username']
+#             # print("00222222222", semail)
+#             email_message(semail, username,  'register')
+#             # print("003333333333")
+#             form.save()
+#             return redirect(reverse('realestates:admin_dashboard', args=[request.user.id]))
+#         else:
+#             # messages.error(request, field.errors)
+#             form = RegistrationForm()
+#             args = {'form': form}
+#             messages.error(request, field.errors)
+#             return render(request, 'realestates/registration/reg_form.html', args)
+#     else:
+#         form = RegistrationForm()
+#         args = {'form': form}
+#         return render(request, 'realestates/registration/reg_form.html', args)
 
 
 def login_page(request):
@@ -514,12 +553,11 @@ def login_page(request):
                     # return redirect('admin_dashboard')  # Redirect admin to admin dashboard
                     # print(user)
                     # print(user.id)
-                    messages.info(request, f"You are now logged in as {username}.")
+                    # messages.info(request, f"You are now logged in as {username}.")
                     return redirect(reverse('realestates:admin_dashboard', args=[user.id]))
                 else:
-                    messages.info(request, f"You are now logged in as {username}.")
+                    # messages.info(request, f"You are now logged in as {username}.")
                     return redirect(reverse('realestates:employee_dashboard', args=[user.id]))
-
             else:
                 messages.error(request, "Invalid username or password.")
         else:
@@ -540,7 +578,7 @@ def login_form_(request, error_message=''):
            'error_message': error_message,
            'company_logo_url': company_logo_url
            }
-    return render(request, 'realestates/registration/login_page.html', arg)
+    return render(request, 'realestates/registration/login.html', arg)
 
 
 def edit_user_profile_new(request):
@@ -588,3 +626,13 @@ def change_password(request):
         args = {'form': form}
         return render(request, 'realestates/registration/change_password.html', args)
 
+
+class CustomLogoutView(View):
+    def post(self, request):
+        # Handle post request if needed
+        logout(request)
+        messages.success(request, 'You have been logged out successfully.')
+        return redirect('realestates:login_page')  # Adjust the redirect URL as needed
+
+    def get(self, request):
+       pass

@@ -63,6 +63,12 @@ class RegistrationForm(UserCreationForm):
     password1 = forms.Field(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     password2 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError("This username is already taken. Please choose a different one.")
+        return username
+
     class Meta:
         model = get_user_model()
         fields = (

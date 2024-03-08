@@ -17,7 +17,7 @@ class ClientAdmin(admin.ModelAdmin):
 
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('client', 'amount_paid',  'approved', 'timestamp', 'employee', 'approved_by')
+    list_display = ('id', 'client', 'amount_paid',  'approved', 'timestamp', 'employee', 'approved_by')
     list_filter = ('approved', 'employee',)
     actions = ['approve_payments', 'reject_payments']
 

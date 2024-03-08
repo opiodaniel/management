@@ -5,7 +5,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Admin</title>
+    <title>Distributor</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -63,7 +63,7 @@
                     </div>
                     <div class="ms-3">
                         <h6 class="mb-0">{{ employee.user.username }}</h6>
-                        <span>Employee</span>
+                        <span>Distributor</span>
                     </div>
                 </div>
                 <div class="navbar-nav w-100">
@@ -117,7 +117,7 @@
                             <i class="fa fa-chart-line fa-3x text-success"></i>
                             <div class="ms-3">
                                 <p class="mb-2">Commission Earned</p>
-                                <h6 class="mb-0">Shs:{{ all_employee_payment_record.total_commission|add_commas }}</h6>
+                                <h6 class="mb-0">Shs:{{ employee_payment_record.total_commission|add_commas }}</h6>
                             </div>
                         </div>
                     </div>
@@ -126,7 +126,7 @@
                             <i class="fa fa-chart-bar fa-3x text-info" aria-hidden="true" style='font-size:50px;'></i>
                             <div class="ms-3">
                                 <p class="mb-2">Paid</p>
-                                <h6 class="mb-0">{{ all_employee_payment_record.amount_paid|add_commas }}</h6>
+                                <h6 class="mb-0">{{ employee_payment_record.amount_paid|add_commas }}</h6>
                             </div>
                         </div>
                     </div>
@@ -135,7 +135,7 @@
                             <i class="fa fa-chart-area text-danger" aria-hidden="true" style='font-size:50px;'></i>
                             <div class="ms-3">
                                 <p class="mb-2">Balance</p>
-                                <h6 class="mb-0">{{ all_employee_payment_record.balance|add_commas }}</h6>
+                                <h6 class="mb-0">{{ employee_payment_record.balance|add_commas }}</h6>
                             </div>
                         </div>
                     </div>

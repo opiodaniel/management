@@ -15,6 +15,7 @@
 
 
 {% block content %}
+
 <style>
 .gradient-custom-2 {
       /* fallback for old browsers */
@@ -45,7 +46,6 @@
     }
 }
 </style>
-
 <style>
 
 .flipper {
@@ -111,12 +111,12 @@ input{
                     <p>Please login to your account</p>
                     {% if messages %}
                         <div style="color:red">
-                          <strong>Messages:</strong>
+
+                          {% for message in messages %}
                           <ul>
-                            {% for message in messages %}
                             <li>{{message}}</li>
-                            {% endfor %}
                           </ul>
+                           {% endfor %}
                         </div>
                     {% endif %}
                     <div class="form-outline mb-4">
@@ -148,7 +148,7 @@ input{
   </div>
 </div>
 
- <script>
+<script>
         const togglePassword = document.querySelector("#togglePassword");
         const password =  document.getElementById("id_password");
 
@@ -166,7 +166,7 @@ input{
         form.addEventListener('submit', function (e) {
             //e.preventDefault();
         });
- </script>
+</script>
 
 
 {% endblock %}

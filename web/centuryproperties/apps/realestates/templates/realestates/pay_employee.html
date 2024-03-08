@@ -154,8 +154,8 @@
                                 <tr>
                                     <td>{{e.employee}}</td>
                                     <td>{{e.total_commission|add_commas }}</td>
-                                    <td>{{e.amount_paid }}</td>
-                                    <td>{{e.balance }}</td>
+                                    <td>{{e.amount_paid|add_commas }}</td>
+                                    <td>{{e.balance|add_commas }}</td>
                                     <td>
                                         {% if not e.approved %}
                                         <form action="{% url 'realestates:approve_employee_payment' e.id%}" method="post">
