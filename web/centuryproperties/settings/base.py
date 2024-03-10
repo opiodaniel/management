@@ -1,19 +1,21 @@
 import os
-
+from dotenv import load_dotenv
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # trades
 WEB_DIR = os.path.dirname(BASE_DIR)                                      # web
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))                  # setting
 
+# print(BASE_DIR)
 
-from dotenv import load_dotenv
 env_path = load_dotenv(os.path.join(BASE_DIR, '.env'))
 load_dotenv(env_path)
 
 # SECRET_KEY = 'django-insecure-00yy$s02_5vdxx=uucg8h88d$2)!#ob%c3=dhw!0-+_+y(&0zr'
-SECRET_KEY = os.environ.get(
-    'DJANGO_SECRET_KEY',
-    'django-insecure-00yy$s02_5vdxx=uucg8h88d$2)!#ob%c3=dhw!0-+_+y(&0zr')
+# SECRET_KEY = os.environ.get(
+#     'DJANGO_SECRET_KEY',
+#     'django-insecure-00yy$s02_5vdxx=uucg8h88d$2)!#ob%c3=dhw!0-+_+y(&0zr')
+
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-00yy$s02_5vdxx=uucg8h88d$2)!#ob%c3=dhw!0-+_+y(&0zr')
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -114,25 +116,33 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+#
+# print('WEB_DIR=====', WEB_DIR)
+# print('BASE_DIR====', BASE_DIR)
 
 STATIC_ROOT = os.path.join(WEB_DIR, "static")
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'danielopio540@gmail.com'
-EMAIL_HOST_PASSWORD = 'hcusjvmuupklpbvy'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() == 'true'
 
 
-# STORAGES = {
-#     # ...
-#     "staticfiles": {
-#         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-#     },
-# }
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+

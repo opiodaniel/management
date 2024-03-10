@@ -14,7 +14,7 @@ from django.core.validators import MinLengthValidator
 class Company(TruncateTableMixin, models.Model):
     company_name = models.CharField(max_length=50, default='', blank=True)
     company_logo = models.ImageField(upload_to='company_logo/', blank=True, null=True,
-                                     default='company_logo/default_profile_pic/default_company_logo_.jpg')
+                                     default='company_logo/default_company_logo/default_company_logo.jpeg')
     company_phone_number = models.CharField('phone', max_length=20, default='', blank=True)
 
 

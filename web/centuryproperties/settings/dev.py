@@ -1,5 +1,5 @@
 from .base import *
-import dj_database_url
+
 
 DEBUG = True
 
@@ -17,8 +17,3 @@ DATABASES = {
 }
 
 
-# if 'DATABASE_URL' in os.environ:
-#     DATABASES['default'] = dj_database_url.config(
-#         conn_max_age=500,
-#         conn_health_checks=True,
-#     )
