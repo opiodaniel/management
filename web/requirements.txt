@@ -20,7 +20,7 @@ packaging==23.2
 phonenumbers==8.13.31
 pillow==10.2.0
 prompt-toolkit==3.0.43
-psycopg2==2.9.9
+#psycopg2==2.9.9
 psycopg2-binary==2.9.9
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
