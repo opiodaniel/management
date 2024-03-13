@@ -40,3 +40,11 @@ if 'DATABASE_URL' in os.environ:
 MEDIA_ROOT = '/home/opio/projects/management/web/centuryproperties/media/'  # for nginx
 STATIC_ROOT = '/home/opio/projects/management/web/static/'  # for nginx
 
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
