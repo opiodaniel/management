@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7ade2d30-b4b6-48a2-aae7-98d6d1f3da59" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/web/.env" beforeDir="false" afterPath="$PROJECT_DIR$/web/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/urls.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,8 +48,8 @@
       <recent name="$PROJECT_DIR$/web/centuryproperties/static/assets/css" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/web" />
       <recent name="$PROJECT_DIR$/web/centuryproperties" />
+      <recent name="$PROJECT_DIR$/web" />
       <recent name="$PROJECT_DIR$/web/centuryproperties/static/assets" />
     </key>
   </component>
