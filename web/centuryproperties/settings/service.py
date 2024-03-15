@@ -1,7 +1,7 @@
 from .base import *
 import dj_database_url
 
-DEBUG = True
+DEBUG = False
 
 ADMINS = (
     ('Opio Daniel', 'danielopio540@gmail.com'),
@@ -15,7 +15,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'acDantez',
         'USER': 'opio',
-        'PASSWORD': 'sql1passq',
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
         'HOST': 'acdantez.clgqa6mksciw.us-east-1.rds.amazonaws.com',
         'PORT': 5432
     }
