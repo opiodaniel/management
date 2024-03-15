@@ -1,7 +1,7 @@
 from .base import *
 import dj_database_url
 
-DEBUG = True
+DEBUG = False
 
 ADMINS = (
     ('Opio Daniel', 'danielopio540@gmail.com'),
