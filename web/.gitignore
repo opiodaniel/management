@@ -2,3 +2,4 @@
 managementenvs/
 
 # Ignore .env file
+.env
