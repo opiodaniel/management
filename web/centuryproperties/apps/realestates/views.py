@@ -486,7 +486,7 @@ def email_message(semail, username,  type):
         email_from = 'noreply@drbaranes.com'
         subject = 'Registering in Century Properties & Real Estates Ltd'
         body = 'You were registered. Temporal password: sql1pass and username: '+username+ ' date-format:1998-12-28 ' + 'Please login and Update/Edit your profile .' \
-               'http://23.22.98.66/'
+               'http://52.90.82.86/'
         # print("005555555555555")
     elif type == 'instructor_confirmed':
         email_from = 'noreply@drbaranes.com'
