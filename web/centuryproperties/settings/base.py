@@ -1,7 +1,9 @@
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # trades
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # trades
+BASE_DIR = Path(__file__).resolve().parent.parent
 WEB_DIR = os.path.dirname(BASE_DIR)                                      # web
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))                  # setting
 
