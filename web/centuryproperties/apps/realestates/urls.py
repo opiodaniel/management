@@ -4,17 +4,11 @@ from .views import (
                     employees_client, register, approve_payment, confirm_payment, add_client, login_page,
                     edit_user_profile_new, change_password, pay_employee, approve_employee_payment,
                     confirm_employee_payment, CustomLogoutView)
-from django.urls import include
 
 
 app_name = 'realestates'
 
 urlpatterns = [
-
-    # Homepage path
-    # path('', home, name='home'),
-
-    # path('/', employee_login, name='employee_login'),
 
     path('', login_page, name='login_page'),
 
@@ -34,18 +28,9 @@ urlpatterns = [
     path('add_client/', add_client, name='add_client'),
 
     path('edit_user_profile_new', edit_user_profile_new, name='edit_user_profile_new'),
-
     path('change-password/', change_password, name='change_password'),
 
-    # path('logout/', custom_logout, name='custom_logout'),
     path('logout/', CustomLogoutView.as_view(), name='logout'),
-
-
-    # inbuilt login path
-    # path('accounts/', include('django.contrib.auth.urls')),
-
-    # path(r'logout/', LogoutView.as_view(template_name='mirai/logout.html'), name='logout'),
-
 
 ]
 

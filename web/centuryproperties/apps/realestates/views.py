@@ -309,16 +309,13 @@ def employees_client(request):
 
 
 def approve_payment(request, client_id):
-
     # print(client_id)
     payment_client_id = client_id
     client = Client.objects.get(id=client_id)
-
     context = {
         'payment_client_id': payment_client_id,
         'client': client,
     }
-
     return render(request, 'realestates/confirm_client_payment.html', context)
 
 
@@ -383,9 +380,6 @@ def confirm_payment(request, client_id):
                 return redirect(reverse('realestates:admin_dashboard', args=[request.user.id]))
             else:
                 return HttpResponse("Error: You are not authorized to approve payments.")
-
-    # Handle GET requests if needed
-    # For example, you might display a confirmation page for approval
     return render(request, 'realestates/confirm_client_payment.html')
 
 
@@ -408,16 +402,12 @@ def pay_employee(request):
 
 
 def approve_employee_payment(request, employee_id):
-
     employee_id_ = employee_id
-    # print(employee_id)
     employee = Employees.objects.get(id=employee_id)
-
     context = {
         'employee_id': employee_id_,
         'employee': employee,
     }
-
     return render(request, 'realestates/confirm_employee_payment.html', context)
 
 
@@ -488,10 +478,6 @@ def email_message(semail, username,  type):
         body = 'You were registered. Temporal password: sql1pass and username: '+username+ ' date-format:1998-12-28 ' + 'Please login and Update/Edit your profile .' \
                'http://52.90.82.86/'
         # print("005555555555555")
-    elif type == 'instructor_confirmed':
-        email_from = 'noreply@drbaranes.com'
-        subject = 'Confirmation on instructor status'
-        body = 'Your status as instructor has been confirmed. You can create a new games:  http://192.168.1.8:8000/'
 
     send_mail(subject, body, email_from, [semail], fail_silently=False)
 
@@ -509,35 +495,6 @@ def register(request):
     else:
         form = RegistrationForm()
     return render(request, 'realestates/registration/reg_form.html', {'form': form})
-
-
-# def register(request):
-#     if request.method == 'POST':
-#         form = RegistrationForm(request.POST)
-#         # print("form====", form)
-#         for field in form:
-#             print("Field Error:", field.name, field.errors)
-#         if form.is_valid():
-#             # print("00vvvvv", form)
-#             cd = form.cleaned_data
-#             # print("0011111111111", cd)
-#             semail = cd['email']
-#             username = cd['username']
-#             # print("00222222222", semail)
-#             email_message(semail, username,  'register')
-#             # print("003333333333")
-#             form.save()
-#             return redirect(reverse('realestates:admin_dashboard', args=[request.user.id]))
-#         else:
-#             # messages.error(request, field.errors)
-#             form = RegistrationForm()
-#             args = {'form': form}
-#             messages.error(request, field.errors)
-#             return render(request, 'realestates/registration/reg_form.html', args)
-#     else:
-#         form = RegistrationForm()
-#         args = {'form': form}
-#         return render(request, 'realestates/registration/reg_form.html', args)
 
 
 def login_page(request):
@@ -566,9 +523,6 @@ def login_page(request):
 
 
 def login_form_(request, error_message=''):
-    # print('-99999-')
-    # print('error_message')
-    # print(error_message)
 
     form_login = EmployeeLoginForm()
     company = Company.objects.get(id=1)
