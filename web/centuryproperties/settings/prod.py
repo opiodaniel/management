@@ -44,8 +44,8 @@ DATABASES = {
 #     )
 
 
-MEDIA_ROOT = '/home/opio/projects/management/web/centuryproperties/media/'  # for nginx
-STATIC_ROOT = '/home/opio/projects/management/web/static/'  # for nginx
+# MEDIA_ROOT = '/home/opio/projects/management/web/centuryproperties/media/'  # for nginx
+# STATIC_ROOT = '/home/opio/projects/management/web/static/'  # for nginx
 
 STORAGES = {
     "default": {
