@@ -294,25 +294,36 @@
                                 </tr>
                             </thead>
                             <tbody class="text-white">
-                                {% for p in payments %}
-                                <tr>
-                                    <td>{{ p.client.date}}</td>
-                                    <td>{{p.client.employee}}</td>
-                                    <td>{{ p.client.name }}</td>
-                                    <td>{{ p.client.phoneNumber1 }}</td>
-                                    <td>{{ p.client.phoneNumber2 }}</td>
-                                    <td>{{ p.client.location }}</td>
-                                    <td>{{ p.amount_paid }}</td>
-                                    <td>{% if p.approved %}<span class="btn-success btn-lg" style="padding:1px;font-size:12px">Approved</span>{% else %}<span class="btn-warning btn-lg" style="padding:1px;font-size:12px">Pending</span>{% endif %}</td>
-                                    <td>
-                                        {% if not p.approved %}
-                                        <form action="{% url 'realestates:approve_payment' p.client.id %}" method="post">
-                                            {% csrf_token %}
-                                            <button class="btn btn-sm btn-primary" type="submit">Approve Payment</button>
-                                        </form>
-                                        {% endif %}
+                                {% for client in all_clients %}
+                                    <tr>
+                                        {% for payment in client.client_payment.all %}
+
+                                           {% if not payment.approved %}
+                                                <td>{{ client.date }}</td>
+                                                <td>{{ client.employee }}</td>
+                                                <td>{{ client.name }}</td>
+                                                <td>{{ client.phoneNumber1 }}</td>
+                                                <td>{{ client.phoneNumber2 }}</td>
+                                                <td>{{ client.location }}</td>
+                                                <td>
+                                                   {{ payment.amount_paid }}
+                                                </td>
+                                                <td>
+                                                    <span class="btn-warning btn-lg" style="padding:1px;font-size:12px">pending</span>
+                                                </td>
+                                                 <td>
+                                                    <!-- Form to approve payment -->
+                                                    <form action="{% url 'realestates:approve_payment' payment.id %}" method="post">
+                                                        {% csrf_token %}
+                                                        <button class="btn btn-sm btn-primary" type="submit">Approve Payment</button>
+                                                    </form>
+                                                 </td>
+                                           {% endif %}
+                                        {% endfor %}
+
                                     </tr>
                                 {% endfor %}
+
                             </tbody>
                         </table>
                     </div>

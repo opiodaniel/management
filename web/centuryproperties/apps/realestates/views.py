@@ -180,8 +180,7 @@ def admin_dashboard(request, admin_id):
     employees = Employees.objects.filter(is_administrator=False)
 
     payments = Payment.objects.filter(approved=False).order_by('approved', '-client__date')
-    total_number_clients = Client.objects.all().count
-
+    all_clients = Client.objects.all()
     clients = Client.objects.all().count()
     profile_pic_url = admin.profile_pic.url
 
@@ -214,6 +213,7 @@ def admin_dashboard(request, admin_id):
         'clients': clients,
         'employees': employees,
         'payments': payments,
+        'all_clients': all_clients,
         'total_number_employees': total_number_employees,
         'total_num_clients_': total_num_clients_,
         'total_amount_made_today': total_amount_made_today,
@@ -245,6 +245,7 @@ def employee_dashboard(request, employee_id):
     # Retrieve the employee object based on the employee_id
     employee = get_object_or_404(Employees, id=employee_id)
     payments = Payment.objects.filter(employee=employee).order_by('approved', '-client__date')
+    all_clients = Client.objects.all()
     profile_pic_url = employee.profile_pic.url
 
     employee_payment_record = EmployeePaymentRecord.objects.get(employee=employee)
@@ -271,6 +272,7 @@ def employee_dashboard(request, employee_id):
         'profile_pic_url': profile_pic_url,
         # 'total_weekly_commission': total_weekly_commission,
         'clients': clients,
+        'all_clients': all_clients,
         'total_number_of_clients': total_number_of_clients,
         'total_approved_clients': total_approved_clients,
         'total_appending_clients': total_appending_clients,
