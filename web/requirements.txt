@@ -17,6 +17,7 @@ django-phonenumbers==1.0.1
 django-storages==1.14.2
 easy-thumbnails==2.8.5
 gunicorn==21.2.0
+h11==0.14.0
 install==1.3.5
 jmespath==1.0.1
 kombu==5.3.5
@@ -34,6 +35,7 @@ sqlparse==0.4.4
 typing_extensions==4.10.0
 tzdata==2024.1
 urllib3==2.0.7
+uvicorn==0.29.0
 vine==5.1.0
 wcwidth==0.2.13
 whitenoise==6.6.0
