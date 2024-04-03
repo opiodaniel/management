@@ -515,7 +515,7 @@ def email_message(semail, username,  type):
         email_from = 'noreply@drbaranes.com'
         subject = 'Registering in Century Properties & Real Estates Ltd'
         body = 'You were registered. Temporal password: sql1pass and username: '+username+ ' date-format:1998-12-28 ' + 'Please login and Update/Edit your profile .' \
-               'https://centurypropertyies.onrender.com'
+               'https://centuryproperties.onrender.com'
         # print("005555555555555")
 
     send_mail(subject, body, email_from, [semail], fail_silently=False)
