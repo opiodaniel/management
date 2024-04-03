@@ -35,6 +35,7 @@ class Employees(TruncateTableMixin, models.Model):
     country = models.CharField('country', max_length=100, default='', blank=True)
     #
     phone = models.CharField('phone', max_length=20, default='', blank=True)
+    # date format, 1998-12-28
     date_of_birth = models.DateField(blank=True, null=True)
 
     profile_pic = models.ImageField(upload_to='profile_pics/', blank=True, null=True,
@@ -46,43 +47,66 @@ class Employees(TruncateTableMixin, models.Model):
         today = datetime.now().date()
         start_of_week = today - timedelta(days=today.weekday())  # Monday of the current week
         end_of_week = start_of_week + timedelta(days=6)  # Sunday of the current week
-        print(start_of_week,  end_of_week)
+        print(start_of_week, end_of_week)
+
         # Filter the payments made within the current week
         clients = Payment.objects.filter(
             client__employee=self,
             approved=True,
             timestamp__range=[start_of_week, end_of_week]
-        ).order_by('timestamp')  # Sort by timestamp to ensure correct or
-        # print(clients)
+        ).order_by('timestamp')  # Sort by timestamp to ensure correct ordering
 
         if clients.exists():
             # Calculate commission for each client
             for client in clients:
                 total_commission += client.amount_paid * 0.1  # 10% commission for bringing a client
-                # print('alone', total_commission)
-
-            pair_count = len(clients) // 2
-            remaining_clients = len(clients) % 2
-            pair_commissions = []
-            if pair_count > 0:
-                amounts_paid = [client.amount_paid for client in clients]
-                # print(amounts_paid)
-                for i in range(pair_count):
-                    pair_minimum_amount = min(amounts_paid[2 * i], amounts_paid[2 * i + 1])  #Take the minimum amount from each pair
-                    total_commission += pair_minimum_amount * 0.05  # Additional 5% for every pair
-                    pair_commissions.append(total_commission)
-            # total_commission += sum(pair_commissions)
-            # print('total_pair_commissions  ', total_commission)
-
-            # if len(pair_commissions) > 0:
-            #     total_commission = sum(pair_commissions)
-
-            # If there's an odd number of clients, calculate commission for the last client individually
-            # if remaining_clients:
-            #     if len(clients) % 2 == 1:  # Check if the last client is not part of a pair
-            #         total_commission += clients.last().amount_paid * 0.1  # 10% commission for the last client
 
         return total_commission
+
+    # ====pairing clients and 0.05 on the lower amount====
+    # def calculate_weekly_commission(self):
+    #     total_commission = 0
+    #
+    #     today = datetime.now().date()
+    #     start_of_week = today - timedelta(days=today.weekday())  # Monday of the current week
+    #     end_of_week = start_of_week + timedelta(days=6)  # Sunday of the current week
+    #     print(start_of_week,  end_of_week)
+    #     # Filter the payments made within the current week
+    #     clients = Payment.objects.filter(
+    #         client__employee=self,
+    #         approved=True,
+    #         timestamp__range=[start_of_week, end_of_week]
+    #     ).order_by('timestamp')  # Sort by timestamp to ensure correct or
+    #     print(clients)
+    #
+    #     if clients.exists():
+    #         # Calculate commission for each client
+    #         for client in clients:
+    #             total_commission += client.amount_paid * 0.1  # 10% commission for bringing a client
+    #             # print('alone', total_commission)
+    #
+    #         pair_count = len(clients) // 2
+    #         remaining_clients = len(clients) % 2
+    #         pair_commissions = []
+    #         if pair_count > 0:
+    #             amounts_paid = [client.amount_paid for client in clients]
+    #             # print(amounts_paid)
+    #             for i in range(pair_count):
+    #                 pair_minimum_amount = min(amounts_paid[2 * i], amounts_paid[2 * i + 1])  #Take the minimum amount from each pair
+    #                 total_commission += pair_minimum_amount * 0.05  # Additional 5% for every pair
+    #                 pair_commissions.append(total_commission)
+    #         total_commission += sum(pair_commissions)
+    #         print('total_pair_commissions  ', total_commission)
+    #
+    #         if len(pair_commissions) > 0:
+    #             total_commission = sum(pair_commissions)
+    #
+    #         If there's an odd number of clients, calculate commission for the last client individually
+    #         if remaining_clients:
+    #             if len(clients) % 2 == 1:  # Check if the last client is not part of a pair
+    #                 total_commission += clients.last().amount_paid * 0.1  # 10% commission for the last client
+    #
+    #     return total_commission
 
     def total_clients(self):
         return self.client_employee.count()

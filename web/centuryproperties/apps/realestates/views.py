@@ -40,8 +40,46 @@ from .models import EmployeePaymentRecord
 from django.db import transaction
 from django.contrib.auth import logout
 from django.views.generic import View
-#Home page
 
+
+def login_page(request):
+    company = Company.objects.get(id=1)
+    company_logo_url = company.company_logo.url
+    arg = {
+           'company_logo_url': company_logo_url
+           }
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        # Authenticate user
+        user = authenticate(request, username=username, password=password)
+        # user = authenticate(username=username, password=password)
+        if user is not None:
+            login(request, user)
+            if user.is_superuser:  # Check if user is admin
+                # return redirect('admin_dashboard')  # Redirect admin to admin dashboard
+                # print(user)
+                # print(user.id)
+                # messages.info(request, f"You are now logged in as {username}.")
+                return redirect(reverse('realestates:admin_dashboard', args=[user.id]))
+            else:
+                # messages.info(request, f"You are now logged in as {username}.")
+                return redirect(reverse('realestates:employee_dashboard', args=[user.id]))
+        else:
+            messages.error(request, "Invalid username or password.")
+
+        # if user is not None:
+        #     # Login user
+        #     login(request, user)
+        #     messages.success(request, 'You have successfully logged in.')
+        #     return redirect('home')  # Redirect to home page after successful login
+        # else:
+        #     messages.error(request, 'Invalid username or password.')
+        #     return redirect('login')  # Redirect back to login page with error message
+
+    # If request method is GET, render the login page
+    return render(request, 'realestates/registration/login.html', arg)
 
 @login_required
 # def home(request):
@@ -83,6 +121,9 @@ def get_total_sales_for_previous_months(request):
 
 @login_required
 def admin_dashboard(request, admin_id):
+
+    if request.method == 'POST':
+        print(1234)
 
     authenticated_admin = request.user.id
 
@@ -245,7 +286,6 @@ def employee_dashboard(request, employee_id):
     # Retrieve the employee object based on the employee_id
     employee = get_object_or_404(Employees, id=employee_id)
     payments = Payment.objects.filter(employee=employee).order_by('approved', '-client__date')
-    all_clients = Client.objects.all()
     profile_pic_url = employee.profile_pic.url
 
     employee_payment_record = EmployeePaymentRecord.objects.get(employee=employee)
@@ -263,16 +303,13 @@ def employee_dashboard(request, employee_id):
     clients = employee.client_employee.all()
 
     approved_clients_count = Payment.objects.filter(employee_id=employee_id, approved=True).count()
-    print(approved_clients_count)
     pending_clients_count = Payment.objects.filter(employee_id=employee_id, approved=False).count()
-    print(pending_clients_count)
 
     context = {
         'employee': employee,
         'profile_pic_url': profile_pic_url,
         # 'total_weekly_commission': total_weekly_commission,
         'clients': clients,
-        'all_clients': all_clients,
         'total_number_of_clients': total_number_of_clients,
         'total_approved_clients': total_approved_clients,
         'total_appending_clients': total_appending_clients,
@@ -499,42 +536,42 @@ def register(request):
     return render(request, 'realestates/registration/reg_form.html', {'form': form})
 
 
-def login_page(request):
-    if request.method == "POST":
-        form_login = EmployeeLoginForm(request, data=request.POST)
-        if form_login.is_valid():
-            username = form_login.cleaned_data.get('username')
-            password = form_login.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                if user.is_superuser:  # Check if user is admin
-                    # return redirect('admin_dashboard')  # Redirect admin to admin dashboard
-                    # print(user)
-                    # print(user.id)
-                    # messages.info(request, f"You are now logged in as {username}.")
-                    return redirect(reverse('realestates:admin_dashboard', args=[user.id]))
-                else:
-                    # messages.info(request, f"You are now logged in as {username}.")
-                    return redirect(reverse('realestates:employee_dashboard', args=[user.id]))
-            else:
-                messages.error(request, "Invalid username or password.")
-        else:
-            messages.error(request, "Invalid username or password.")
-    return login_form_(request, error_message='')
+# def login_page(request):
+#     if request.method == "POST":
+#         form_login = EmployeeLoginForm(request, data=request.POST)
+#         if form_login.is_valid():
+#             username = form_login.cleaned_data.get('username')
+#             password = form_login.cleaned_data.get('password')
+#             user = authenticate(username=username, password=password)
+#             if user is not None:
+#                 login(request, user)
+#                 if user.is_superuser:  # Check if user is admin
+#                     # return redirect('admin_dashboard')  # Redirect admin to admin dashboard
+#                     # print(user)
+#                     # print(user.id)
+#                     # messages.info(request, f"You are now logged in as {username}.")
+#                     return redirect(reverse('realestates:admin_dashboard', args=[user.id]))
+#                 else:
+#                     # messages.info(request, f"You are now logged in as {username}.")
+#                     return redirect(reverse('realestates:employee_dashboard', args=[user.id]))
+#             else:
+#                 messages.error(request, "Invalid username or password.")
+#         else:
+#             messages.error(request, "Invalid username or password.")
+#     return login_form_(request, error_message='')
 
 
-def login_form_(request, error_message=''):
-
-    form_login = EmployeeLoginForm()
-    company = Company.objects.get(id=1)
-    company_logo_url = company.company_logo.url
-
-    arg = {'form_login': form_login,
-           'error_message': error_message,
-           'company_logo_url': company_logo_url
-           }
-    return render(request, 'realestates/registration/login.html', arg)
+# def login_form_(request, error_message=''):
+#
+#     form_login = EmployeeLoginForm()
+#     company = Company.objects.get(id=1)
+#     company_logo_url = company.company_logo.url
+#
+#     arg = {'form_login': form_login,
+#            'error_message': error_message,
+#            'company_logo_url': company_logo_url
+#            }
+#     return render(request, 'realestates/registration/login.html', arg)
 
 
 def edit_user_profile_new(request):

@@ -28,18 +28,10 @@ DATABASES['default'] = dj_database_url.parse(database_url)
 
 settings = os.environ.get('DJANGO_SETTINGS_MODULE')
 
+# MEDIA_ROOT = '/home/opio/projects/management/web/centuryproperties/media/'  # for nginx
+# STATIC_ROOT = '/home/opio/projects/management/web/staticfiles/'  # for nginx
 
 if not DEBUG:
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
-
-
-# STORAGES = {
-#     "default": {
-#         "BACKEND": "django.core.files.storage.FileSystemStorage",
-#     },
-#     "staticfiles": {
-#         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-#     },
-# }
 

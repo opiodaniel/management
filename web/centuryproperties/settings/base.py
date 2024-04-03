@@ -115,6 +115,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
+print(BASE_DIR)
+print(WEB_DIR)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
