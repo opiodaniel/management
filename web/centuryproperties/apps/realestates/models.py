@@ -11,6 +11,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from datetime import datetime, timedelta
 from django.core.validators import MinLengthValidator
 
+
 class Company(TruncateTableMixin, models.Model):
     company_name = models.CharField(max_length=50, default='', blank=True)
     company_logo = models.ImageField(upload_to='company_logo/', blank=True, null=True,
