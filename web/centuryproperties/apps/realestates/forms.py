@@ -106,6 +106,8 @@ class UserEditForm(forms.ModelForm):
 
 
 class ProfileEditForm(forms.ModelForm):
+    date_of_birth = forms.CharField(widget=forms.TextInput(attrs={'type': 'date'}))
+
     class Meta:
         model = Employees
         fields = ('profile_pic', 'date_of_birth', 'short_bio', 'bio',

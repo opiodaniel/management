@@ -514,7 +514,7 @@ def email_message(semail, username,  type):
         # print("0044444444444444")
         email_from = 'noreply@drbaranes.com'
         subject = 'Registering in Century Properties & Real Estates Ltd'
-        body = 'You were registered. Temporal password: sql1pass and username: '+username+ ' date-format:1998-12-28 ' + 'Please login and Update/Edit your profile .' \
+        body = 'You were registered. Temporal password: sql1pass and username: '+username +' Please login and Update/Edit your profile .' \
                'https://centuryproperties.pythonanywhere.com/'
         # print("005555555555555")
 
