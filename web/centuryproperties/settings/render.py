@@ -4,7 +4,7 @@ from .base import *
 import dj_database_url
 
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
-
+# DEBUG = False
 ADMINS = (
     ('Opio Daniel', 'danielopio540@gmail.com'),
 )
@@ -28,8 +28,9 @@ DATABASES['default'] = dj_database_url.parse(database_url)
 
 settings = os.environ.get('DJANGO_SETTINGS_MODULE')
 
-# MEDIA_ROOT = '/home/opio/projects/management/web/centuryproperties/media/'  # for nginx
-# STATIC_ROOT = '/home/opio/projects/management/web/staticfiles/'  # for nginx
+MEDIA_ROOT = MEDIA_ROOT = '/home/opio/projects/management/web/centuryproperties/media/'
+
+
 
 if not DEBUG:
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
