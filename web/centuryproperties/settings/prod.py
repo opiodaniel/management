@@ -1,7 +1,7 @@
 from .base import *
 import dj_database_url
 
-DEBUG = True
+DEBUG = False
 
 ADMINS = (
     ('Opio Daniel', 'danielopio540@gmail.com'),
@@ -35,7 +35,7 @@ DATABASES = {
 #         'PORT': os.environ.get('DB_PORT', '5432'),
 #     }
 # }
-#
+
 #
 # if 'DATABASE_URL' in os.environ:
 #     DATABASES['default'] = dj_database_url.config(

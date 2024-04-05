@@ -1,0 +1,100 @@
+
+{% extends "base.html" %}
+{% load static %}
+{% load custom_filters %}
+
+
+    {% block title %}
+       Login
+    {% endblock %}
+
+
+    {% block add_css %}
+      <style>
+        body {
+              background: url("/static/images/bg.jpg") no-repeat center center
+                fixed;
+              -webkit-background-size: cover;
+              -moz-background-size: cover;
+              -o-background-size: cover;
+              background-size: cover;
+            }
+      </style>
+    {% endblock %}
+
+
+     <!-- Sign In Start -->
+     {% block container %}
+        <div class="container-fluid">
+            <div class="row h-100 align-items-center justify-content-center" style="min-height: 100vh;">
+                <div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+                    <form method="post" action="{% url 'realestates:login_page' %}">
+                        {% csrf_token %}
+                        <div class="bg-secondary rounded p-4 p-sm-5 my-4 mx-3">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <img src="{{ company_logo_url }}" style="border-radius: 60px;" width="120px" alt="logo">
+                                <h3>Sign In</h3>
+                            </div>
+                            {% if messages %}
+                            <div style="color:red">
+                              <strong>Message:</strong>
+                              {% for message in messages %}
+                              <ul>
+                                <li>{{message}}</li>
+                              </ul>
+                               {% endfor %}
+                            </div>
+                        {% endif %}
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="floatingInput" name="username" placeholder="acDantez" required>
+                                <label>Username</label>
+                            </div>
+                            <div class="form-floating mb-4">
+                                <input type="password" class="form-control" id="id_password" name="password" placeholder="Password" required>
+                                <label for="id_password">Password</label>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="togglePassword">
+                                    <label class="form-check-label" for="togglePassword">Show Password</label>
+                                </div>
+                                <!-- <a href="">Forgot Password</a> -->
+                            </div>
+                            <button type="submit" class="btn btn-primary py-3 w-100 mb-4">Sign In</button>
+                            <!-- <p class="text-center mb-0">Don't have an Account? <a href="">Sign Up</a></p> -->
+                            <p class="small mb-0" style="color:white;font-size:15px;">
+                                <span style="color:red;font-size:18px;">Services:</span><br> Buying & Selling Land, Land Surveying,
+                                Land Documentation (Process Land Titles ,Processing Land Registration, Land Caveats..
+                            </p>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+     {% endblock %}
+     <!-- Sign In End -->
+
+
+     {% block add_js %}
+      <script>
+        const togglePassword = document.querySelector("#togglePassword");
+        const password =  document.getElementById("id_password");
+
+        togglePassword.addEventListener("click", function () {
+            // toggle the type attribute
+
+            const type = password.getAttribute("type") === "password" ? "text" : "password";
+            password.setAttribute("type", type);
+
+            // toggle the icon
+            this.classList.toggle("form-check-input");
+        });
+
+        // prevent form submit
+        const form = document.querySelector("form");
+        form.addEventListener('submit', function (e) {
+            //e.preventDefault();
+        });
+      </script>
+     {% endblock %}
