@@ -21,6 +21,6 @@ class Command(BaseCommand):
         )
         print('===inactive_clients==', inactive_clients)
         # Delete inactive clients
-        inactive_clients.delete()
+        # inactive_clients.delete()
 
         self.stdout.write(self.style.SUCCESS('Inactive clients removed successfully.'))

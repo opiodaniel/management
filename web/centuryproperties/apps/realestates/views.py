@@ -222,8 +222,16 @@ def admin_dashboard(request, admin_id):
     employees = Employees.objects.filter(is_administrator=False)
 
     payments = Payment.objects.filter(approved=False).order_by('approved', '-client__date')
-    all_clients = Client.objects.all()
-    clients = Client.objects.all().count()
+
+    expiry_date = datetime.now().date() - timedelta(days=7)
+
+    # Filter clients who have not exceeded the expiry date
+    active_clients = Client.objects.filter(date__gte=expiry_date)
+
+    all_clients = active_clients
+
+    # all_clients = Client.objects.all()
+
     profile_pic_url = admin.profile_pic.url
 
     approved_clients = []
@@ -252,7 +260,6 @@ def admin_dashboard(request, admin_id):
         'employee': admin,
         'admin_id': admin_id,
         'profile_pic_url': profile_pic_url,
-        'clients': clients,
         'employees': employees,
         'payments': payments,
         'all_clients': all_clients,
@@ -301,16 +308,34 @@ def employee_dashboard(request, employee_id):
     total_number_of_clients = employee.total_clients()
     total_approved_clients = employee.total_approved_clients()
     total_appending_clients = employee.total_appending_clients()
+
+    expiry_date = datetime.now().date() - timedelta(days=7)
     clients = employee.client_employee.all()
+    expired_clients = employee.client_employee.filter(date__lt=expiry_date)
 
     approved_clients_count = Payment.objects.filter(employee_id=employee_id, approved=True).count()
     pending_clients_count = Payment.objects.filter(employee_id=employee_id, approved=False).count()
+
+    if request.method == 'POST' and 'reset_expired_clients' in request.POST:
+        # Reset the entry date of expired clients to the current date
+        client_id = request.POST.get('client_id')
+        # client = employee.client_employee.get(id=client_id)
+        client = Client.objects.get(id=client_id)
+        expiry_date = datetime.now().date() - timedelta(days=7)
+        if client.date < expiry_date:
+            # Update the client's date to the current date
+            client.date = datetime.now().date()
+            # Save the changes to the database
+            client.save()
+        return redirect(reverse('realestates:employee_dashboard', args=[request.user.id]))
 
     context = {
         'employee': employee,
         'profile_pic_url': profile_pic_url,
         # 'total_weekly_commission': total_weekly_commission,
         'clients': clients,
+        'expiry_date': expiry_date,
+        'expired_clients': expired_clients,
         'total_number_of_clients': total_number_of_clients,
         'total_approved_clients': total_approved_clients,
         'total_appending_clients': total_appending_clients,

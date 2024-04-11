@@ -2,7 +2,6 @@
 {% load static %}
 {% load custom_filters %}
 
-
         {% block title %}
           Distributor
         {% endblock %}
@@ -182,7 +181,7 @@
                 </div>
                 <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
                     <table class="table text-start align-middle table-bordered table-hover mb-0">
-                     <thead>
+                        <thead>
                             <tr class="text-success">
                                 <th scope="col">DateClientBrought</th>
                                 <th scope="col">Client</th>
@@ -190,34 +189,49 @@
                                 <th scope="col">PhoneNum2</th>
                                 <th scope="col">ClientLocation</th>
                                 <th scope="col">Amount</th>
-                                <th scope="col">Status</th>
+                                <th scope="col">PaymentStatus</th>
+                                <th scope="col">
+                                 Status
+                                </th>
                                 <th scope="col">Action</th>
-
                             </tr>
                         </thead>
-                     <tbody class="text-white card-link popupbtn1"  >
-                        {% for client in clients %}
-                                <tr>
-                                    <td>{{ client.date }}</td>
-                                    <td>{{ client.name }}</td>
-                                    <td>{{ client.phoneNumber1 }}</td>
-                                    <td>{{ client.phoneNumber2 }}</td>
-                                    <td>{{ client.location }}</td>
-                                    <!-- Loop through payments for the current client -->
-                                    {% for payment in client.client_payment.all %}
-                                        <td>{{ payment.amount_paid|add_commas }}</td>
-                                        <td>
-                                            {% if payment.approved %}<span class="btn-success btn-lg" style="padding:1px;font-size:12px">Approved</span>{% else %}<span class="btn-warning btn-lg" style="padding:1px;font-size:12px">Pending</span>{% endif %}
-                                        </td>
-                                    {% endfor %}
-
-                                    <td><button  type="button">
+                        <tbody class="text-white card-link popupbtn1">
+                            {% for client in clients %}
+                            <tr>
+                                <td>{{ client.date }}</td>
+                                <td>{{ client.name }}</td>
+                                <td>{{ client.phoneNumber1 }}</td>
+                                <td>{{ client.phoneNumber2 }}</td>
+                                <td>{{ client.location }}</td>
+                                <!-- Loop through payments for the current client -->
+                                {% for payment in client.client_payment.all %}
+                                <td>{{ payment.amount_paid|add_commas }}</td>
+                                <td>
+                                    {% if payment.approved %}<span class="btn-success btn-lg" style="padding:1px;font-size:12px">Approved</span>{% else %}<span class="btn-warning btn-lg" style="padding:1px;font-size:12px">Pending</span>{% endif %}
+                                </td>
+                                <td>
+                                    {% if client.date < expiry_date %}
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="client_id" value="{{ client.id }}">
+                                            <button type="submit" style="border-radius: 50%; width: 20px; height: 20px; font-size: 10px;margin-left:40px;background-color:red;" name="reset_expired_clients">R</button>
+                                        </form>
+                                        <span class="btn-danger btn-lg" style="padding:1px;font-size:12px">Expired</span>
+                                    {% else %}
+                                        <span class="btn-success btn-lg" style="padding:1px;font-size:12px">Active</span>
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                                <td>
+                                    <button type="button">
                                         <a href="{% url 'realestates:edit_client' client.id %}">
-                                            <span class="btn btn-sm btn-primary">Edit</span></a></button></td>
-
-                                </tr>
-                        {% endfor %}
-
+                                            <span class="btn btn-sm btn-primary">Edit</span>
+                                        </a>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -225,7 +239,6 @@
         </div>
         <!-- Recent Sales End -->
         {% endblock %}
-
 
         <!-- Footer Start -->
         {% block footer %}
