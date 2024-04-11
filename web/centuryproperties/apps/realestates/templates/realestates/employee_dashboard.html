@@ -191,6 +191,8 @@
                                 <th scope="col">ClientLocation</th>
                                 <th scope="col">Amount</th>
                                 <th scope="col">Status</th>
+                                <th scope="col">Action</th>
+
                             </tr>
                         </thead>
                      <tbody class="text-white card-link popupbtn1"  >
@@ -208,6 +210,10 @@
                                             {% if payment.approved %}<span class="btn-success btn-lg" style="padding:1px;font-size:12px">Approved</span>{% else %}<span class="btn-warning btn-lg" style="padding:1px;font-size:12px">Pending</span>{% endif %}
                                         </td>
                                     {% endfor %}
+
+                                    <td><button  type="button">
+                                        <a href="{% url 'realestates:edit_client' client.id %}">
+                                            <span class="btn btn-sm btn-primary">Edit</span></a></button></td>
 
                                 </tr>
                         {% endfor %}

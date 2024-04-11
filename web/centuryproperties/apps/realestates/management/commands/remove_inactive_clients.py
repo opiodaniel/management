@@ -10,7 +10,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         # Calculate the cutoff date (e.g., clients who haven't made a payment in the last 30 days)
-        cutoff_date = timezone.now() - timedelta(days=30)
+        cutoff_date = timezone.now() - timedelta(days=7)
 
         print('===inside commands cutoff_date===', cutoff_date)
 

@@ -50,6 +50,25 @@ class ClientForm(forms.ModelForm):
         return phone_number2
 
 
+class ClientEditForm(forms.ModelForm):
+    class Meta:
+        model = Client
+        fields = ('name', 'phoneNumber1', 'phoneNumber2', 'location')
+
+    def clean_phoneNumber1(self):
+        phoneNumber1 = self.cleaned_data['phoneNumber1']
+        if Client.objects.exclude(id=self.instance.id).filter(phoneNumber1=phoneNumber1).exists():
+            raise forms.ValidationError("Phone number already exists.")
+        return phoneNumber1
+
+    def clean_phoneNumber2(self):
+        phoneNumber2 = self.cleaned_data['phoneNumber2']
+        if phoneNumber2:  # Only validate if phoneNumber2 is provided
+            if Client.objects.exclude(id=self.instance.id).filter(phoneNumber2=phoneNumber2).exists():
+                raise forms.ValidationError("Phone number already exists.")
+        return phoneNumber2
+
+
 class EmployeeLoginForm(AuthenticationForm):
     username = forms.CharField(label='Username', max_length=100)
     password = forms.CharField(label='Password', widget=forms.PasswordInput)

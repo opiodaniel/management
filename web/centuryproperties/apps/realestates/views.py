@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User,auth
 
 from .models import Client, Employees, Payment, MonthlyTotal, TotalAmount, Company
-from .forms import ClientForm, EmployeeLoginForm, RegistrationForm, ProfileEditForm, UserEditForm
+from .forms import ClientForm, ClientEditForm, EmployeeLoginForm, RegistrationForm, ProfileEditForm, UserEditForm
 
 from django.contrib.auth import authenticate, login
 
@@ -17,7 +17,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.core.mail import send_mail
 
 from datetime import date
-
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .utils import total_amount_today
 from .tasks import remove_inactive_clients
 
@@ -40,6 +40,7 @@ from .models import EmployeePaymentRecord
 from django.db import transaction
 from django.contrib.auth import logout
 from django.views.generic import View
+from django import forms
 
 
 def login_page(request):
@@ -507,6 +508,22 @@ def add_client(request):
     else:
         form = ClientForm()
     return render(request, 'realestates/add_client.html', {'form': form})
+
+
+def UpdateClient(request, pk):
+
+    client_info = get_object_or_404(Client, id=pk)
+
+    if request.method == 'POST':
+        client_form = ClientEditForm(data=request.POST, instance=client_info)
+        if client_form.is_valid():
+            client_form.save()
+            return redirect(reverse('realestates:employee_dashboard', args=[request.user.id]))
+    else:
+        # Populate forms with existing data
+        client_form = ClientEditForm(instance=client_info)
+
+    return render(request, 'realestates/edit_client.html', {'form': client_form})
 
 
 def email_message(semail, username,  type):

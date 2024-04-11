@@ -6,9 +6,16 @@
   <component name="ChangeListManager">
     <list default="true" id="7ade2d30-b4b6-48a2-aae7-98d6d1f3da59" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/registration/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/registration/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/management/commands/remove_inactive_clients.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/management/commands/remove_inactive_clients.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/employee_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/employee_dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/asgi.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/asgi.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/centuryproperties/settings/prod.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/settings/prod.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/centuryproperties/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/wsgi.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/wsgi.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,7 +47,7 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/opio/projects/management/web/centuryproperties/apps/realestates/templates/realestates/registration&quot;
+    &quot;last_opened_file_path&quot;: &quot;/home/opio/projects/management/web/centuryproperties/apps/realestates/templates/realestates&quot;
   }
 }</component>
   <component name="RecentsManager">
