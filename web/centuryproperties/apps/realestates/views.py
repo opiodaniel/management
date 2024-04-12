@@ -122,6 +122,8 @@ def get_total_sales_for_previous_months(request):
 
 @login_required
 def admin_dashboard(request, admin_id):
+    DEfault_thresholdInput1 = 50
+    DEfault_thresholdInput = 0
 
     if request.method == 'POST':
         print(1234)
@@ -272,6 +274,8 @@ def admin_dashboard(request, admin_id):
         'total_amount_month': total_amount_month,
         'total_sales_previous_months_sum': total_sales_previous_months_sum,
         'monthly_data': monthly_data,
+        "DEfault_thresholdInput1": DEfault_thresholdInput1,
+        "DEfault_thresholdInput":  DEfault_thresholdInput,
     }
     return render(request, 'realestates/admin_dashboard.html', context)
 
