@@ -10,6 +10,37 @@
 <!--         <link type="text/css" rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}"/>-->
          <script src="{% static 'js/jquery-3.3.1.js' %}"></script>
          <script src="{% static 'js/bootstrap.min.js' %}"></script>
+         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <style>
+            table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+
+                    th, td {
+                        padding: 8px;
+                        border: 1px solid black;
+                    }
+
+                    /* Truncate long text and display ellipsis */
+                    .truncate {
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+
+                    /* Responsive styles */
+                    @media screen and (max-width: 600px) {
+                        th, td {
+                            padding: 4px;
+                        }
+
+                        .truncate {
+                                max-width: 90px; /* Adjust max-width as needed */
+                            }
+                    }
+        </style>
+
        {% endblock %}
 
         <!-- Sidebar Start -->
@@ -184,6 +215,7 @@
         <!-- Monthly Sales  End -->
 
         <!-- Graph of Approved/pending Detail  -->
+         <!--
          <div class="container-fluid pt-4 px-4">
             <div class="row g-4">
                 <div class="col-sm-12 col-xl-6">
@@ -203,7 +235,93 @@
 
             </div>
         </div>
+         -->
         <!-- Graph of Approved/pending Detail End -->
+
+
+        <!-- Graph of Approved/pending Detail  -->
+        <!--
+         <div class="container-fluid pt-4 px-4">
+            <div class="row g-4">
+                 <div class="col-sm-12 col-xl-6">
+                    <div class="bg-secondary rounded h-100 p-4">
+                        <h6 class="mb-4">Total number clients brought by each Distributor</h6>
+                        <canvas id="clientChart2" width="400" height="200"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        -->
+        <!-- Graph of Approved/pending Detail End -->
+
+
+        <!-- Graph of Approved/pending Detail  -->
+         <div class="container-fluid pt-4 px-4">
+            <div class="row g-4">
+
+<!--                <div class="col-sm-12 col-xl-4">-->
+<!--                    <div class="bg-secondary text-center rounded p-4">-->
+<!--                        <div class="d-flex align-items-center justify-content-between mb-4">-->
+<!--                            <h6 class="mb-0">Approved/pending Detail for each Distributor</h6>-->
+<!--                        </div>-->
+<!--                        <canvas id="clientChart3" width="400" height="200"></canvas>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                <div class="col-sm-12 col-xl-6">-->
+<!--                    <div class="bg-secondary text-center rounded p-4">-->
+<!--                        <div class="d-flex align-items-center justify-content-between mb-4">-->
+<!--                            <h6 class="mb-0">Approved/pending Detail for each Distributor</h6>-->
+<!--                        </div>-->
+<!--                        <canvas id="clientChart" width="400" height="200"></canvas>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+                <div class="col-sm-12 col-xl-6">
+                    <div class="bg-secondary text-center rounded p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-4">
+                            <h6 class="mb-0">Approval Rate Analysis</h6>
+                        </div>
+                        <canvas id="lineChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+
+                 <div class="col-sm-12 col-xl-6">
+                    <div class="bg-secondary rounded h-100 p-4">
+                        <h6 class="mb-4">Total number clients brought by each Distributor</h6>
+                        <canvas id="employeeChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Graph of Approved/pending Detail End -->
+
+        <!-- client table data -->
+        <div class="container-fluid pt-4">
+            <div class="bg-danger text-center rounded p-4">
+                <h6 class="mb-3">Performance</h6>
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                </div>
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table >
+                        <thead>
+                            <tr class="text-dark">
+                                <th scope="col">Name</th>
+                                <th scope="col">Clients</th>
+                                <th scope="col"><i class="fas fa-check-circle" style='font-size:25px'></i></th>
+                                <th scope="col"><i class='fas fa-question-circle' style='font-size:25px'></i></th>
+                                <th scope="col">A-Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-white" id="employeeTableBody">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+       </div>
+        <!-- client table data End  -->
 
         <!-- client table data -->
         <div class="container-fluid pt-4 px-4">
@@ -220,9 +338,9 @@
                                 <th scope="col">DateClientBrought</th>
                                 <th scope="col">DistributorName</th>
                                 <th scope="col">ClientName</th>
-                                <th scope="col">PhoneNumber1</th>
-                                <th scope="col">PhoneNumber2</th>
-                                <th scope="col">ClientLocation</th>
+                                <th scope="col">contact1</th>
+                                <th scope="col">contact2</th>
+                                <th scope="col">Location</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">ApprovePayment</th>
                             </tr>
@@ -436,15 +554,280 @@
         </script>
        <!--  amount comas    -->
        <script>
-    function formatAmount(input) {
-        // Remove existing commas and non-numeric characters from the input
-        let value = input.value.replace(/[^\d]/g, '');
+            function formatAmount(input) {
+                // Remove existing commas and non-numeric characters from the input
+                let value = input.value.replace(/[^\d]/g, '');
 
-        // Add commas to the value
-        value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                // Add commas to the value
+                value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-        // Update the input value
-        input.value = value;
-    }
+                // Update the input value
+                input.value = value;
+            }
     </script>
+
+      <!-- last graph -->
+        <script>
+            fetch("{% url 'realestates:employees_client' %}")
+                  .then(response => response.json())
+                  .then(data => {
+                    // Extract employee data and format it for the chart
+                    const employeeData = Object.entries(data).map(([employee, employeeData]) => ({
+                      employee: employee,
+                      approvedClients: employeeData.approved_clients,
+                      appendingClients: employeeData.appending_clients
+                    }));
+
+                    // Extract employee names and client data
+                    const employeeNames = employeeData.map(entry => entry.employee);
+                    const approvedClients = employeeData.map(entry => entry.approvedClients);
+                    const appendingClients = employeeData.map(entry => entry.appendingClients);
+
+                    // Create a new Chart instance
+                    const ctx = document.getElementById('clientChart2').getContext('2d');
+                    const myChart = new Chart(ctx, {
+                      type: 'bar',
+                      data: {
+                        labels: employeeNames,
+                        datasets: [{
+                          label: 'Approved Clients',
+                          backgroundColor: 'blue',
+                          data: approvedClients
+                        }, {
+                          label: 'Appending Clients',
+                          backgroundColor: 'green',
+                          data: appendingClients
+                        }]
+                      },
+                      options: {
+                        indexAxis: 'y',
+                        plugins: {
+                          legend: {
+                            position: 'right'
+                          }
+                        }
+                      }
+                    });
+                  });
+
+        </script>
+        <script>
+           fetch("{% url 'realestates:employees_client' %}")
+              .then(response => response.json())
+              .then(data => {
+                // Extract employee data and format it for the chart
+                const employeeData = Object.entries(data).map(([employee, employeeData]) => ({
+                  employee: employee,
+                  approvedClients: employeeData.approved_clients,
+                  appendingClients: employeeData.appending_clients
+                }));
+
+                // Extract employee names and client data
+                const employeeNames = employeeData.map(entry => entry.employee);
+                const approvedClients = employeeData.map(entry => entry.approvedClients);
+                const appendingClients = employeeData.map(entry => entry.appendingClients);
+
+                // Create a new Chart instance
+                const ctx = document.getElementById('clientChart').getContext('2d');
+                const myChart = new Chart(ctx, {
+                  type: 'bar',
+                  data: {
+                    labels: employeeNames,
+                    datasets: [{
+                      label: 'Approved Clients',
+                      backgroundColor: "RGB(0, 195, 0)",
+                      data: approvedClients
+                    }, {
+                      label: 'Appending Clients',
+                      backgroundColor: "rgb(255, 234, 0)",
+                      data: appendingClients
+                    }]
+                  },
+                  options: {
+                    scales: {
+                      x: {
+                        stacked: true
+                      },
+                      y: {
+                        stacked: true
+                      }
+                    }
+                  }
+                });
+              });
+
+        </script>
+
+      <!-- pie-chart   -->
+       <script>
+       fetch("{% url 'realestates:employees_client' %}")
+              .then(response => response.json())
+              .then(data => {
+                // Extract employee data and format it for the chart
+                const employeeData = Object.entries(data).map(([employee, employeeData]) => ({
+                  employee: employee,
+                  totalClients: employeeData.approved_clients + employeeData.appending_clients
+                }));
+
+                // Extract employee names and total number of clients
+                const employeeNames = employeeData.map(entry => entry.employee);
+                const totalClients = employeeData.map(entry => entry.totalClients);
+
+                // Create a new Chart instance
+                const ctx = document.getElementById('clientChart3').getContext('2d');
+                const myChart = new Chart(ctx, {
+                  type: 'pie',
+                  data: {
+                    labels: employeeNames,
+                    datasets: [{
+                      label: 'Total Clients',
+                      backgroundColor: ['#ff9999', '#66b3ff', '#99ff99', '#ffcc99', '#c2c2f0'], // Add more colors as needed
+                      data: totalClients
+                    }]
+                  }
+                });
+              });
+       </script>
+
+     <!-- clients brought -->
+       <script>
+        fetch("{% url 'realestates:employees_client' %}")
+        .then(response => response.json())
+            .then(data => {
+                // Extract employee names and client counts from the fetched data
+                const employeeNames = Object.keys(data);
+                const clientCounts = employeeNames.map(employee => data[employee].clients.length);
+
+                // Create a line chart
+                const ctx = document.getElementById('employeeChart').getContext('2d');
+                const myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: employeeNames,
+                        datasets: [{
+                            label: 'Total Clients Brought',
+                            data: clientCounts,
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Total Clients Brought'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Employee'
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+        </script>
+     <!-- Approval rate table -->
+        <script>
+        // Fetch data from the server
+        fetch("{% url 'realestates:employees_client' %}")
+             .then(response => response.json())
+            .then(data => {
+                // Extract and sort employee data by performance and approval rate
+                const sortedEmployees = Object.entries(data);
+
+                // Populate table body with employee information
+                const tableBody = document.getElementById('employeeTableBody');
+                sortedEmployees.forEach(([employee, performanceData]) => {
+                    const totalClientsBrought = performanceData.clients.length;
+                    const approvedClients = performanceData.approved_clients;
+                    const pendingClients = performanceData.appending_clients;
+                    const approvalRate = approvedClients > 0 ? ((approvedClients / totalClientsBrought) * 100).toFixed(0) + '%' : '0%';
+
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                        <td class="truncate">${employee}</td>
+                        <td>${totalClientsBrought}</td>
+                        <td>${approvedClients}</td>
+                        <td>${pendingClients}</td>
+                        <td>${approvalRate}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+        </script>
+     <!-- Approval rate graph -->
+       <script>
+           // Fetch data from the server
+            fetch("{% url 'realestates:employees_client' %}")
+                .then(response => response.json())
+                .then(data => {
+                    // Extract and sort employee data by performance and approval rate
+                    const sortedEmployees = Object.entries(data);
+
+                    // Initialize arrays to store employee names and approval rates
+                    const employeeNames = [];
+                    const approvalRates = [];
+
+                    // Populate arrays with employee names and approval rates
+                    sortedEmployees.forEach(([employee, performanceData]) => {
+                        const totalClientsBrought = performanceData.clients.length;
+                        const approvedClients = performanceData.approved_clients;
+                        //const approvalRate = approvedClients > 0 ? (approvedClients / totalClientsBrought) * 100 : 0;
+                        const approvalRate = approvedClients > 0 ? ((approvedClients / totalClientsBrought) * 100).toFixed(0) : 0;
+
+                        employeeNames.push(employee);
+                        approvalRates.push(approvalRate);
+                    });
+
+                    // Create line chart using Chart.js
+                    const ctx = document.getElementById('lineChart').getContext('2d');
+                    const lineChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: employeeNames,
+                            datasets: [{
+                                label: 'Approval Rate',
+                                data: approvalRates,
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)', // Adjust colors as needed
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Approval Rate (%)'
+                                    }
+                                },
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Distributor'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+
+       </script>
        {% endblock %}
