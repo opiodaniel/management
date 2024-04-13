@@ -125,8 +125,13 @@ def admin_dashboard(request, admin_id):
     DEfault_thresholdInput1 = 50
     DEfault_thresholdInput = 0
 
-    if request.method == 'POST':
-        print(1234)
+    if request.method == 'POST' and 'confirm_client_payment' in request.POST:
+        # Reset the entry date of expired clients to the current date
+        client_id = request.POST.get('client_id')
+        # client = employee.client_employee.get(id=client_id)
+        client = Client.objects.get(id=client_id)
+        print(client)
+        return redirect(reverse('realestates:employee_dashboard', args=[request.user.id]))
 
     authenticated_admin = request.user.id
 

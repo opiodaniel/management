@@ -198,7 +198,7 @@
                                             <td>{{ md.client.phoneNumber2 }}</td>
                                             <td>{{ md.client.location }}</td>
                                             <td>{{ md.client.employee }}</td>
-                                            <td>Mr.{{ md.approved_by }}</td>
+                                            <td>{{ md.approved_by }}</td>
                                           </tr>
                                          {% endfor %}
                                     </table>
@@ -312,7 +312,7 @@
                 <div class="d-flex align-items-center justify-content-between mb-4">
                 </div>
                 <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-                    <table >
+                    <table>
                         <thead>
                             <tr class="text-dark">
                                 <th scope="col">Name</th>
@@ -340,17 +340,18 @@
                     <input style="margin-right:1100px" size="40" type="number" id="searchInput" placeholder="client phone number...">
                 </div>
                 <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-                    <table class="table text-start align-middle table-bordered table-hover mb-0 search-table">
+                    <!--<table class="table text-start align-middle table-bordered table-hover mb-0 search-table"> -->
+                    <table class="search-table">
                         <thead>
                             <tr class="text-success">
-                                <th scope="col">DateClientBrought</th>
-                                <th scope="col">DistributorName</th>
-                                <th scope="col">ClientName</th>
+                               <!-- <th scope="col">DateClientBrought</th>-->
+                               <!--  <th scope="col">DistributorName</th>-->
+                               <!--  <th scope="col">Name</th>-->
                                 <th scope="col">contact1</th>
-                                <th scope="col">contact2</th>
-                                <th scope="col">Location</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">ApprovePayment</th>
+                               <!--  <th scope="col">contact2</th>-->
+                                <!-- <th scope="col">Location</th>-->
+                                <!-- <th scope="col">Status</th>-->
+                                <th scope="col">Payment</th>
                             </tr>
                         </thead>
                         <tbody class="text-white">
@@ -358,27 +359,23 @@
                                 {% for payment in client.client_payment.all %}
                                    {% if not payment.approved %}
                                    <tr>
-                                        <td>{{ client.date }}</td>
-                                        <td>{{ client.employee }}</td>
-                                        <td>{{ client.name }}</td>
+                                       <!-- <td>{{ client.date }}</td>-->
+                                        <!-- <td>{{ client.employee }}</td>-->
+                                        <!-- <td>{{ client.name }}</td>-->
                                         <td>{{ client.phoneNumber1 }}</td>
-                                        <td>{{ client.phoneNumber2 }}</td>
-                                        <td>{{ client.location }}</td>
-                                        <td><span class="btn-warning btn-lg" style="padding:1px;font-size:12px">pending</span></td>
+                                        <!--<td>{{ client.phoneNumber2 }}</td>-->
+                                        <!-- <td>{{ client.location }}</td>-->
+                                        <!-- <td><span class="btn-warning btn-lg" style="padding:1px;font-size:12px">pending</span></td>-->
                                          <td>
-                                            <!-- Form to approve payment -->
-
                                             <form action="{% url 'realestates:approve_payment' payment.id %}" method="post">
                                                 {% csrf_token %}
-                                                <button class="btn btn-sm btn-primary" type="submit">Approve Payment</button>
+                                                <button class="btn btn-sm btn-primary" type="submit">Approve</button>
                                             </form>
-                                         <!--
-                                         <form method="post">
-                                            {% csrf_token %}
-
-                                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal">Archive Offerings</button>
-
-                                        </form> -->
+                                             <!--<form method="post">-->
+                                              <!--  {% csrf_token %}-->
+                                               <!-- <input type="hidden" name="client_id" value="{{ client.id }}">-->
+                                              <!--  <button type="button" client-id="{{ client.id }}" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal" name="confirm_client_payment">Archive</button>-->
+                                           <!-- </form>-->
                                          </td>
                                    </tr>
 

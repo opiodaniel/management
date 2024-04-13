@@ -14,11 +14,6 @@
 <body>
     <div class="container bg-dark" style="color:white">
         <div class="dashboard-container">
-            <div class="row">
-                <div class="col-md-4">
-<!--                    <h3 style="color:blue;margin-top:50px;">Register new Employee</h3>-->
-                </div>
-            </div>
             <div class="row mt-4">
                 <div class="col-md-12">
                     <div class="shadow p-4 wb-5 bg-body rounded" >
@@ -33,7 +28,31 @@
                             </form>
                     </div>
                 </div>
-
+               <div class="col-md-12">
+                    <div class="shadow p-4 wb-5 bg-body rounded" >
+                        <h3 style="margin-bottom:15px">Client Detail</span></h3>
+                            <table class="table table-striped table-dark">
+                                  <tbody>
+                                    <tr>
+                                      <th scope="col">Name</th>
+                                      <td>{{client}}</td>
+                                    </tr>
+                                    <tr>
+                                      <th scope="col">Contact1</th>
+                                      <td>{{ client.phoneNumber1 }}</td>
+                                    </tr>
+                                    <tr>
+                                      <th scope="col">Contact2</th>
+                                      <td>{{ client.phoneNumber2 }}</td>
+                                    </tr>
+                                    <tr>
+                                      <th scope="col">Location</th>
+                                      <td>{{ client.location }}</td>
+                                    </tr>
+                                  </tbody>
+                            </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
