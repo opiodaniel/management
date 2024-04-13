@@ -86,20 +86,20 @@
                         <table class="table text-start align-middle table-bordered table-hover mb-0 search-table">
                             <thead>
                                 <tr class="text-success">
-                                    <th scope="col">EmployeeName</th>
-                                    <th scope="col">CommissionEarned</th>
-                                    <th scope="col">Paid</th>
-                                    <th scope="col">Balance</th>
-                                    <th scope="col">ApprovePayment</th>
+                                    <th scope="col">Name</th>
+                                    <!--<th scope="col"><i class="fas fa-hand-holding-usd"></i></th>-->
+                                    <!--<th scope="col">Paid</th>-->
+                                    <!--<th scope="col">Balance</th>-->
+                                    <th scope="col">Payment</th>
                                 </tr>
                             </thead>
                             <tbody class="text-white">
                                 {% for e in all_employee_payment_record %}
                                 <tr>
                                     <td>{{e.employee}}</td>
-                                    <td>{{e.total_commission|add_commas }}</td>
-                                    <td>{{e.amount_paid|add_commas }}</td>
-                                    <td>{{e.balance|add_commas }}</td>
+                                    <!--<td>{{e.total_commission|add_commas }}</td>-->
+                                    <!--<td>{{e.amount_paid|add_commas }}</td>-->
+                                    <!--<td>{{e.balance|add_commas }}</td>-->
                                     <td>
                                         {% if not e.approved %}
                                         <form action="{% url 'realestates:approve_employee_payment' e.id%}" method="post">

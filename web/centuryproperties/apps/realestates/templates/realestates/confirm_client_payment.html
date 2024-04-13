@@ -14,9 +14,9 @@
 <body>
     <div class="container bg-dark" style="color:white">
         <div class="dashboard-container">
-            <div class="row mt-4">
+            <div class="row mt-2">
                 <div class="col-md-12">
-                    <div class="shadow p-4 wb-5 bg-body rounded" >
+                    <div class="shadow p-2 wb-5 bg-body rounded" >
                         <h6 style="color:red">{{message}}</h6>
                         <h3 style="margin-bottom:15px">Confirming the payment for <span class="text-success">{{client}}</span></h3>
                             <form action="{% url 'realestates:confirm_payment' payment_client_id %}" method="post">

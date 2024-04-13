@@ -325,7 +325,7 @@
                                     }
                                 });
 
-                                // Approved/Appending Graph //
+                                // Approved/Pending Graph //
 
                                 var ctx1 = $("#worldwide-sales").get(0).getContext("2d");
                                 var myChart1 = new Chart(ctx1, {
@@ -338,7 +338,7 @@
                                                 backgroundColor: "RGB(0, 195, 0)"
                                             },
                                             {
-                                                label: "Appending",
+                                                label: "Pending",
                                                 data: appending_clients,
                                                 backgroundColor: "rgb(255, 234, 0)"
                                             }
@@ -362,7 +362,7 @@
 
                 if ($("#transaction-history").length) {
                   var areaData = {
-                    labels: ["Approved","Appending"],
+                    labels: ["Approved","Pending"],
                     datasets: [{
                         data: [totalApprovedClients, totalAppendingClients],
                         backgroundColor: [

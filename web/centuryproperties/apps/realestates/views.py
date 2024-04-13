@@ -478,9 +478,12 @@ def pay_employee(request):
 def approve_employee_payment(request, employee_id):
     employee_id_ = employee_id
     employee = Employees.objects.get(id=employee_id)
+    employee_payment_record = EmployeePaymentRecord.objects.get(employee=employee)
+    print(employee_payment_record.total_commission)
     context = {
         'employee_id': employee_id_,
         'employee': employee,
+        'employee_payment_record': employee_payment_record,
     }
     return render(request, 'realestates/confirm_employee_payment.html', context)
 

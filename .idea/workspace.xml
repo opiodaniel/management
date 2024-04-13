@@ -6,7 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="7ade2d30-b4b6-48a2-aae7-98d6d1f3da59" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/confirm_client_payment.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/confirm_client_payment.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/confirm_employee_payment.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/confirm_employee_payment.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/employee_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/employee_dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/pay_employee.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/pay_employee.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
