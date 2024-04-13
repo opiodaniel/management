@@ -6,6 +6,7 @@
           Distributor
         {% endblock %}
 
+
         <!-- Sidebar Start -->
         {% block Sidebar %}
          <nav class="navbar bg-secondary navbar-dark">
@@ -183,32 +184,32 @@
                     <table class="table text-start align-middle table-bordered table-hover mb-0">
                         <thead>
                             <tr class="text-success">
-                                <th scope="col">DateClientBrought</th>
+                                <!--<th scope="col">DateClientBrought</th>-->
                                 <th scope="col">Client</th>
-                                <th scope="col">PhoneNum1</th>
-                                <th scope="col">PhoneNum2</th>
-                                <th scope="col">ClientLocation</th>
-                                <th scope="col">Amount</th>
-                                <th scope="col">PaymentStatus</th>
+                                <!--<th scope="col">PhoneNum1</th>-->
+                                <!--<th scope="col">PhoneNum2</th>-->
+                                <!--<th scope="col">ClientLocation</th>-->
+                                <!--<th scope="col">Amount</th>-->
+                                <th scope="col"><i class="fas fa-hand-holding-usd"></i></th>
                                 <th scope="col">
                                  Status
                                 </th>
-                                <th scope="col">Action</th>
+                                <th scope="col">Edit</th>
                             </tr>
                         </thead>
                         <tbody class="text-white card-link popupbtn1">
                             {% for client in clients %}
                             <tr>
-                                <td>{{ client.date }}</td>
+                                <!--<td>{{ client.date }}</td>-->
                                 <td>{{ client.name }}</td>
-                                <td>{{ client.phoneNumber1 }}</td>
-                                <td>{{ client.phoneNumber2 }}</td>
-                                <td>{{ client.location }}</td>
+                                <!--<td>{{ client.phoneNumber1 }}</td>-->
+                                <!--<td>{{ client.phoneNumber2 }}</td>-->
+                                <!--<td>{{ client.location }}</td>-->
                                 <!-- Loop through payments for the current client -->
                                 {% for payment in client.client_payment.all %}
-                                <td>{{ payment.amount_paid|add_commas }}</td>
+                                <!--<td>{{ payment.amount_paid|add_commas }}</td>-->
                                 <td>
-                                    {% if payment.approved %}<span class="btn-success btn-lg" style="padding:1px;font-size:12px">Approved</span>{% else %}<span class="btn-warning btn-lg" style="padding:1px;font-size:12px">Pending</span>{% endif %}
+                                    {% if payment.approved %}<span class="btn-success btn-lg" style="padding:1px;font-size:12px"><i class="fas fa-check-circle"></i></span>{% else %}<span class="btn-warning btn-lg" style="padding:1px;font-size:12px"><i class="fas fa-question-circle"></i></span>{% endif %}
                                 </td>
                                 <td>
                                     {% if client.date < expiry_date %}
@@ -224,9 +225,9 @@
                                 </td>
                                 {% endfor %}
                                 <td>
-                                    <button type="button">
+                                    <button type="button" style="border-radius: 50%; width: 30px; height: 30px; font-size: 10px;">
                                         <a href="{% url 'realestates:edit_client' client.id %}">
-                                            <span class="btn btn-sm btn-primary">Edit</span>
+                                           <i class="fas fa-edit" style="padding:1px;font-size:12px"></i>
                                         </a>
                                     </button>
                                 </td>
