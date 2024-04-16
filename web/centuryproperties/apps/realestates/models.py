@@ -11,6 +11,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from datetime import datetime, timedelta
 from django.core.validators import MinLengthValidator
 from django.urls import reverse
+from django.db.models import F
 
 
 class Company(TruncateTableMixin, models.Model):
@@ -55,6 +56,7 @@ class Employees(TruncateTableMixin, models.Model):
         clients = Payment.objects.filter(
             client__employee=self,
             approved=True,
+            client__client_payment__remaining_amount=0,
             timestamp__range=[start_of_week, end_of_week]
         ).order_by('timestamp')  # Sort by timestamp to ensure correct ordering
 
@@ -158,13 +160,41 @@ class Client(TruncateTableMixin, models.Model):
 class Payment(TruncateTableMixin, models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name="client_payment")
     amount_paid = models.IntegerField(default=0)
+    total_amount = models.IntegerField(default=0)
+    remaining_amount = models.IntegerField(default=0)
+    installment_number = models.PositiveIntegerField(default=1)
+    total_installments = models.PositiveIntegerField(default=1)
+    installment_date = models.DateField(auto_now_add=True, null=True)
     approved = models.BooleanField(default=False)
     approved_by = models.ForeignKey(Employees, on_delete=models.CASCADE, related_name='approved_payments', null=True)
     employee = models.ForeignKey(Employees, on_delete=models.CASCADE, related_name='employee_payments', null=True)
     timestamp = models.DateField(auto_now_add=True, null=True)
 
+    # def save(self, *args, **kwargs):
+    #     if self.total_installments > 1:
+    #         self.remaining_amount = self.total_amount - self.amount_paid
+    #         if self.amount_paid == self.total_amount:
+    #             self.approved = True
+    #     super().save(*args, **kwargs)
+
+    # def save(self, *args, **kwargs):
+    #     if self.total_installments > 1:
+    #         # Update remaining_amount based on the current amount_paid and the previous remaining_amount
+    #         self.remaining_amount = F('remaining_amount') - self.amount_paid
+    #
+    #         # Update total_amount if necessary (e.g., if the client increases the total amount)
+    #         if self.amount_paid > self.total_amount:
+    #             pass
+    #             # self.total_amount = self.amount_paid
+    #
+    #         # Mark payment as approved if fully paid
+    #         if self.remaining_amount == 0:
+    #             self.approved = True
+    #
+    #     super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"Payment for {self.client.name}"
+        return self.client.name
 
 
 class EmployeePaymentRecord(TruncateTableMixin, models.Model):

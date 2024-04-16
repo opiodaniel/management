@@ -6,7 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="7ade2d30-b4b6-48a2-aae7-98d6d1f3da59" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/admin_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/admin_dashboard.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/confirm_client_payment.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/confirm_client_payment.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,6 +54,7 @@
       <recent name="$PROJECT_DIR$/web/centuryproperties/static/assets/css" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates" />
       <recent name="$PROJECT_DIR$/web/centuryproperties" />
       <recent name="$PROJECT_DIR$/web" />
       <recent name="$PROJECT_DIR$/web/centuryproperties/static/assets" />

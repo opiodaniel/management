@@ -396,12 +396,21 @@ def approve_payment(request, client_id):
 @transaction.atomic
 def confirm_payment(request, client_id):
     if request.method == 'POST':
-        # Get the amount paid from the form data
+        client = Client.objects.get(id=client_id)
         amount_paid_str = request.POST.get('amount_paid', '0').replace(',', '')  # Remove commas
+        total_amount_str = request.POST.get('total_amount', '0').replace(',', '')  # Remove commas
         amount_paid = int(amount_paid_str)
-        if amount_paid <= 0:
+        total_amount = int(total_amount_str)
+        if amount_paid <= 0 or total_amount <= 0:
             message = 'You must enter a valid positive amount.'
-            return render(request, 'realestates/confirm_client_payment.html', {'payment_client_id': client_id, 'message':message})
+            return render(request, 'realestates/confirm_client_payment.html',
+                          {'payment_client_id': client_id, 'message': message, 'client': client})
+
+        if amount_paid > total_amount:
+            message = 'Amount paid cannot be greater than the Expected amount.'
+            return render(request, 'realestates/confirm_client_payment.html',
+                          {'payment_client_id': client_id, 'message': message, 'client': client})
+
         else:
             # Assuming the request.user is the user making the request
             current_user = request.user
@@ -429,11 +438,25 @@ def confirm_payment(request, client_id):
 
                 # Update the approved field of the client's payment
                 payment = Payment.objects.get(client=client)
-                payment.amount_paid = amount_paid
+                payment.amount_paid += amount_paid
+                # Check if total_amount has been set
+                if payment.total_amount == 0:
+                    payment.total_amount = total_amount  # Set the initial total_amount
+
+                payment.remaining_amount = payment.total_amount - payment.amount_paid  # Update remaining amount
                 payment.timestamp = date.today()
                 payment.approved = True
                 payment.approved_by = admin_employee
                 payment.save()
+
+                # payment = Payment.objects.get(client=client)
+                # payment.amount_paid += amount_paid  # Increment the amount_paid
+                # payment.remaining_amount = payment.total_amount - payment.amount_paid  # Recalculate remaining_amount
+                # if payment.remaining_amount == 0:
+                #     payment.approved = True  # Mark as approved if fully paid
+                # payment.timestamp = date.today()
+                # payment.approved_by = admin_employee
+                # payment.save()
 
                 # Calculate commission for non-admin employees and update EmployeePaymentRecord
                 for employee in Employees.objects.filter(is_administrator=False):
@@ -683,3 +706,14 @@ class CustomLogoutView(View):
 
     def get(self, request):
        pass
+
+
+def pending_payments_view(request):
+    # Query clients with pending payments (remaining amount > 0)
+    # clients_with_pending_payments = Payment.objects.filter(remaining_amount__gt=0).values('client__name', 'remaining_amount')
+
+    clients_with_pending_payments = Payment.objects.filter(remaining_amount__gt=0).all()
+
+    return render(request, 'realestates/installment_lists.html', {'clients_with_pending_payments': clients_with_pending_payments})
+
+

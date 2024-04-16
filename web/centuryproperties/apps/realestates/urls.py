@@ -3,7 +3,7 @@ from .views import (
                     employee_dashboard, admin_dashboard,
                     employees_client, register, approve_payment, confirm_payment, add_client, login_page,
                     edit_user_profile_new, change_password, pay_employee, approve_employee_payment,
-                    confirm_employee_payment, CustomLogoutView, UpdateClient)
+                    confirm_employee_payment, CustomLogoutView, UpdateClient, pending_payments_view)
 
 
 app_name = 'realestates'
@@ -23,6 +23,8 @@ urlpatterns = [
     path('pay_employee/', pay_employee, name='pay_employee'),
     path('approve_employee_payment/<int:employee_id>/', approve_employee_payment, name='approve_employee_payment'),
     path('confirm_employee_payment/<int:employee_id>/', confirm_employee_payment, name='confirm_employee_payment'),
+
+    path('pending-payments/', pending_payments_view, name='pending_payments'),
 
 
     path(r'register/', register, name='register'),

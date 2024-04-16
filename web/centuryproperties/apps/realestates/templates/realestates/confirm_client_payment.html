@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_filters %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,10 +22,19 @@
                         <h3 style="margin-bottom:15px">Confirming the payment for <span class="text-success">{{client}}</span></h3>
                             <form action="{% url 'realestates:confirm_payment' payment_client_id %}" method="post">
                                 {% csrf_token %}
-                                <label>Enter Amount paid</label>
+                                <label>Amount paid:</label>
+                                <br>
                                 <input type="text" id="amountInput" oninput="formatAmount(this)" name="amount_paid" placeholder="Enter amount" required>
-                                 <button type="submit">Approve Payment</button>
-                                <input type="button" value="Cancel" class="btn-danger btn-badge" onclick="window.history.go(-1);"/>
+                                <br>
+                                <!-- Input field for the total amount -->
+                                <label for="totalAmount">Expected:</label>
+                                 <br>
+
+                                <input  type="text" id="totalAmount" oninput="formatAmount(this)" name="total_amount" placeholder="Enter total amount"
+                                        {% for payment in client.client_payment.all %} {% if payment.remaining_amount > 0 %} value="{{ payment.remaining_amount|add_commas }}" {% endif %} {% endfor %} required>
+
+                                 <button type="submit" style="background-color:blue;color:white">Approve</button>
+                                 <input type="button" value="Cancel" class="btn-danger btn-badge" onclick="window.history.go(-1);"/>
                             </form>
                     </div>
                 </div>
@@ -37,10 +47,12 @@
                                       <th scope="col">Name</th>
                                       <td>{{client}}</td>
                                     </tr>
+
                                     <tr>
                                       <th scope="col">Contact1</th>
                                       <td>{{ client.phoneNumber1 }}</td>
                                     </tr>
+
                                     <tr>
                                       <th scope="col">Contact2</th>
                                       <td>{{ client.phoneNumber2 }}</td>
@@ -49,9 +61,26 @@
                                       <th scope="col">Location</th>
                                       <td>{{ client.location }}</td>
                                     </tr>
+                                     {% for payment in client.client_payment.all %}
+
+                                        <tr>
+                                          <th scope="col">Paid</th>
+                                          <td style="color:red">{{ payment.amount_paid|add_commas }}</td>
+                                        </tr>
+                                        <tr>
+                                          <th scope="col">Balance</th>
+                                          <td style="color:red">{{ payment.remaining_amount|add_commas }}</td>
+                                        </tr>
+
+                                        <tr>
+                                          <th scope="col">Total Amount</th>
+                                          <td style="color:red">{{ payment.total_amount|add_commas }}</td>
+                                        </tr>
+                                     {% endfor %}
+
                                     <tr>
                                       <th scope="col" style="color:blue">Brought By:</th>
-                                      <td style="color:red">{{ client.employee }}</td>
+                                      <td style="color:green">{{ client.employee }}</td>
                                     </tr>
                                   </tbody>
                             </table>
