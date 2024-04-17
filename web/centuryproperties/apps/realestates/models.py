@@ -56,7 +56,7 @@ class Employees(TruncateTableMixin, models.Model):
         clients = Payment.objects.filter(
             client__employee=self,
             approved=True,
-            client__client_payment__remaining_amount=0,
+            # client__client_payment__remaining_amount=0,
             timestamp__range=[start_of_week, end_of_week]
         ).order_by('timestamp')  # Sort by timestamp to ensure correct ordering
 
