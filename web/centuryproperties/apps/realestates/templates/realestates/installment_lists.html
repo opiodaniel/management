@@ -19,7 +19,7 @@
             <h6 class="mb-3">Installment Table</h6>
             <div class="d-flex align-items-center justify-content-between mb-4 shadow">
                 <!-- Search Bar -->
-                <input class="border-0" size="25" type="number" id="searchInput" placeholder="client phone number...">
+                <input class="border-0" size="25" type="text" id="searchInput" placeholder="Client contact or plot number...">
             </div>
             <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
                 <table class="table text-start align-middle table-bordered table-hover mb-0 search-table">
@@ -69,12 +69,17 @@
     }
     </script>
     <script>
-    $(document).ready(function() {
-        $('#searchInput').on('keyup', function() {
-            var searchText = $(this).val().toLowerCase();
-            $(this).closest('.shadow').find('.search-table tbody tr').filter(function() {
-                $(this).toggle($(this).text().toLowerCase().indexOf(searchText) > -1);
-            });
+        document.getElementById('searchInput').addEventListener('input', function() {
+        var input = this.value.trim().toLowerCase();
+        var rows = document.querySelectorAll('.search-table tbody tr');
+        rows.forEach(function(row) {
+            var phoneNumber = row.cells[0].textContent.trim().toLowerCase();
+            var plotNumber = row.cells[1].textContent.trim().toLowerCase();
+            if (phoneNumber.includes(input) || plotNumber.includes(input)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
         });
     });
     </script>
