@@ -12,12 +12,12 @@ class EmployeesAdmin(admin.ModelAdmin):
 
 
 class ClientAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'date', 'employee', 'phoneNumber1', 'phoneNumber2', 'location']
+    list_display = ['id', 'name', 'date', 'employee', 'plot_number', 'phoneNumber1', 'phoneNumber2', 'location']
     list_filter = ('employee',)
 
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'client', 'amount_paid', 'total_amount', 'remaining_amount', 'installment_number',
+    list_display = ('id', 'client', 'amount_paid', 'total_amount', 'plot_number', 'remaining_amount', 'installment_number',
                     'total_installments', 'installment_date', 'approved', 'timestamp', 'employee', 'approved_by')
     list_filter = ('approved', 'employee',)
     actions = ['approve_payments', 'reject_payments']

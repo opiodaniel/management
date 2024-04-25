@@ -1,150 +1,70 @@
-{% extends "base.html" %}
+{% extends "base_admin_dashboard.html" %}
 {% load static %}
 {% load custom_filters %}
 
+{% block SubNavbar %}
+ <div class="nav-item dropdown">
+     <a href="{% url 'realestates:admin_dashboard' admin_id %}" class="nav-item nav-link"><i class="fas fa-home"></i>Home</a>
+ </div>
+{% endblock SubNavbar %}
 
-        <!-- Sidebar Start -->
-         {% block Sidebar %}
-            <nav class="navbar bg-secondary navbar-dark">
-
-                <div class="navbar-brand mx-4 mb-3">
-                    <img class="rounded-circle" src="{{ company_logo_url }}" alt="" style="width: 70px; height: 70px; margin-left:45px">
-                    <h5 class="text-info" style="margin-top:5px;text-align:center">Century Properties  <br>& <br> Real Estates Ltd</h5>
-                </div>
-                <div class="d-flex align-items-center ms-4 mb-4">
-                    <div class="position-relative">
-                        <img class="rounded-circle" src="{{ profile_pic_url }}" alt="" style="width: 40px; height: 40px;">
-                        <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
-                    </div>
-                    <div class="ms-3">
-                        <h6 class="mb-0">{{ employee.user.username }}</h6>
-                        <span>Admin</span>
-                    </div>
-                </div>
-                <div class="navbar-nav w-100">
-                    <a href="#" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
-                    <a href="{% url 'realestates:register' %}" class="nav-item nav-link"><i class="fa fa-user-plus"></i>Add Employee</a>
-                    <input type="button" value="Cancel" style="color:red;cursor:pointer" onclick="window.history.go(-1);"/>
-                </div>
-
-            </nav>
-         {% endblock %}
-        <!-- Sidebar End -->
-
-
-          <!-- Navbar Start -->
-         {% block Navbar %}
-            <nav class="navbar navbar-expand bg-secondary navbar-dark sticky-top px-4 py-0">
-                <a href="#" class="navbar-brand d-flex d-lg-none me-4">
-                    <img class="rounded-circle" src="{{ company_logo_url }}" alt="" style="width: 70px; height: 70px; margin-left:45px">
-                </a>
-                <a href="#" class="sidebar-toggler flex-shrink-0">
-                    <i class="fa fa-bars"></i>
-                </a>
-                <form class="d-none d-md-flex ms-4">
-                    <input class="form-control bg-dark border-0" type="search" placeholder="Search">
-                </form>
-                <div class="navbar-nav align-items-center ms-auto">
-                    <div class="nav-item dropdown">
-<!--                        <a href=" url 'realestates:compose_message' "   aria-expanded="true">-->
-<!--                            <i class="fa fa-envelope me-lg-2"></i>-->
-<!--                            <span class="d-none d-lg-inline-flex">Message to employees</span>-->
-<!--                        </a>-->
-
-                    </div>
-                    <div class="nav-item dropdown">
-
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                            <img class="rounded-circle me-lg-2" src="{{ profile_pic_url }}" alt="" style="width: 40px; height: 40px;">
-                            <span class="d-none d-lg-inline-flex">{{employee.user.username}}</span>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0">
-                            <a class="dropdown-item" href="{% url 'realestates:edit_user_profile_new' %}"><i class="fas fa-user-edit text-warning"></i> Edit Profile</a>
-                            <!-- <a href="#" class="dropdown-item">Settings</a> -->
-                            <a href="{% url 'realestates:change_password' %}" class="dropdown-item"><i class="fas fa-user-cog text-success"></i> Change Password</a>
-                            <form method="post" action="{% url 'realestates:logout' %}">
-                                {% csrf_token %}
-                                <button class="dropdown-item" ><i class="fas fa-sign-in-alt text-primary"></i> Log out</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-         {% endblock %}
-          <!-- Navbar End -->
-
-         {% block content %}
-            <!-- Recent Sales Start -->
-           <div class="container-fluid pt-4 px-4">
-                <div class="bg-secondary text-center rounded p-4">
-                    <h6 class="mb-3">Distributor Table</h6>
-                    <div class="d-flex align-items-center justify-content-between mb-4">
-                        <!-- Search Bar -->
-                        <input style="margin-right:1100px" size="30" type="text" id="searchInput" placeholder="distributor name...">
-                    </div>
-                    <div class="table-responsive" style="max-height: 180px; overflow-y: auto;">
-                        <table class="table text-start align-middle table-bordered table-hover mb-0 search-table">
-                            <thead>
-                                <tr class="text-success">
-                                    <th scope="col">Name</th>
-                                    <!--<th scope="col"><i class="fas fa-hand-holding-usd"></i></th>-->
-                                    <!--<th scope="col">Paid</th>-->
-                                    <!--<th scope="col">Balance</th>-->
-                                    <th scope="col">Payment</th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-white">
-                                {% for e in all_employee_payment_record %}
-                                <tr>
-                                    <td>{{e.employee}}</td>
-                                    <!--<td>{{e.total_commission|add_commas }}</td>-->
-                                    <!--<td>{{e.amount_paid|add_commas }}</td>-->
-                                    <!--<td>{{e.balance|add_commas }}</td>-->
-                                    <td>
-                                        {% if not e.approved %}
-                                        <form action="{% url 'realestates:approve_employee_payment' e.id%}" method="post">
-                                            {% csrf_token %}
-                                            <button class="btn btn-sm btn-primary" type="submit">Approve Payment</button>
-                                        </form>
-                                        {% endif %}
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-           </div>
-            <!-- Recent Sales End -->
-
-            <!-- Footer Start -->
-            <div class="container-fluid pt-4 px-4" style="margin-top:25%">
-                <div class="bg-secondary rounded-top p-4">
-                    <div class="row">
-                        <div class="col-12 col-sm-6 text-center text-sm-start">
-                            &copy; <a href="https://academycity.org/en/e/" target="_blank">Academy City</a>, All Right Reserved.
-                        </div>
-                        <div class="col-12 col-sm-6 text-center text-sm-end">
-                            <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
-                            Designed By <a href="https://academycity.org/en/e/" target="_blank">Academy City</a>
-                            <br>Distributed By: <a href="https://academycity.org/en/e/" target="_blank">Academy City</a>
-                        </div>
-                    </div>
-                </div>
+ {% block content %}
+    <!-- Recent Sales Start -->
+   <div class="container-fluid pt-4 px-4">
+        <div class="bg-secondary text-center rounded p-4">
+            <h6 class="mb-3">Distributor Table</h6>
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <!-- Search Bar -->
+                <input  class="border-0" size="25"  type="text" id="searchInput" placeholder="distributor name...">
             </div>
-            <!-- Footer End -->
-         {% endblock %}
+            <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                <table class="table text-start align-middle table-bordered table-hover mb-0 search-table">
+                    <thead>
+                        <tr class="text-info">
+                            <th scope="col">Name</th>
+                            <!--<th scope="col"><i class="fas fa-hand-holding-usd"></i></th>-->
+                            <!--<th scope="col">Paid</th>-->
+                            <!--<th scope="col">Balance</th>-->
+                            <th scope="col">Payment</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-white">
+                        {% for e in all_employee_payment_record %}
+                        <tr>
+                            <td>{{e.employee}}</td>
+                            <!--<td>{{e.total_commission|add_commas }}</td>-->
+                            <!--<td>{{e.amount_paid|add_commas }}</td>-->
+                            <!--<td>{{e.balance|add_commas }}</td>-->
+                            <td>
+                                {% if not e.approved %}
+                                <form action="{% url 'realestates:approve_employee_payment' e.id%}" method="post">
+                                    {% csrf_token %}
+                                    <button class="btn btn-sm btn-primary" type="submit">Approve Payment</button>
+                                </form>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+   </div>
+    <!-- Recent Sales End -->
+ {% endblock %}
 
 
-          {% block add_js %}
-             <script>
-                $(document).ready(function() {
-                    $('#searchInput').on('keyup', function() {
-                        var searchText = $(this).val().toLowerCase();
-                        $(this).closest('.bg-secondary').find('.search-table tbody tr').filter(function() {
-                            $(this).toggle($(this).text().toLowerCase().indexOf(searchText) > -1);
-                        });
-                    });
+  {% block add_js %}
+     <script>
+        $(document).ready(function() {
+            $('#searchInput').on('keyup', function() {
+                var searchText = $(this).val().toLowerCase();
+                $(this).closest('.bg-secondary').find('.search-table tbody tr').filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(searchText) > -1);
                 });
-            </script>
-          {% endblock %}
+            });
+        });
+    </script>
+  {% endblock %}
 
+{% block footer %}
+{% endblock %}

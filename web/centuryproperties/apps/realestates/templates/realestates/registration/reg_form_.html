@@ -1,0 +1,118 @@
+{% extends "base_admin_dashboard.html" %}
+{% load static %}
+{% load custom_filters %}
+
+    {% block title %}
+       register
+    {% endblock %}
+
+    {% block SubNavbar %}
+     <div class="nav-item dropdown">
+         <a href="{% url 'realestates:admin_dashboard' admin_id %}" class="nav-item nav-link"><i class="fa fa-user-plus"></i>Home</a>
+     </div>
+    {% endblock SubNavbar %}
+
+    {% block add_css %}
+
+         <script src="{% static 'js/bootstrap.min.js' %}"></script>
+        <style>
+            form i {
+            margin-left: 0px;
+            cursor: pointer;
+        }
+        form input {
+            background-color:white;
+        }
+        </style>
+        <style>
+            footer {
+                position: fixed;
+                bottom: 0;
+                width: 80%; /* Adjust the width as needed */
+                margin-left: 15%; /* Center the footer horizontally */
+                background-color: #f8f9fa; /* Add your desired background color */
+                border-top: 1px solid #dee2e6; /* Add your desired border */
+                padding: 20px; /* Add padding for better spacing */
+            }
+        </style>
+    {% endblock %}
+
+
+    {% block content %}
+    <div class="container bg-dark" style="color:white">
+        <div class="dashboard-container">
+            <div class="row mt-2 gradient-custom-2">
+                <div class="col-md-8 container" >
+                    <div class="shadow p-4 wb-5 mb-4 bg-body rounded" >
+                        <h4 style="text-align:center">Register new Distributor</h4>
+                        <form method="post" class="bg-secondary" >
+                            {% csrf_token %}
+                            <div class="form-outline mb-4">
+                               <label>UserName:</label>
+                               {{ form.username }}
+                            </div>
+                             <div class="form-outline mb-4">
+                               <label>First Name:</label>
+                               {{ form.first_name }}
+                             </div>
+                              <div class="form-outline mb-4">
+                               <label>Last Name:</label>
+                               {{ form.last_name }}
+                              </div>
+                               <div class="form-outline mb-4">
+                               <label>Email:</label>
+                               {{ form.email }}
+                               </div>
+                                <div class="form-outline mb-4">
+                                 <label>Password:</label>
+                                {{ form.password1 }}
+                                   <i class="bi bi-eye-slash" id="togglePassword1"></i>
+                                   <label for="togglePassword1" style="color:red">Show Password</label>
+                               </div>
+                                <div class="form-outline mb-4">
+                                <label>Confirm Password:</label>
+                                {{ form.password2 }}
+                                   <i class="bi bi-eye-slash" id="togglePassword2"></i>
+                                    <label for="togglePassword2" style="color:red">Show Password</label>
+                               </div>
+                            <button class="btn-success btn-badge" type="submit">Submit</button>
+                          <!--  <input type="button" value="Cancel" class="btn-danger btn-badge" onclick="window.history.go(-1);"/>-->
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+
+    {% block add_js %}
+    <script>
+            const togglePassword1 = document.querySelector("#togglePassword1");
+            const password1 =  document.getElementById("id_password1");
+            togglePassword1.addEventListener("click", function () {
+                // toggle the type attribute
+                const type = password1.getAttribute("type") === "password" ? "text" : "password";
+                password1.setAttribute("type", type);
+                // toggle the icon
+                this.classList.toggle("bi-eye");
+            });
+
+            const togglePassword2 = document.querySelector("#togglePassword2");
+            const password2 =  document.getElementById("id_password2");
+            togglePassword2.addEventListener("click", function () {
+                // toggle the type attribute
+                const type = password2.getAttribute("type") === "password" ? "text" : "password";
+                password2.setAttribute("type", type);
+                // toggle the icon
+                this.classList.toggle("bi-eye");
+            });
+
+            // prevent form submit
+            const form = document.querySelector("form");
+            form.addEventListener('submit', function (e) {
+                //e.preventDefault();
+            });
+    </script>
+    {% endblock %}
+

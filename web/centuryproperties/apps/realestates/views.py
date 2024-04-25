@@ -122,6 +122,7 @@ def get_total_sales_for_previous_months(request):
 
 @login_required
 def admin_dashboard(request, admin_id):
+
     DEfault_thresholdInput1 = 50
     DEfault_thresholdInput = 0
 
@@ -320,7 +321,7 @@ def employee_dashboard(request, employee_id):
 
     expiry_date = datetime.now().date() - timedelta(days=7)
     clients = employee.client_employee.all()
-    expired_clients = employee.client_employee.filter(date__lt=expiry_date)
+    expired_clients = employee.client_employee.filter(date__lt=expiry_date)  # client_payment__approved=False
 
     approved_clients_count = Payment.objects.filter(employee_id=employee_id, approved=True).count()
     pending_clients_count = Payment.objects.filter(employee_id=employee_id, approved=False).count()
@@ -334,6 +335,8 @@ def employee_dashboard(request, employee_id):
         if client.date < expiry_date:
             # Update the client's date to the current date
             client.date = datetime.now().date()
+            # Set the employee field to the current employee
+            client.employee = request.user.employee  # Assuming the logged-in user is an employee
             # Save the changes to the database
             client.save()
         return redirect(reverse('realestates:employee_dashboard', args=[request.user.id]))
@@ -357,6 +360,7 @@ def employee_dashboard(request, employee_id):
     return render(request, 'realestates/employee_dashboard.html', context)
 
 
+@login_required
 def employees_client(request):
     employees = Employees.objects.filter(is_administrator=False)
     dic_ = {}
@@ -382,6 +386,45 @@ def employees_client(request):
     return JsonResponse(dic_)
 
 
+@login_required
+def expired_clients_list(request):
+    company = Company.objects.get(id=1)
+    company_logo_url = company.company_logo.url
+    employee_id = request.user.id
+    # Retrieve the employee object based on the employee_id
+    employee = get_object_or_404(Employees, id=employee_id)
+    profile_pic_url = employee.profile_pic.url
+    expiry_date = datetime.now().date() - timedelta(days=7)
+    # Retrieve expired clients
+    expired_clients = Client.objects.filter(date__lt=expiry_date, client_payment__approved=False)
+    if request.method == 'POST' and 'reset_expired_clients' in request.POST:
+        # Reset the entry date of expired clients to the current date
+        client_id = request.POST.get('client_id')
+        # client = employee.client_employee.get(id=client_id)
+        client = Client.objects.get(id=client_id)
+        payment = Payment.objects.get(client=client)
+        expiry_date = datetime.now().date() - timedelta(days=7)
+        if client.date < expiry_date:
+            # Update the client's date to the current date
+            client.date = datetime.now().date()
+            # Set the employee field to the current employee
+            client.employee = request.user.employee  # Assuming the logged-in user is an employee
+            # Update the existing payment record with the new employee
+            payment.employee = request.user.employee   # Assign the new employee to the payment
+            # Save the changes to the database
+            client.save()
+            payment.save()
+
+    context = {
+        'expired_clients': expired_clients,
+        'company_logo_url': company_logo_url,
+        'profile_pic_url': profile_pic_url,
+        'employee_id': employee_id
+    }
+    return render(request, 'realestates/expired_clients.html', context)
+
+
+@login_required
 def approve_payment(request, client_id):
     # print(client_id)
     payment_client_id = client_id
@@ -399,6 +442,7 @@ def confirm_payment(request, client_id):
         client = Client.objects.get(id=client_id)
         amount_paid_str = request.POST.get('amount_paid', '0').replace(',', '')  # Remove commas
         total_amount_str = request.POST.get('total_amount', '0').replace(',', '')  # Remove commas
+        plot_number = request.POST.get('plot_number', '')
         amount_paid = int(amount_paid_str)
         total_amount = int(total_amount_str)
         if amount_paid <= 0 or total_amount <= 0:
@@ -447,8 +491,10 @@ def confirm_payment(request, client_id):
                 payment.timestamp = date.today()
                 payment.approved = True
                 payment.approved_by = admin_employee
+                payment.plot_number = plot_number
                 payment.save()
-
+                client.plot_number = plot_number
+                client.save()
                 # payment = Payment.objects.get(client=client)
                 # payment.amount_paid += amount_paid  # Increment the amount_paid
                 # payment.remaining_amount = payment.total_amount - payment.amount_paid  # Recalculate remaining_amount
@@ -480,8 +526,9 @@ def confirm_payment(request, client_id):
     return render(request, 'realestates/confirm_client_payment.html')
 
 
+@login_required
 def pay_employee(request):
-
+    admin_id = request.user.id
     admin = Employees.objects.get(id=request.user.id)
     profile_pic_url = admin.profile_pic.url
     company = Company.objects.get(id=1)
@@ -490,6 +537,7 @@ def pay_employee(request):
     all_employee_payment_record = EmployeePaymentRecord.objects.filter(employee__in=employees)
     context = {
         'employees': employees,
+        'admin_id': admin_id,
         'company_logo_url': company_logo_url,
         'profile_pic_url': profile_pic_url,
         'all_employee_payment_record': all_employee_payment_record,
@@ -498,6 +546,7 @@ def pay_employee(request):
     return render(request, 'realestates/pay_employee.html', context)
 
 
+@login_required
 def approve_employee_payment(request, employee_id):
     employee_id_ = employee_id
     employee = Employees.objects.get(id=employee_id)
@@ -511,6 +560,7 @@ def approve_employee_payment(request, employee_id):
     return render(request, 'realestates/confirm_employee_payment.html', context)
 
 
+@login_required
 def confirm_employee_payment(request, employee_id):
     if request.method == 'POST':
         # Get the amount paid from the form data
@@ -536,15 +586,6 @@ def confirm_employee_payment(request, employee_id):
             all_employee_payment_record.balance = commission_earned - all_employee_payment_record.amount_paid
             all_employee_payment_record.save()
 
-
-        # # Calculate balance
-        # employee_balance = commission_earned - amount_paid
-        # # Update EmployeePaymentRecord
-        # all_employee_payment_record = EmployeePaymentRecord.objects.get(employee=employee)
-        # all_employee_payment_record.amount_paid += amount_paid
-        # all_employee_payment_record.balance = employee_balance
-        # all_employee_payment_record.save()
-
         return redirect(reverse('realestates:admin_dashboard', args=[request.user.id]))
 
     # Handle GET requests if needed
@@ -552,6 +593,7 @@ def confirm_employee_payment(request, employee_id):
     return render(request, 'realestates/confirm_employee_payment.html')
 
 
+@login_required
 def add_client(request):
 
     if request.method == 'POST':
@@ -570,6 +612,33 @@ def add_client(request):
     return render(request, 'realestates/add_client.html', {'form': form})
 
 
+@login_required
+def client_list(request):
+    admin_id = request.user.id
+    admin = Employees.objects.get(id=request.user.id)
+    profile_pic_url = admin.profile_pic.url
+    company = Company.objects.get(id=1)
+    company_logo_url = company.company_logo.url
+    employees = Employees.objects.all().filter(is_administrator=False)
+
+    expiry_date = datetime.now().date() - timedelta(days=7)
+    # Filter clients who have not exceeded the expiry date
+    active_clients = Client.objects.filter(date__gte=expiry_date)
+
+    all_clients = active_clients
+
+    context = {
+        'all_clients': all_clients,
+        'admin_id': admin_id,
+        'employees': employees,
+        'company_logo_url': company_logo_url,
+        'profile_pic_url': profile_pic_url,
+    }
+
+    return render(request, 'realestates/client_list.html', context)
+
+
+@login_required
 def UpdateClient(request, pk):
 
     client_info = get_object_or_404(Client, id=pk)
@@ -598,6 +667,7 @@ def email_message(semail, username,  type):
     send_mail(subject, body, email_from, [semail], fail_silently=False)
 
 
+@login_required
 def register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
@@ -610,45 +680,21 @@ def register(request):
             return redirect(reverse('realestates:admin_dashboard', args=[request.user.id]))
     else:
         form = RegistrationForm()
-    return render(request, 'realestates/registration/reg_form.html', {'form': form})
+        admin_id = request.user.id
+        admin = Employees.objects.get(id=request.user.id)
+        profile_pic_url = admin.profile_pic.url
+        company = Company.objects.get(id=1)
+        company_logo_url = company.company_logo.url
+        employees = Employees.objects.all().filter(is_administrator=False)
+        context = {
+            'form': form,
+            'admin_id': admin_id,
+            'employees': employees,
+            'company_logo_url': company_logo_url,
+            'profile_pic_url': profile_pic_url,
+        }
 
-
-# def login_page(request):
-#     if request.method == "POST":
-#         form_login = EmployeeLoginForm(request, data=request.POST)
-#         if form_login.is_valid():
-#             username = form_login.cleaned_data.get('username')
-#             password = form_login.cleaned_data.get('password')
-#             user = authenticate(username=username, password=password)
-#             if user is not None:
-#                 login(request, user)
-#                 if user.is_superuser:  # Check if user is admin
-#                     # return redirect('admin_dashboard')  # Redirect admin to admin dashboard
-#                     # print(user)
-#                     # print(user.id)
-#                     # messages.info(request, f"You are now logged in as {username}.")
-#                     return redirect(reverse('realestates:admin_dashboard', args=[user.id]))
-#                 else:
-#                     # messages.info(request, f"You are now logged in as {username}.")
-#                     return redirect(reverse('realestates:employee_dashboard', args=[user.id]))
-#             else:
-#                 messages.error(request, "Invalid username or password.")
-#         else:
-#             messages.error(request, "Invalid username or password.")
-#     return login_form_(request, error_message='')
-
-
-# def login_form_(request, error_message=''):
-#
-#     form_login = EmployeeLoginForm()
-#     company = Company.objects.get(id=1)
-#     company_logo_url = company.company_logo.url
-#
-#     arg = {'form_login': form_login,
-#            'error_message': error_message,
-#            'company_logo_url': company_logo_url
-#            }
-#     return render(request, 'realestates/registration/login.html', arg)
+    return render(request, 'realestates/registration/reg_form.html', context)
 
 
 def edit_user_profile_new(request):
@@ -676,6 +722,7 @@ def edit_user_profile_new(request):
                                                                                         'profile_form': profile_form, })
 
 
+@login_required
 def change_password(request):
     if request.method == 'POST':
         form = PasswordChangeForm(data=request.POST, user=request.user)
@@ -709,11 +756,21 @@ class CustomLogoutView(View):
 
 
 def pending_payments_view(request):
-    # Query clients with pending payments (remaining amount > 0)
-    # clients_with_pending_payments = Payment.objects.filter(remaining_amount__gt=0).values('client__name', 'remaining_amount')
-
+    admin_id = request.user.id
+    admin = Employees.objects.get(id=request.user.id)
+    profile_pic_url = admin.profile_pic.url
+    company = Company.objects.get(id=1)
+    company_logo_url = company.company_logo.url
+    employees = Employees.objects.all().filter(is_administrator=False)
     clients_with_pending_payments = Payment.objects.filter(remaining_amount__gt=0).all()
 
-    return render(request, 'realestates/installment_lists.html', {'clients_with_pending_payments': clients_with_pending_payments})
+    context = {
+        'clients_with_pending_payments': clients_with_pending_payments,
+        'admin_id': admin_id,
+        'employees': employees,
+        'company_logo_url': company_logo_url,
+        'profile_pic_url': profile_pic_url,
+    }
 
+    return render(request, 'realestates/installment_lists.html', context)
 

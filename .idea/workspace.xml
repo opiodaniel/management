@@ -4,9 +4,28 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7ade2d30-b4b6-48a2-aae7-98d6d1f3da59" name="Changes" comment="">
+    <list default="true" id="8c1124b6-6789-4251-99c8-d42593558513" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/registration/reg_form_.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/management.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/management.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/forms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/base_realestates.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/base_employee_dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/admin_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/admin_dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/confirm_client_payment.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/confirm_client_payment.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/employee_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/employee_dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/installment_lists.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/installment_lists.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/pay_employee.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/pay_employee.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/registration/reg_form.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/templates/base.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,7 +35,7 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
@@ -27,49 +46,38 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 5
+  &quot;associatedIndex&quot;: 3
 }</component>
-  <component name="ProjectId" id="2dNaiZnvxJCVOnKu2yMs6jdCfSg" />
+  <component name="ProjectId" id="2fFHiKMkJECGBCrgxehfHtO8xsx" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/opio/projects/management/web/centuryproperties/apps/realestates/templates/realestates&quot;
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/opio/projects/management/web/centuryproperties/apps/realestates/templates/realestates/registration&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/registration" />
-      <recent name="$PROJECT_DIR$/web/centuryproperties/settings" />
-      <recent name="$PROJECT_DIR$/web/centuryproperties/media/company_logo/default_company_logo" />
-      <recent name="$PROJECT_DIR$/web/centuryproperties/static/assets/css" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/web/centuryproperties/apps/realestates" />
+      <recent name="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates" />
       <recent name="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates" />
-      <recent name="$PROJECT_DIR$/web/centuryproperties" />
-      <recent name="$PROJECT_DIR$/web" />
-      <recent name="$PROJECT_DIR$/web/centuryproperties/static/assets" />
     </key>
-  </component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="bundled-python-sdk-09665e90c3a7-d3b881c8e49f-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-233.15026.15" />
-      </set>
-    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="7ade2d30-b4b6-48a2-aae7-98d6d1f3da59" name="Changes" comment="" />
-      <created>1709851117748</created>
+      <changelist id="8c1124b6-6789-4251-99c8-d42593558513" name="Changes" comment="" />
+      <created>1713390031400</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1709851117748</updated>
+      <updated>1713390031400</updated>
     </task>
     <servers />
   </component>

@@ -150,8 +150,9 @@ class Client(TruncateTableMixin, models.Model):
     phoneNumber1 = models.CharField(max_length=10, blank=True, default='', validators=[MinLengthValidator(10)])
     phoneNumber2 = models.CharField(max_length=10, blank=True, default='', null=True)
     location = models.CharField(max_length=30, default='', blank=True, null=True)
+    plot_number = models.CharField(max_length=20, blank=True, default='')
     date = models.DateField(auto_now_add=True, null=True)
-    employee = models.ForeignKey(Employees, on_delete=models.CASCADE, related_name="client_employee")
+    employee = models.ForeignKey(Employees, on_delete=models.SET_NULL, null=True, related_name="client_employee")
 
     def __str__(self):
         return self.name
@@ -165,9 +166,10 @@ class Payment(TruncateTableMixin, models.Model):
     installment_number = models.PositiveIntegerField(default=1)
     total_installments = models.PositiveIntegerField(default=1)
     installment_date = models.DateField(auto_now_add=True, null=True)
+    plot_number = models.CharField(max_length=20, blank=True, default='')
     approved = models.BooleanField(default=False)
     approved_by = models.ForeignKey(Employees, on_delete=models.CASCADE, related_name='approved_payments', null=True)
-    employee = models.ForeignKey(Employees, on_delete=models.CASCADE, related_name='employee_payments', null=True)
+    employee = models.ForeignKey(Employees, on_delete=models.SET_NULL, related_name='employee_payments', null=True)
     timestamp = models.DateField(auto_now_add=True, null=True)
 
     # def save(self, *args, **kwargs):

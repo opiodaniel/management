@@ -1,17 +1,17 @@
-{% extends "base.html" %}
+{% extends "base_admin_dashboard.html" %}
 {% load static %}
 {% load custom_filters %}
 
-       {% block title %}
-         Admin
-       {% endblock %}
+{% block title %}
+   Admin
+{% endblock %}
 
-       {% block add_css %}
-<!--         <link type="text/css" rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}"/>-->
+ {% block add_css %}
+       <!--<link type="text/css" rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}"/>-->
          <script src="{% static 'js/jquery-3.3.1.js' %}"></script>
          <script src="{% static 'js/bootstrap.min.js' %}"></script>
          <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <style>
+         <style>
             table {
                         width: 100%;
                         border-collapse: collapse;
@@ -40,790 +40,192 @@
                             }
                     }
         </style>
+{% endblock %}
 
-       {% endblock %}
-
-        <!-- Sidebar Start -->
-        {% block Sidebar %}
-            <nav class="navbar bg-secondary navbar-dark">
-                <div class="navbar-brand mx-4 mb-3">
-                    <img class="rounded-circle" src="{{ company_logo_url }}" alt="" style="width: 70px; height: 70px; margin-left:45px">
-                    <h5 class="text-info" style="margin-top:5px;text-align:center">Century Properties  <br>& <br> Real Estates Ltd</h5>
-                </div>
-                <div class="d-flex align-items-center ms-4 mb-4">
-                    <div class="position-relative">
-                        <img class="rounded-circle" src="{{ profile_pic_url }}" alt="" style="width: 40px; height: 40px;">
-                        <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
-                    </div>
-                    <div class="ms-3">
-                        <h6 class="mb-0">{{ employee.user.username }}</h6>
-                        <span>Admin</span>
-                    </div>
-                </div>
-                <div class="navbar-nav w-100">
-                    <a href="#" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
-                    <a href="{% url 'realestates:register' %}" class="nav-item nav-link"><i class="fa fa-user-plus"></i>Add Distributor</a>
-                    <a href="{% url 'realestates:pay_employee' %}" class="nav-item nav-link"><i class="fa fa-credit-card custom"></i>Pay Distributor</a>
-                    <a href="{% url 'realestates:pending_payments' %}" class="nav-item nav-link"><i class="fa fa-credit-card custom"></i>Installment List</a>
-                </div>
-            </nav>
-        {% endblock %}
-        <!-- Sidebar End -->
-
-        <!-- Navbar Start -->
-        {% block Navbar %}
-         <nav class="navbar navbar-expand bg-secondary navbar-dark sticky-top px-4 py-0">
-            <a href="#" class="navbar-brand d-flex d-lg-none me-4">
-                <img class="rounded-circle" src="{{ company_logo_url }}" alt="" style="width: 70px; height: 70px; margin-left:45px">
-            </a>
-            <a href="#" class="sidebar-toggler flex-shrink-0">
-                <i class="fa fa-bars"></i>
-            </a>
-            <form class="d-none d-md-flex ms-4">
-                <input class="form-control bg-dark border-0" type="search" placeholder="Search">
-            </form>
-            <div class="navbar-nav align-items-center ms-auto">
-                <div class="nav-item dropdown">
-<!--                        <a href=" url 'realestates:compose_message' "   aria-expanded="true">-->
-<!--                            <i class="fa fa-envelope me-lg-2"></i>-->
-<!--                            <span class="d-none d-lg-inline-flex">Message to employees</span>-->
-<!--                        </a>-->
-
-                </div>
-                <div class="nav-item dropdown">
-
-                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                        <img class="rounded-circle me-lg-2" src="{{ profile_pic_url }}" alt="" style="width: 40px; height: 40px;">
-                        <span class="d-none d-lg-inline-flex">{{employee.user.username}}</span>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0">
-                        <a class="dropdown-item" href="{% url 'realestates:edit_user_profile_new' %}"><i class="fas fa-user-edit text-warning"></i> Edit Profile</a>
-                        <!-- <a href="#" class="dropdown-item">Settings</a> -->
-                        <a href="{% url 'realestates:change_password' %}" class="dropdown-item"><i class="fas fa-user-cog text-success"></i> Change Password</a>
-                        <form method="post" action="{% url 'realestates:logout' %}">
-                            {% csrf_token %}
-                            <button class="dropdown-item" ><i class="fas fa-sign-in-alt text-primary"></i> Log out</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </nav>
-        {% endblock %}
-        <!-- Navbar End -->
-
-        {% block content %}
-        <!-- Monthly Sales  Start -->
-         <div class="container-fluid pt-4 px-4">
-            <div class="row g-4">
-                <div class="col-sm-6 col-xl-3">
-                    <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
-                        <i class="fa fa-chart-line fa-3x text-success"></i>
-                        <div class="ms-3">
-                            <p class="mb-2">Monthly Sale</p>
-                            <h6 class="mb-0">Shs:{{total_amount_month}}</h6>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-xl-3">
-                    <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
-                        <i class="fa fa-chart-bar fa-3x text-info"></i>
-                        <div class="ms-3">
-                            <p class="mb-2">Total Sale</p>
-                            <h6 class="mb-0">Shs:{{total_sales_previous_months_sum}}</h6>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-xl-3">
-                    <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
-                        <i class="fa fa-users text-warning" aria-hidden="true" style='font-size:50px;'></i>
-                        <div class="ms-3">
-                            <p class="mb-2">Distributors</p>
-                            <h6 class="mb-0">{{total_number_employees}}</h6>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-xl-3">
-                    <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
-                        <i class="fa fa-user-friends" aria-hidden="true" style='font-size:50px;color:blue'></i>
-                        <div class="ms-3">
-                            <p class="mb-2">Clients</p>
-                            <h6 class="mb-0">{{total_num_clients_}}</h6>
-                        </div>
-                    </div>
+{% block content %}
+<!-- Monthly Sales  Start -->
+ <div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
+                <i class="fa fa-chart-line fa-3x text-success"></i>
+                <div class="ms-3">
+                    <p class="mb-2">Monthly Sale</p>
+                    <h6 class="mb-0">Shs:{{total_amount_month}}</h6>
                 </div>
             </div>
         </div>
-        <!-- Monthly Sales Start End -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
+                <i class="fa fa-chart-bar fa-3x text-info"></i>
+                <div class="ms-3">
+                    <p class="mb-2">Total Sale</p>
+                    <h6 class="mb-0">Shs:{{total_sales_previous_months_sum}}</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
+                <i class="fa fa-users text-warning" aria-hidden="true" style='font-size:50px;'></i>
+                <div class="ms-3">
+                    <p class="mb-2">Distributors</p>
+                    <h6 class="mb-0">{{total_number_employees}}</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
+                <i class="fa fa-user-friends" aria-hidden="true" style='font-size:50px;color:blue'></i>
+                <div class="ms-3">
+                    <p class="mb-2">Clients</p>
+                    <h6 class="mb-0">{{total_num_clients_}}</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Monthly Sales Start End -->
 
-        <!-- All Monthly Sales Start -->
-         <div class="container-fluid pt-4 px-4">
+<!-- All Monthly Sales Start -->
+ <div class="container-fluid pt-4 px-4">
+    <div class="bg-secondary text-center rounded p-4">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h6 class="mb-0">All Monthly Sale</h6>
+        </div>
+        <div id="table_content" class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+            <table class="table text-start align-middle table-bordered table-hover mb-0">
+                <thead>
+                    <tr class="text-info">
+                        <th scope="col">Date</th>
+                        <th scope="col">Amount</th>
+                    </tr>
+                </thead>
+                <tbody style="cursor:pointer" class="text-white">
+                    {% for data in monthly_data %}
+                    <tr onclick="showSubTable(this)">
+                        <td>{{ data.date }}</td>
+                        <td>{{ data.amount }}</td>
+                    </tr>
+                    <!-- Hidden sub-table -->
+                    <tr class="sub-table-row" style="display:none;">
+                        <td colspan="2">
+                            <div style= "max-height: 200px; overflow-y: auto;">
+                            <table id="customers" style="max-height: 200px; overflow-y: auto;">
+                                  <tr>
+                                     <th>{{data.date}}</th>
+                                     <th>AmountPaid</th>
+                                     <th>ClientName</th>
+                                     <th>PhoneNumber1</th>
+                                     <th>PhoneNumber2</th>
+                                     <th>Location</th>
+                                     <th>BroughtBy:</th>
+                                     <th>ApprovedBy:</th>
+                                  </tr>
+                                  {% for md in  data.month_detail  %}
+                                  <tr>
+                                    <td>{{ md.timestamp }}</td>
+                                    <td>{{md.amount_paid|add_commas}}</td>
+                                    <td>{{ md.client }}</td>
+                                    <td>{{ md.client.phoneNumber1 }}</td>
+                                    <td>{{ md.client.phoneNumber2 }}</td>
+                                    <td>{{ md.client.location }}</td>
+                                    <td>{{ md.client.employee }}</td>
+                                    <td>{{ md.approved_by }}</td>
+                                  </tr>
+                                 {% endfor %}
+                            </table>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <!-- Add more rows as needed -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- Monthly Sales  End -->
+
+<!-- Graph of Approved/pending Detail  -->
+ <div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-sm-12 col-xl-6">
             <div class="bg-secondary text-center rounded p-4">
+                <label for="thresholdInput">Threshold:</label>
+                <input type="number" id="thresholdInput1" value="{{DEfault_thresholdInput1}}" size="5" style="text-align:center">
+                <button id="updateThresholdButton1" style="background-color:red">Update Threshold</button>
+
                 <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h6 class="mb-0">All Monthly Sale</h6>
+                    <h6 class="mb-0">Approval Rate Analysis</h6>
                 </div>
-                <div id="table_content" class="table-responsive" style="max-height: 500px; overflow-y: auto;">
-                    <table class="table text-start align-middle table-bordered table-hover mb-0">
-                        <thead>
-                            <tr class="text-success">
-                                <th scope="col">Date</th>
-                                <th scope="col">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody style="cursor:pointer" class="text-white">
-                            {% for data in monthly_data %}
-                            <tr onclick="showSubTable(this)">
-                                <td>{{ data.date }}</td>
-                                <td>{{ data.amount }}</td>
-                            </tr>
-                            <!-- Hidden sub-table -->
-                            <tr class="sub-table-row" style="display:none;">
-                                <td colspan="2">
-                                    <div style= "max-height: 200px; overflow-y: auto;">
-                                    <table id="customers" style="max-height: 200px; overflow-y: auto;">
-                                          <tr>
-                                             <th>{{data.date}}</th>
-                                             <th>AmountPaid</th>
-                                             <th>ClientName</th>
-                                             <th>PhoneNumber1</th>
-                                             <th>PhoneNumber2</th>
-                                             <th>Location</th>
-                                             <th>BroughtBy:</th>
-                                             <th>ApprovedBy:</th>
-                                          </tr>
-                                          {% for md in  data.month_detail  %}
-                                          <tr>
-                                            <td>{{ md.timestamp }}</td>
-                                            <td>{{md.amount_paid|add_commas}}</td>
-                                            <td>{{ md.client }}</td>
-                                            <td>{{ md.client.phoneNumber1 }}</td>
-                                            <td>{{ md.client.phoneNumber2 }}</td>
-                                            <td>{{ md.client.location }}</td>
-                                            <td>{{ md.client.employee }}</td>
-                                            <td>{{ md.approved_by }}</td>
-                                          </tr>
-                                         {% endfor %}
-                                    </table>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                            <!-- Add more rows as needed -->
-                        </tbody>
-                    </table>
-                </div>
+                <canvas id="lineChart" width="400" height="200"></canvas>
             </div>
         </div>
-        <!-- Monthly Sales  End -->
 
-        <!-- Graph of Approved/pending Detail  -->
-         <!--
-         <div class="container-fluid pt-4 px-4">
-            <div class="row g-4">
-                <div class="col-sm-12 col-xl-6">
-                    <div class="bg-secondary text-center rounded p-4">
-                        <div class="d-flex align-items-center justify-content-between mb-4">
-                            <h6 class="mb-0">Approved/pending Detail for each Distributor</h6>
-                        </div>
-                        <canvas id="worldwide-sales"></canvas>
-                    </div>
-                </div>
-                <div class="col-sm-12 col-xl-6">
-                    <div class="bg-secondary rounded h-100 p-4">
-                        <h6 class="mb-4">Total number clients brought by each Distributor</h6>
-                        <canvas id="bar-chart" width="838" height="418" style="display: block; box-sizing: border-box; height: 209px; width: 419px;"></canvas>
-                    </div>
-                </div>
-
+         <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary text-center rounded h-100 p-4">
+                   <label for="thresholdInput">Threshold:</label>
+                   <input type="number" id="thresholdInput" value="{{DEfault_thresholdInput}}" size="5" style="text-align:center">
+                   <button id="updateThresholdButton" style="background-color:red">Update Threshold</button>
+                   <div class="d-flex align-items-center justify-content-between mb-4">
+                     <h6 class="mb-0">Clients Brought</h6>
+                   </div>
+                <canvas id="employeeChart" width="400" height="200"></canvas>
             </div>
         </div>
-         -->
-        <!-- Graph of Approved/pending Detail End -->
+    </div>
+</div>
+<!-- Graph of Approved/pending Detail End -->
 
+<!-- client table data -->
+<div class="container-fluid pt-4 px-4">
+    <div class="bg-secondary text-center rounded p-4">
+        <h6 class="mb-3">Performance</h6>
+        <div class="d-flex align-items-center justify-content-between mb-4">
+        </div>
+        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+            <table id="scroll-table">
+                <thead>
+                    <tr class="text-info">
+                        <th scope="col">Name</th>
+                        <th scope="col">Clients</th>
+                        <th scope="col"><i class="fas fa-check-circle" style='font-size:25px'></i></th>
+                        <th scope="col"><i class='fas fa-question-circle' style='font-size:25px'></i></th>
+                        <th scope="col">Rate</th>
+                    </tr>
+                </thead>
+                <tbody class="text-white" id="employeeTableBody">
 
-        <!-- Bar Graph of Approved/pending Detail  -->
-         <!--
-         <div class="container-fluid pt-4 px-4">
-            <div class="row g-4">
-                 <div class="col-sm-12 col-xl-6">
-                    <div class="bg-secondary rounded h-100 p-4">
-                        <h6 class="mb-4">Total number clients brought by each Distributor</h6>
-                        <canvas id="clientChart2" width="400" height="200"></canvas>
-                    </div>
-                </div>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- client table data End  -->
 
+<!-- Back to Top -->
+<a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+{% endblock %}
+
+ <!-- Footer Start -->
+{% block footer %}
+ <div class="container-fluid pt-4 px-4">
+    <div class="bg-secondary rounded-top p-4">
+        <div class="row">
+            <div class="col-12 col-sm-6 text-center text-sm-start">
+                &copy; <a href="https://academycity.org/en/e/" target="_blank">@AcDantez</a>, All Right Reserved.
+            </div>
+            <div class="col-12 col-sm-6 text-center text-sm-end">
+                <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
+                Designed By <a href="https://academycity.org/en/e/" target="_blank">@AcDantez</a>
+                <br>Distributed By: <a href="https://academycity.org/en/e/" target="_blank">@AcDantez</a>
             </div>
         </div>
-        -->
-        <!-- Graph of Approved/pending Detail End -->
+    </div>
+</div>
+{% endblock %}
+<!-- Footer End -->
 
 
-        <!-- Graph of Approved/pending Detail  -->
-         <div class="container-fluid pt-4 px-4">
-            <div class="row g-4">
-
-<!--                <div class="col-sm-12 col-xl-4">-->
-<!--                    <div class="bg-secondary text-center rounded p-4">-->
-<!--                        <div class="d-flex align-items-center justify-content-between mb-4">-->
-<!--                            <h6 class="mb-0">Approved/pending Detail for each Distributor</h6>-->
-<!--                        </div>-->
-<!--                        <canvas id="clientChart3" width="400" height="200"></canvas>-->
-<!--                    </div>-->
-<!--                </div>-->
-
-<!--                <div class="col-sm-12 col-xl-6">-->
-<!--                    <div class="bg-secondary text-center rounded p-4">-->
-<!--                        <div class="d-flex align-items-center justify-content-between mb-4">-->
-<!--                            <h6 class="mb-0">Approved/pending Detail for each Distributor</h6>-->
-<!--                        </div>-->
-<!--                        <canvas id="clientChart" width="400" height="200"></canvas>-->
-<!--                    </div>-->
-<!--                </div>-->
-                <div class="col-sm-12 col-xl-6">
-                    <div class="bg-secondary text-center rounded p-4">
-                        <label for="thresholdInput">Threshold:</label>
-                        <input type="number" id="thresholdInput1" value="{{DEfault_thresholdInput1}}" size="5" style="text-align:center">
-                        <button id="updateThresholdButton1" style="background-color:red">Update Threshold</button>
-
-                        <div class="d-flex align-items-center justify-content-between mb-4">
-                            <h6 class="mb-0">Approval Rate Analysis</h6>
-                        </div>
-                        <canvas id="lineChart" width="400" height="200"></canvas>
-                    </div>
-                </div>
-
-                 <div class="col-sm-12 col-xl-6">
-                    <div class="bg-secondary text-center rounded h-100 p-4">
-                           <label for="thresholdInput">Threshold:</label>
-                           <input type="number" id="thresholdInput" value="{{DEfault_thresholdInput}}" size="5" style="text-align:center">
-                           <button id="updateThresholdButton" style="background-color:red">Update Threshold</button>
-                           <div class="d-flex align-items-center justify-content-between mb-4">
-                             <h6 class="mb-0">Clients Brought</h6>
-                           </div>
-                        <canvas id="employeeChart" width="400" height="200"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Graph of Approved/pending Detail End -->
-
-        <!-- client table data -->
-        <div class="container-fluid pt-4">
-            <div class="bg-danger text-center rounded p-4">
-                <h6 class="mb-3">Performance</h6>
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                </div>
-                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-                    <table>
-                        <thead>
-                            <tr class="text-dark">
-                                <th scope="col">Name</th>
-                                <th scope="col">Clients</th>
-                                <th scope="col"><i class="fas fa-check-circle" style='font-size:25px'></i></th>
-                                <th scope="col"><i class='fas fa-question-circle' style='font-size:25px'></i></th>
-                                <th scope="col">A-Rate</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-white" id="employeeTableBody">
-
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-       </div>
-        <!-- client table data End  -->
-
-        <!-- client table data -->
-        <div class="container-fluid pt-4 px-4">
-            <div class="bg-secondary text-center rounded p-4">
-                <h6 class="mb-3">Client Table</h6>
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <!-- Search Bar -->
-                    <input style="margin-right:1100px" size="40" type="number" id="searchInput" placeholder="client phone number...">
-                </div>
-                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-                    <table class="table text-start align-middle table-bordered table-hover mb-0 search-table">
-                    <!--<table class="search-table">-->
-                        <thead>
-                            <tr class="text-success">
-                               <!-- <th scope="col">DateClientBrought</th>-->
-                               <!--  <th scope="col">DistributorName</th>-->
-                               <!--  <th scope="col">Name</th>-->
-                                <th scope="col">contact1</th>
-                               <!--  <th scope="col">contact2</th>-->
-                                <!-- <th scope="col">Location</th>-->
-                                <!-- <th scope="col">Status</th>-->
-                                <th scope="col">Payment</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-white">
-                            {% for client in all_clients %}
-                                {% for payment in client.client_payment.all %}
-                                   {% if not payment.approved %}
-                                   <tr>
-                                       <!-- <td>{{ client.date }}</td>-->
-                                        <!-- <td>{{ client.employee }}</td>-->
-                                        <!-- <td>{{ client.name }}</td>-->
-                                        <td>{{ client.phoneNumber1 }}</td>
-                                        <!--<td>{{ client.phoneNumber2 }}</td>-->
-                                        <!-- <td>{{ client.location }}</td>-->
-                                        <!-- <td><span class="btn-warning btn-lg" style="padding:1px;font-size:12px">pending</span></td>-->
-                                         <td>
-                                            <form action="{% url 'realestates:approve_payment' payment.id %}" method="post">
-                                                {% csrf_token %}
-                                                <button class="btn btn-sm btn-primary" type="submit">Approve</button>
-                                            </form>
-                                             <!--<form method="post">-->
-                                              <!--  {% csrf_token %}-->
-                                               <!-- <input type="hidden" name="client_id" value="{{ client.id }}">-->
-                                              <!--  <button type="button" client-id="{{ client.id }}" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal" name="confirm_client_payment">Archive</button>-->
-                                           <!-- </form>-->
-                                         </td>
-                                   </tr>
-
-                                   <!-- POP-UP -->
-                                   <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                      <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                          <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalLabel">Offerings report archiving</h5>
-                                            <button type="button"  class="close" data-dismiss="modal" aria-label="Close" style="border:none;">
-                                              <span aria-hidden="true" style="color:red">&times;</span>
-                                            </button>
-                                          </div>
-                                          <div class="modal-body">
-                                            <h5 style="color:blue">Confirming the payment of <span class="text-danger">{{client}}</span></h5>
-                                               <form method="post">
-                                                {% csrf_token %}
-                                                     <input type="text" id="amountInput" oninput="formatAmount(this)" name="amount_paid" placeholder="Enter amount" required>
-                                                     <button type="submit" style="margin-top:5px" >confirm</button>
-                                               </form>
-                                          </div>
-                                          <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                          </div>
-                                        </div>
-                                      </div>
-                                   </div>
-                                   {% endif %}
-                                {% endfor %}
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-       </div>
-        <!-- client table data End  -->
-       {% endblock %}
-
-        <!-- Footer Start -->
-        {% block footer %}
-         <div class="container-fluid pt-4 px-4">
-            <div class="bg-secondary rounded-top p-4">
-                <div class="row">
-                    <div class="col-12 col-sm-6 text-center text-sm-start">
-                        &copy; <a href="https://academycity.org/en/e/" target="_blank">Academy City</a>, All Right Reserved.
-                    </div>
-                    <div class="col-12 col-sm-6 text-center text-sm-end">
-                        <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
-                        Designed By <a href="https://academycity.org/en/e/" target="_blank">Academy City</a>
-                        <br>Distributed By: <a href="https://academycity.org/en/e/" target="_blank">Academy City</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endblock %}
-        <!-- Footer End -->
-
-       {% block add_js %}
-        <script type="text/javascript">
-
-          var csrftoken = Cookies.get('csrftoken');
-          function csrfSafeMethod(method) {
-            // these HTTP methods do not require CSRF protection
-            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-          }
-          $.ajaxSetup({
-            beforeSend: function(xhr, settings) {
-              if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-              }
-            }
-          });
-
-          $(document).ready(function () {
-
-            employees_client = function(e)
-                 {
-                     url = "{% url 'realestates:employees_client' %}"
-                     $.post(url,
-                            { },
-                     function(data){
-
-                         //alert(JSON.stringify(data))
-
-                         var xValue = [];
-                         var yValue = [];
-                         approved_clients = [];
-                         appending_clients = [];
-                         for(employee_name in data)
-                         {
-                             //alert(JSON.stringify(data[employee_name]["approved_clients"]))
-                             approved_clients.push(data[employee_name]["approved_clients"])
-                             appending_clients.push(data[employee_name]["appending_clients"])
-                             //alert(JSON.stringify(data[employee_name]["clients"]))
-                             xValue.push(employee_name);
-                             yValue.push(data[employee_name]["clients"].length);
-                         }
-
-                            // Total number clients brought by each Employee Graph //
-
-                            var ctx4 = $("#bar-chart").get(0).getContext("2d");
-                            var myChart4 = new Chart(ctx4, {
-                                type: "bar",
-                                data: {
-                                    labels: xValue,
-                                    datasets: [{
-                                        backgroundColor: [
-                                            "rgba(15, 10, 222, .7)",
-                                            "rgba(15, 10, 222, .7)",
-                                            "rgba(15, 10, 222, .7)",
-                                            "rgba(15, 10, 222, .7)",
-                                            "rgba(15, 10, 222, .7)"
-                                        ],
-                                        data: yValue
-                                    }]
-                                },
-                                options: {
-                                    responsive: true
-                                }
-                            });
-
-                            // Approved/Appending Graph //
-
-                            var ctx1 = $("#worldwide-sales").get(0).getContext("2d");
-                            var myChart1 = new Chart(ctx1, {
-                                type: "bar",
-                                data: {
-                                    labels: xValue,
-                                    datasets: [{
-                                            label: "Approved",
-                                            data: approved_clients,
-                                            backgroundColor: "RGB(0, 195, 0)"
-                                        },
-                                        {
-                                            label: "Appending",
-                                            data: appending_clients,
-                                            backgroundColor: "rgb(255, 234, 0)"
-                                        }
-                                    ]
-                                    },
-                                options: {
-                                    responsive: true
-                                }
-                            });
 
 
-                     })
-                 }
-            employees_client()
-          });
-        </script>
-        <script>
-            function showSubTable(row) {
-                // Extract the date value from the clicked row
-                var date = row.children[0].innerHTML;
-
-                // Toggle the visibility of the next row (which contains the sub-table)
-                var nextRow = row.nextElementSibling;
-                if (nextRow.classList.contains('sub-table-row')) {
-                    nextRow.style.display = (nextRow.style.display === 'none') ? 'table-row' : 'none';
-                }
-            }
-
-            // Attach event listeners to table rows
-            //$('tbody tr').click(function(event) {
-                // Prevent the default behavior of the click event
-             //   event.preventDefault();
-            //});
-
-
-        </script>
-        <script>
-            $(document).ready(function() {
-                $('#searchInput').on('keyup', function() {
-                    var searchText = $(this).val().toLowerCase();
-                    $(this).closest('.bg-secondary').find('.search-table tbody tr').filter(function() {
-                        $(this).toggle($(this).text().toLowerCase().indexOf(searchText) > -1);
-                    });
-                });
-            });
-        </script>
-       <!--  amount comas    -->
-       <script>
-            function formatAmount(input) {
-                // Remove existing commas and non-numeric characters from the input
-                let value = input.value.replace(/[^\d]/g, '');
-
-                // Add commas to the value
-                value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
-                // Update the input value
-                input.value = value;
-            }
-    </script>
-     <!-- horizontal bar graph -->
-        <script>
-            fetch("{% url 'realestates:employees_client' %}")
-                  .then(response => response.json())
-                  .then(data => {
-                    // Extract employee data and format it for the chart
-                    const employeeData = Object.entries(data).map(([employee, employeeData]) => ({
-                      employee: employee,
-                      approvedClients: employeeData.approved_clients,
-                      appendingClients: employeeData.appending_clients
-                    }));
-
-                    // Extract employee names and client data
-                    const employeeNames = employeeData.map(entry => entry.employee);
-                    const approvedClients = employeeData.map(entry => entry.approvedClients);
-                    const appendingClients = employeeData.map(entry => entry.appendingClients);
-
-                    // Create a new Chart instance
-                    const ctx = document.getElementById('clientChart2').getContext('2d');
-                    const myChart = new Chart(ctx, {
-                      type: 'bar',
-                      data: {
-                        labels: employeeNames,
-                        datasets: [{
-                          label: 'Approved Clients',
-                          backgroundColor: 'blue',
-                          data: approvedClients
-                        }, {
-                          label: 'Appending Clients',
-                          backgroundColor: 'green',
-                          data: appendingClients
-                        }]
-                      },
-                      options: {
-                        indexAxis: 'y',
-                        plugins: {
-                          legend: {
-                            position: 'right'
-                          }
-                        }
-                      }
-                    });
-                  });
-
-        </script>
-     <!-- clients brought graph -->
-       <script>
-        let myChart; // Declare myChart variable outside fetch function
-
-        // Function to update the chart based on the threshold
-        const updateChart = (threshold) => {
-
-            // Fetch data from the server
-            fetch("{% url 'realestates:employees_client' %}")
-                .then(response => response.json())
-                .then(data => {
-                    // Extract employee names and client counts from the fetched data
-                    const employeeNames = Object.keys(data);
-                    const clientCounts = employeeNames.map(employee => data[employee].clients.length);
-
-                    // Filter employees based on the threshold
-                    const selectedEmployees = employeeNames.filter((employee, index) => clientCounts[index] > threshold);
-                    const selectedClientCounts = clientCounts.filter((count, index) => count > threshold);
-
-                    // Update the chart data
-                    myChart.data.labels = selectedEmployees;
-                    myChart.data.datasets[0].data = selectedClientCounts;
-
-                    // Update the chart
-                    myChart.update();
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                });
-        };
-
-        // Fetch data from the server
-        fetch("{% url 'realestates:employees_client' %}")
-            .then(response => response.json())
-            .then(data => {
-                // Extract employee names and client counts from the fetched data
-                const employeeNames = Object.keys(data);
-                const clientCounts = employeeNames.map(employee => data[employee].clients.length);
-
-                // Default threshold value
-                const defaultThreshold =parseInt(document.getElementById('thresholdInput').value);
-
-                // Create a line chart
-                const ctx = document.getElementById('employeeChart').getContext('2d');
-                myChart = new Chart(ctx, { // Assign myChart inside fetch function
-                    type: 'line',
-                    data: {
-                        labels: employeeNames,
-                        datasets: [{
-                            label: 'Total Clients Brought',
-                            data: clientCounts,
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 2,
-                            fill: false
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Total Clients Brought'
-                                }
-                            },
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Distributor'
-                                }
-                            }
-                        }
-                    }
-                });
-
-                // Update the chart with the default threshold value immediately
-                updateChart(defaultThreshold);
-
-                // Event listener for the threshold input field
-                document.getElementById('thresholdInput').addEventListener('change', function() {
-                    const threshold = parseInt(this.value); // Get the new threshold value
-                    updateChart(threshold); // Update the chart with the new threshold value
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-
-        </script>
-     <!-- Approval rate table -->
-        <script>
-        // Fetch data from the server
-        fetch("{% url 'realestates:employees_client' %}")
-            .then(response => response.json())
-            .then(data => {
-                // Extract and sort employee data by the number of clients brought in
-                const sortedEmployees = Object.entries(data).sort((a, b) => {
-                    return b[1].clients.length - a[1].clients.length; // Sort in descending order
-                });
-
-                // Populate table body with employee information
-                const tableBody = document.getElementById('employeeTableBody');
-                sortedEmployees.forEach(([employee, performanceData]) => {
-                    const totalClientsBrought = performanceData.clients.length;
-                    const approvedClients = performanceData.approved_clients;
-                    const pendingClients = performanceData.appending_clients;
-                    const approvalRate = approvedClients > 0 ? ((approvedClients / totalClientsBrought) * 100).toFixed(0) + '%' : '0%';
-
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td class="truncate">${employee}</td>
-                        <td>${totalClientsBrought}</td>
-                        <td>${approvedClients}</td>
-                        <td>${pendingClients}</td>
-                        <td>${approvalRate}</td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-
-        </script>
-     <!-- Approval rate graph -->
-       <script>
-         // Fetch data from the server
-            fetch("{% url 'realestates:employees_client' %}")
-                .then(response => response.json())
-                .then(data => {
-                    // Initialize arrays to store employee names and approval rates
-                    let employeeNames = [];
-                    let approvalRates = [];
-
-                    // Function to update the chart based on the threshold
-                    const updateChart = (threshold) => {
-                        // Clear existing data
-                        employeeNames = [];
-                        approvalRates = [];
-
-                        // Extract and filter employee data based on the threshold
-                        Object.entries(data).forEach(([employee, performanceData]) => {
-                            const totalClientsBrought = performanceData.clients.length;
-                            const approvedClients = performanceData.approved_clients;
-                            const approvalRate = totalClientsBrought > 0 ? ((approvedClients / totalClientsBrought) * 100).toFixed(0) : 0;
-
-                            // Check if approval rate meets the threshold
-                            if (approvalRate > threshold) {
-                                employeeNames.push(employee);
-                                approvalRates.push(approvalRate);
-                            }
-                        });
-
-                        // Update the chart
-                        lineChart.data.labels = employeeNames;
-                        lineChart.data.datasets[0].data = approvalRates;
-                        lineChart.update();
-                    };
-
-                    // Default threshold value
-                    const value  = document.getElementById('thresholdInput1').value
-                    const defaultThreshold = parseInt(value); // Default threshold set to 50%
-
-                    // Create line chart using Chart.js
-                    const ctx = document.getElementById('lineChart').getContext('2d');
-                    const lineChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: employeeNames,
-                            datasets: [{
-                                label: 'Approval Rate',
-                                data: approvalRates,
-                                backgroundColor: 'rgba(54, 162, 235, 0.2)', // Adjust colors as needed
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    title: {
-                                        display: true,
-                                        text: 'Approval Rate (%)'
-                                    }
-                                },
-                                x: {
-                                    title: {
-                                        display: true,
-                                        text: 'Distributor'
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                    // Update the chart with the default threshold value immediately
-                    updateChart(defaultThreshold);
-
-                    // Event listener for the threshold input field
-                    document.getElementById('thresholdInput1').addEventListener('change', function() {
-                        const threshold = parseInt(this.value); // Get the new threshold value
-                        updateChart(threshold); // Update the chart with the new threshold value
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                });
-
-       </script>
-       {% endblock %}

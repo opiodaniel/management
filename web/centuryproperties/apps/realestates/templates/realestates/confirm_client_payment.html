@@ -29,10 +29,11 @@
                                 <!-- Input field for the total amount -->
                                 <label for="totalAmount">Expected:</label>
                                  <br>
-
                                 <input  type="text" id="totalAmount" oninput="formatAmount(this)" name="total_amount" placeholder="Enter total amount"
                                         {% for payment in client.client_payment.all %} {% if payment.remaining_amount > 0 %} value="{{ payment.remaining_amount|add_commas }}" {% endif %} {% endfor %} required>
-
+                                <br>
+                                <label for="plotNumberInput">Plot number:</label><br>
+                                <input type="text" id="plotNumberInput" name="plot_number" placeholder="Enter plot number" {% for payment in client.client_payment.all %} {% if payment.plot_number %} value="{{ payment.plot_number }}" {% endif %} {% endfor %} >
                                  <button type="submit" style="background-color:blue;color:white">Approve</button>
                                  <input type="button" value="Cancel" class="btn-danger btn-badge" onclick="window.history.go(-1);"/>
                             </form>

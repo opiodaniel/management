@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_filters %}
+
+        {% block title %}
+          Distributor
+        {% endblock %}
+
+
+        <!-- Sidebar Start -->
+        {% block Sidebar %}
+         <nav class="navbar bg-secondary navbar-dark">
+
+                <div class="navbar-brand mx-4 mb-3">
+                    <img class="rounded-circle" src="{{ company_logo_url }}" alt="" style="width: 70px; height: 70px; margin-left:45px">
+                    <h5 class="text-info" style="margin-top:5px;text-align:center">Century Properties  <br>& <br> Real Estates Ltd</h5>
+                </div>
+                <div class="d-flex align-items-center ms-4 mb-4">
+                    <div class="position-relative">
+                        <img class="rounded-circle" src="{{ profile_pic_url }}" alt="" style="width: 40px; height: 40px;">
+                        <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="mb-0">{{ employee.user.username }}</h6>
+                        <span>Distributor</span>
+                    </div>
+                </div>
+                <div class="navbar-nav w-100">
+                    <a href="#" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+                    <a href="{% url 'realestates:add_client' %}" class="nav-item nav-link"><i class="fa fa-user-plus"></i>Add Client</a>
+                    <a href="{% url 'realestates:expired_clients_list' %}" class="nav-item nav-link">
+                        <i class="fas fa-exchange-alt"></i>
+                         Claim Clients
+                    </a>
+                </div>
+
+            </nav>
+        {% endblock %}
+        <!-- Sidebar End -->
+
+        <!-- Navbar Start -->
+        {% block Navbar %}
+         <nav class="navbar navbar-expand bg-secondary navbar-dark sticky-top px-4 py-0">
+            <a href="#" class="navbar-brand d-flex d-lg-none me-4">
+                 <img class="rounded-circle" src="{{ company_logo_url }}" alt="" style="width: 70px; height: 70px; margin-left:45px">
+            </a>
+            <a href="#" class="sidebar-toggler flex-shrink-0">
+                <i class="fa fa-bars"></i>
+            </a>
+            <form class="d-none d-md-flex ms-4">
+                <input class="form-control bg-dark border-0" type="search" placeholder="Search">
+            </form>
+            <div class="navbar-nav align-items-center ms-auto">
+                <div class="nav-item dropdown">
+                     <a href="{% url 'realestates:employee_dashboard' employee_id %}" class="nav-item nav-link"><i class="fas fa-home"></i>Home</a>
+                </div>
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                        <img class="rounded-circle me-lg-2" src="{{ profile_pic_url }}" alt="" style="width: 40px; height: 40px;">
+                        <span class="d-none d-lg-inline-flex">{{employee.user.username}}</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0">
+                        <a class="dropdown-item" href="{% url 'realestates:edit_user_profile_new' %}"><i class="fas fa-user-edit text-warning"></i> Edit Profile</a>
+                        <!-- <a href="#" class="dropdown-item">Settings</a> -->
+                        <a href="{% url 'realestates:change_password' %}" class="dropdown-item"><i class="fas fa-user-cog text-success"></i> Change Password</a>
+                        <form method="post" action="{% url 'realestates:logout' %}">
+                            {% csrf_token %}
+                            <button class="dropdown-item" ><i class="fas fa-sign-in-alt text-primary"></i> Log out</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        {% endblock %}
+        <!-- Navbar End -->
+
+        {% block content %}
+        <!-- Recent Sales Start -->
+        <div class="container-fluid pt-4 px-4">
+            <div class="bg-secondary text-center rounded p-4">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h6 class="mb-0">Claim Clients</h6>
+                </div>
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table class="table text-start align-middle table-bordered table-hover mb-0">
+                        <thead>
+                            <tr class="text-success">
+                                <th>Name</th>
+                                <th scope="col">Action</th>
+
+                            </tr>
+                        </thead>
+                        <tbody class="text-white card-link">
+                            {% for client in expired_clients %}
+                            <tr>
+                                <td>{{ client.name }}</td>
+                                <td>
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="client_id" value="{{ client.id }}">
+                                        <button type="submit" style="border-radius: 50%; width: 20px; height: 20px; font-size: 10px;margin-left:40px;background-color:red;" name="reset_expired_clients">R</button>
+                                    </form>
+                                    <span class="btn-danger btn-lg" style="padding:1px;font-size:12px">Expired</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- Recent Sales End -->
+        {% endblock %}
+
+        <!-- Footer Start -->
+        {% block footer %}
+
+        {% endblock %}
+        <!-- Footer End -->
+
+        {% block add_js %}
+
+        {% endblock %}
+
+
+
+
+

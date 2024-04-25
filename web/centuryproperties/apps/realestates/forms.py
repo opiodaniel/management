@@ -129,9 +129,9 @@ class ProfileEditForm(forms.ModelForm):
 
     class Meta:
         model = Employees
-        fields = ('profile_pic', 'date_of_birth', 'short_bio', 'bio',
+        fields = ('profile_pic', 'date_of_birth',
                   'address', 'zip', 'city', 'country',
-                  'phone',)
+                  'phone',)  #'short_bio', 'bio',
 
 
 class MessageForm(forms.Form):
