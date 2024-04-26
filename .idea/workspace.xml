@@ -6,6 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="8c1124b6-6789-4251-99c8-d42593558513" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/base_admin_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/base_admin_dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/admin_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/admin_dashboard.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

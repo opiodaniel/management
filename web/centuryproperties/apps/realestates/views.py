@@ -58,7 +58,7 @@ def login_page(request):
         # user = authenticate(username=username, password=password)
         if user is not None:
             login(request, user)
-            if user.is_superuser:  # Check if user is admin
+            if user.is_staff:  # Check if user is admin
                 # return redirect('admin_dashboard')  # Redirect admin to admin dashboard
                 # print(user)
                 # print(user.id)
@@ -123,7 +123,7 @@ def get_total_sales_for_previous_months(request):
 @login_required
 def admin_dashboard(request, admin_id):
 
-    DEfault_thresholdInput1 = 50
+    DEfault_thresholdInput1 = 1
     DEfault_thresholdInput = 0
 
     if request.method == 'POST' and 'confirm_client_payment' in request.POST:
@@ -460,7 +460,7 @@ def confirm_payment(request, client_id):
             current_user = request.user
 
             # Check if the current user is a superuser (admin)
-            if current_user.is_superuser:
+            if current_user.is_staff:
                 # Get the associated employee record for the admin user
                 # print(current_user, 'I am a superuser')
                 try:
@@ -708,7 +708,7 @@ def edit_user_profile_new(request):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            if request.user.is_superuser:  # Check if user is admin
+            if request.user.is_staff:  # Check if user is admin
                 # return redirect('admin_dashboard')  # Redirect admin to admin dashboard
                 # print(user)
                 # print(user.id)
