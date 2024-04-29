@@ -26,7 +26,7 @@
                 <!--<table class="search-table">-->
                     <thead>
                         <tr class="text-info">
-                           <!-- <th scope="col">DateClientBrought</th>-->
+                            <th scope="col">Date</th>
                            <!--  <th scope="col">DistributorName</th>-->
                            <!--  <th scope="col">Name</th>-->
                             <th scope="col">contact1</th>
@@ -42,7 +42,7 @@
                             {% for payment in client.client_payment.all %}
                                {% if not payment.approved %}
                                <tr>
-                                   <!-- <td>{{ client.date }}</td>-->
+                                    <td>{{ client.date }}</td>
                                     <!-- <td>{{ client.employee }}</td>-->
                                     <!-- <td>{{ client.name }}</td>-->
                                     <td>{{ client.phoneNumber1 }}</td>

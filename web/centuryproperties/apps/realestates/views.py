@@ -393,10 +393,15 @@ def expired_clients_list(request):
     employee_id = request.user.id
     # Retrieve the employee object based on the employee_id
     employee = get_object_or_404(Employees, id=employee_id)
+
     profile_pic_url = employee.profile_pic.url
     expiry_date = datetime.now().date() - timedelta(days=7)
+
     # Retrieve expired clients
-    expired_clients = Client.objects.filter(date__lt=expiry_date, client_payment__approved=False)
+    # all_expired_clients = Client.objects.filter(date__lt=expiry_date, client_payment__approved=False)
+
+    # Retrieve expired clients for a specific employee
+    expired_clients = employee.client_employee.filter(date__lt=expiry_date, client_payment__approved=False)
     if request.method == 'POST' and 'reset_expired_clients' in request.POST:
         # Reset the entry date of expired clients to the current date
         client_id = request.POST.get('client_id')

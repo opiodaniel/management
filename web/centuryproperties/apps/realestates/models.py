@@ -151,7 +151,8 @@ class Client(TruncateTableMixin, models.Model):
     phoneNumber2 = models.CharField(max_length=10, blank=True, default='', null=True)
     location = models.CharField(max_length=30, default='', blank=True, null=True)
     plot_number = models.CharField(max_length=20, blank=True, default='')
-    date = models.DateField(auto_now_add=True, null=True)
+    # date = models.DateField(auto_now_add=True, null=True)
+    date = models.DateTimeField(auto_now_add=True, null=True)  # DateTimeField to capture date and time
     employee = models.ForeignKey(Employees, on_delete=models.SET_NULL, null=True, related_name="client_employee")
 
     def __str__(self):
