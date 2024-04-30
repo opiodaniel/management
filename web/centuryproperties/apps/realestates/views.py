@@ -17,6 +17,8 @@ from django.contrib.auth import update_session_auth_hash
 from django.core.mail import send_mail
 
 from datetime import date
+from django.utils import timezone
+
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .utils import total_amount_today
 from .tasks import remove_inactive_clients
@@ -124,7 +126,7 @@ def get_total_sales_for_previous_months(request):
 def admin_dashboard(request, admin_id):
 
     DEfault_thresholdInput1 = 1
-    DEfault_thresholdInput = 0
+    DEfault_thresholdInput = 10
 
     if request.method == 'POST' and 'confirm_client_payment' in request.POST:
         # Reset the entry date of expired clients to the current date
@@ -231,10 +233,10 @@ def admin_dashboard(request, admin_id):
 
     payments = Payment.objects.filter(approved=False).order_by('approved', '-client__date')
 
-    expiry_date = datetime.now().date() - timedelta(days=7)
+    expiry_date = timezone.now().date() - timedelta(days=7)
 
     # Filter clients who have not exceeded the expiry date
-    active_clients = Client.objects.filter(date__gte=expiry_date)
+    active_clients = Client.objects.filter(date__date__gte=expiry_date)
 
     all_clients = active_clients
 
@@ -319,7 +321,7 @@ def employee_dashboard(request, employee_id):
     total_approved_clients = employee.total_approved_clients()
     total_appending_clients = employee.total_appending_clients()
 
-    expiry_date = datetime.now().date() - timedelta(days=7)
+    expiry_date = timezone.now().date() - timedelta(days=7)
     clients = employee.client_employee.all()
     expired_clients = employee.client_employee.filter(date__lt=expiry_date)  # client_payment__approved=False
 
@@ -331,10 +333,10 @@ def employee_dashboard(request, employee_id):
         client_id = request.POST.get('client_id')
         # client = employee.client_employee.get(id=client_id)
         client = Client.objects.get(id=client_id)
-        expiry_date = datetime.now().date() - timedelta(days=7)
+        expiry_date = timezone.now().date() - timedelta(days=7)
         if client.date < expiry_date:
             # Update the client's date to the current date
-            client.date = datetime.now().date()
+            client.date = timezone.now()
             # Set the employee field to the current employee
             client.employee = request.user.employee  # Assuming the logged-in user is an employee
             # Save the changes to the database
@@ -395,23 +397,23 @@ def expired_clients_list(request):
     employee = get_object_or_404(Employees, id=employee_id)
 
     profile_pic_url = employee.profile_pic.url
-    expiry_date = datetime.now().date() - timedelta(days=7)
+    expiry_date = timezone.now().date() - timedelta(days=7)
 
     # Retrieve expired clients
     # all_expired_clients = Client.objects.filter(date__lt=expiry_date, client_payment__approved=False)
 
     # Retrieve expired clients for a specific employee
-    expired_clients = employee.client_employee.filter(date__lt=expiry_date, client_payment__approved=False)
+    expired_clients = employee.client_employee.filter(date__date__lt=expiry_date, client_payment__approved=False)
     if request.method == 'POST' and 'reset_expired_clients' in request.POST:
         # Reset the entry date of expired clients to the current date
         client_id = request.POST.get('client_id')
         # client = employee.client_employee.get(id=client_id)
         client = Client.objects.get(id=client_id)
         payment = Payment.objects.get(client=client)
-        expiry_date = datetime.now().date() - timedelta(days=7)
-        if client.date < expiry_date:
+        expiry_date = timezone.now().date() - timedelta(days=7)
+        if client.date.date() < expiry_date:
             # Update the client's date to the current date
-            client.date = datetime.now().date()
+            client.date = timezone.now()
             # Set the employee field to the current employee
             client.employee = request.user.employee  # Assuming the logged-in user is an employee
             # Update the existing payment record with the new employee
@@ -626,9 +628,9 @@ def client_list(request):
     company_logo_url = company.company_logo.url
     employees = Employees.objects.all().filter(is_administrator=False)
 
-    expiry_date = datetime.now().date() - timedelta(days=7)
+    expiry_date = timezone.now().now().date() - timedelta(days=7)
     # Filter clients who have not exceeded the expiry date
-    active_clients = Client.objects.filter(date__gte=expiry_date)
+    active_clients = Client.objects.filter(date__date__gte=expiry_date)
 
     all_clients = active_clients
 
@@ -691,13 +693,13 @@ def register(request):
         company = Company.objects.get(id=1)
         company_logo_url = company.company_logo.url
         employees = Employees.objects.all().filter(is_administrator=False)
-        context = {
-            'form': form,
-            'admin_id': admin_id,
-            'employees': employees,
-            'company_logo_url': company_logo_url,
-            'profile_pic_url': profile_pic_url,
-        }
+    context = {
+        'form': form,
+        'admin_id': admin_id,
+        'employees': employees,
+        'company_logo_url': company_logo_url,
+        'profile_pic_url': profile_pic_url,
+    }
 
     return render(request, 'realestates/registration/reg_form.html', context)
 
