@@ -505,41 +505,43 @@ def confirm_payment(request, client_id):
                 # payment.save()
 
                 # TO USE THIS CODE SOON. IT'S A NEW UPDATE. ONLY CALCULATES FOR A PARTICULAR EMPLOYEE.
-                # employee_id = request.POST.get('employee_id')
-                # print('employee_id=1222222222222222', employee_id)
-                # employee__ = Employees.objects.get(id=employee_id)
-                # print('employee_id-----employee ', employee_id,  employee__)
-                # weekly_commission = employee__.calculate_weekly_commission()
-                # employee_payment_record, created = EmployeePaymentRecord.objects.get_or_create(
-                #     employee=employee__)
-                # employee_payment_record.total_commission += weekly_commission
-                # employee_payment_record.balance = employee_payment_record.total_commission - employee_payment_record.amount_paid
-                # employee_payment_record.save()
+                employee_id = request.POST.get('employee_id')
+                print('employee_id=1222222222222222', employee_id)
+                employee__ = Employees.objects.get(id=employee_id)
+                print('employee_id-----employee ', employee_id,  employee__)
+                weekly_commission = employee__.calculate_weekly_commission()
+                employee_payment_record, created = EmployeePaymentRecord.objects.get_or_create(
+                    employee=employee__)
+                employee_payment_record.total_commission = weekly_commission
+                employee_payment_record.balance = employee_payment_record.total_commission - employee_payment_record.amount_paid
+                employee_payment_record.save()
                 # END OF THE CODE
 
-                logging.basicConfig(level=logging.INFO)
-                # Update EmployeePaymentRecord
-                for employee in Employees.objects.filter(is_administrator=False):
-                    try:
-                        weekly_commission = employee.calculate_weekly_commission()
-                        all_employee_payment_record, created = EmployeePaymentRecord.objects.get_or_create(
-                            employee=employee)
+                # THIS CODE CALCULATES ALL EMPLOYEES TOTAL COMMISSION
 
-                        logging.info(f'Employee: {employee.id}, Calculated Weekly Commission: {weekly_commission}')
-
-                        # Update total commission by adding the weekly commission
-                        all_employee_payment_record.total_commission += weekly_commission
-                        all_employee_payment_record.balance = all_employee_payment_record.total_commission - all_employee_payment_record.amount_paid
-                        all_employee_payment_record.save()
-
-                        logging.info(
-                            f'Updated Employee: {employee.id}, Total Commission: {all_employee_payment_record.total_commission}, Weekly Commission: {weekly_commission}, Balance: {all_employee_payment_record.balance}')
-
-                    except EmployeePaymentRecord.DoesNotExist:
-                        logging.error(
-                            f'Payment record for employee {employee.id} does not exist and could not be created.')
-                    except Exception as e:
-                        logging.error(f'An error occurred while updating employee {employee.id}: {e}')
+                # logging.basicConfig(level=logging.INFO)
+                # # Update EmployeePaymentRecord
+                # for employee in Employees.objects.filter(is_administrator=False):
+                #     try:
+                #         weekly_commission = employee.calculate_weekly_commission()
+                #         all_employee_payment_record, created = EmployeePaymentRecord.objects.get_or_create(
+                #             employee=employee)
+                #
+                #         logging.info(f'Employee: {employee.id}, Calculated Weekly Commission: {weekly_commission}')
+                #
+                #         # Update total commission by adding the weekly commission
+                #         all_employee_payment_record.total_commission += weekly_commission
+                #         all_employee_payment_record.balance = all_employee_payment_record.total_commission - all_employee_payment_record.amount_paid
+                #         all_employee_payment_record.save()
+                #
+                #         logging.info(
+                #             f'Updated Employee: {employee.id}, Total Commission: {all_employee_payment_record.total_commission}, Weekly Commission: {weekly_commission}, Balance: {all_employee_payment_record.balance}')
+                #
+                #     except EmployeePaymentRecord.DoesNotExist:
+                #         logging.error(
+                #             f'Payment record for employee {employee.id} does not exist and could not be created.')
+                #     except Exception as e:
+                #         logging.error(f'An error occurred while updating employee {employee.id}: {e}')
 
                 # # Calculate commission for non-admin employees
                 # for employee in Employees.objects.filter(is_administrator=False):  # Exclude superuser (admin)
