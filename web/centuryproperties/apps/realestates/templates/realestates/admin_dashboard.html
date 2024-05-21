@@ -42,6 +42,15 @@
         </style>
 {% endblock %}
 
+
+{% block SubNavbar %}
+    <div class="nav-item dropdown mr-4">
+        <a href="{% url 'realestates:register' %}" class="nav-item nav-link"><i class="fa fa-user-plus"></i></a>
+    </div>
+    <!--<button onclick="clean_data(event)" type="button" class="btn btn-light btn-sm">Clean Database</button>-->
+
+{% endblock SubNavbar %}
+
 {% block content %}
 <!-- Monthly Sales  Start -->
  <div class="container-fluid pt-4 px-4">
@@ -152,9 +161,8 @@
 
         <div class="col-sm-12 col-xl-6">
             <div class="bg-secondary text-center rounded h-100 p-4">
-                 <label for="thresholdInput">Threshold:</label>
-                 <input type="number" id="thresholdInput1" value="{{DEfault_thresholdInput1}}" size="5" style="text-align:center">
-                 <button id="updateThresholdButton1" style="background-color:red">Update Threshold</button>
+                 <input type="number" id="thresholdInput1" value="{{DEfault_thresholdInput1}}" style="text-align:center; width: 50px; height: 30px"  />
+                <button id="updateThresholdButton1" type="button" class="btn btn-info btn-sm mb-1">Update Threshold</button>
                 <div class="d-flex align-items-center justify-content-between mb-4">
                     <h6 class="mb-0">Approved clients</h6>
                 </div>
@@ -163,13 +171,12 @@
         </div>
         <div class="col-sm-12 col-xl-6">
             <div class="bg-secondary text-center rounded h-100 p-4">
-                   <label for="thresholdInput">Threshold:</label>
-                   <input type="number" id="thresholdInput" value="{{DEfault_thresholdInput}}" size="5" style="text-align:center">
-                   <button id="updateThresholdButton" style="background-color:red">Update Threshold</button>
+                   <input type="number" id="thresholdInput" value="{{DEfault_thresholdInput}}" size="5" style="text-align:center; width: 50px; height: 30px"  />
+                   <button id="updateThresholdButton" type="button" class="btn btn-info btn-sm mb-1">Update Threshold</button>
                    <div class="d-flex align-items-center justify-content-between mb-4">
                      <h6 class="mb-0">Clients Brought</h6>
                    </div>
-                <canvas id="employeeChart" width="400" height="200"></canvas>
+                <canvas id="employeebarChart" width="400" height="200"></canvas>
             </div>
         </div>
 
@@ -411,12 +418,118 @@
     </script>
    <!-- end  -->
 
-   <!-- clients brought graph -->
+   <!-- clients brought bar graph -->
    <script>
     let myChart; // Declare myChart variable outside fetch function
 
-    // Function to update the chart based on the threshold
-    const updateChart = (threshold) => {
+        // Function to fetch data and initialize/update the chart
+        const fetchDataAndInitializeChart = (threshold) => {
+            // Fetch data from the server
+            fetch("{% url 'realestates:employees_client' %}")
+                .then(response => response.json())
+                .then(data => {
+                    // Extract employee names and client counts from the fetched data
+                    const employeeNames = Object.keys(data);
+                    const clientCounts = employeeNames.map(employee => data[employee].clients.length);
+
+                    // Filter employees based on the threshold
+                    const selectedEmployees = employeeNames.filter((employee, index) => clientCounts[index] >= threshold);
+                    const selectedClientCounts = clientCounts.filter((count, index) => count >= threshold);
+
+                    // Initialize or update the chart
+                    if (!myChart) {
+                        // Create a new bar chart if myChart is not initialized
+                        const ctx = document.getElementById('employeebarChart').getContext('2d');
+                        myChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: selectedEmployees,
+                                datasets: [{
+                                    label: 'Total Clients Brought',
+                                    data: selectedClientCounts,
+                                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                indexAxis: 'y', // Display labels on the y-axis
+                                scales: {
+                                    y: {
+                                        title: {
+                                            display: true,
+                                            text: 'Distributor'
+                                        }
+                                    },
+                                    x: {
+                                        beginAtZero: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Total Clients Brought'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        // Update the existing chart with new data and options
+                        myChart.data.labels = selectedEmployees;
+                        myChart.data.datasets[0].data = selectedClientCounts;
+                        myChart.update(); // Update the chart
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        };
+
+        // Event listener for the threshold input field
+        document.getElementById('thresholdInput').addEventListener('change', function() {
+            const threshold = parseInt(this.value); // Get the new threshold value
+            fetchDataAndInitializeChart(threshold); // Fetch data and update the chart
+        });
+
+        // Initial data fetch and chart initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            // Default threshold value
+            const defaultThreshold = parseInt(document.getElementById('thresholdInput').value);
+
+            // Fetch data and initialize the chart with default threshold
+            fetchDataAndInitializeChart(defaultThreshold);
+        });
+
+    </script>
+
+   <!-- clients brought horizontal bar graph -->
+    <script>
+        let myChart; // Declare myChart variable outside fetch function
+
+        // Function to update the chart based on the threshold
+        const updateChart = (threshold) => {
+
+            // Fetch data from the server
+            fetch("{% url 'realestates:employees_client' %}")
+                .then(response => response.json())
+                .then(data => {
+                    // Extract employee names and client counts from the fetched data
+                    const employeeNames = Object.keys(data);
+                    const clientCounts = employeeNames.map(employee => data[employee].clients.length);
+
+                    // Filter employees based on the threshold
+                    const selectedEmployees = employeeNames.filter((employee, index) => clientCounts[index] >= threshold);
+                    const selectedClientCounts = clientCounts.filter((count, index) => count >= threshold);
+
+                    // Update the chart data
+                    myChart.data.labels = selectedEmployees;
+                    myChart.data.datasets[0].data = selectedClientCounts;
+
+                    // Update the chart
+                    myChart.update();
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        };
 
         // Fetch data from the server
         fetch("{% url 'realestates:employees_client' %}")
@@ -426,79 +539,54 @@
                 const employeeNames = Object.keys(data);
                 const clientCounts = employeeNames.map(employee => data[employee].clients.length);
 
-                // Filter employees based on the threshold
-                const selectedEmployees = employeeNames.filter((employee, index) => clientCounts[index] > threshold);
-                const selectedClientCounts = clientCounts.filter((count, index) => count > threshold);
+                // Default threshold value
+                const defaultThreshold =parseInt(document.getElementById('thresholdInput').value);
 
-                // Update the chart data
-                myChart.data.labels = selectedEmployees;
-                myChart.data.datasets[0].data = selectedClientCounts;
+                // Create a line chart
+                const ctx = document.getElementById('employeeChart').getContext('2d');
+                myChart = new Chart(ctx, { // Assign myChart inside fetch function
+                    type: 'line',
+                    data: {
+                        labels: employeeNames,
+                        datasets: [{
+                            label: 'Total Clients Brought',
+                            data: clientCounts,
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Total Clients Brought'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Distributor'
+                                }
+                            }
+                        }
+                    }
+                });
 
-                // Update the chart
-                myChart.update();
+                // Update the chart with the default threshold value immediately
+                updateChart(defaultThreshold);
+
+                // Event listener for the threshold input field
+                document.getElementById('thresholdInput').addEventListener('change', function() {
+                    const threshold = parseInt(this.value); // Get the new threshold value
+                    updateChart(threshold); // Update the chart with the new threshold value
+                });
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
-    };
-
-    // Fetch data from the server
-    fetch("{% url 'realestates:employees_client' %}")
-        .then(response => response.json())
-        .then(data => {
-            // Extract employee names and client counts from the fetched data
-            const employeeNames = Object.keys(data);
-            const clientCounts = employeeNames.map(employee => data[employee].clients.length);
-
-            // Default threshold value
-            const defaultThreshold =parseInt(document.getElementById('thresholdInput').value);
-
-            // Create a line chart
-            const ctx = document.getElementById('employeeChart').getContext('2d');
-            myChart = new Chart(ctx, { // Assign myChart inside fetch function
-                type: 'line',
-                data: {
-                    labels: employeeNames,
-                    datasets: [{
-                        label: 'Total Clients Brought',
-                        data: clientCounts,
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 2,
-                        fill: false
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Total Clients Brought'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Distributor'
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Update the chart with the default threshold value immediately
-            updateChart(defaultThreshold);
-
-            // Event listener for the threshold input field
-            document.getElementById('thresholdInput').addEventListener('change', function() {
-                const threshold = parseInt(this.value); // Get the new threshold value
-                updateChart(threshold); // Update the chart with the new threshold value
-            });
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error);
-        });
-
     </script>
 
    <!-- Approval rate table -->
@@ -601,6 +689,42 @@
         employees_client();
 
    </script>
+
+    <script>
+        //=============================================
+        // cleaning database with button
+        //==============================================
+
+        var activate_function_link_ = "{% url 'realestates:truncate_model' %}"
+        truncate_model = function(model_name)
+        {
+               var dic_ = { "model_name": model_name, "app":'realestates'}
+
+               alert(JSON.stringify(dic_))
+               //alert(activate_function_link_)
+               try{
+                 $.post(activate_function_link_,
+                  {
+                    dic : JSON.stringify(dic_)
+                  },
+                  function(data){
+                      var rr = data['status']
+                      alert(rr)
+
+                  });
+              } catch(er){alert(er)}
+
+        }
+        clean_data =function(event)
+        {
+            var seek_permission =  prompt("Are you sure you want to clear all data? if so type y" , 'No')
+            if(seek_permission != 'y'){return;}
+            truncate_model("client")
+            //truncate_model("payment")
+            //truncate_model("measuregroupdim")
+            //truncate_model("fact")
+        }
+    </script>
 {% endblock %}
 
 

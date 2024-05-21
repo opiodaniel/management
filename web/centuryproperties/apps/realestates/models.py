@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 from django.core.validators import MinLengthValidator
 from django.urls import reverse
 from django.db.models import F
-
+from django.utils import timezone
 
 class Company(TruncateTableMixin, models.Model):
     company_name = models.CharField(max_length=50, default='', blank=True)
@@ -47,7 +47,7 @@ class Employees(TruncateTableMixin, models.Model):
     def calculate_weekly_commission(self):
         total_commission = 0
 
-        today = datetime.now().date()
+        today = timezone.now().date()
         start_of_week = today - timedelta(days=today.weekday())  # Monday of the current week
         end_of_week = start_of_week + timedelta(days=6)  # Sunday of the current week
         print(start_of_week, end_of_week)

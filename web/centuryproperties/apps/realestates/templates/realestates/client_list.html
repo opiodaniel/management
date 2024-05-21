@@ -18,86 +18,83 @@
         <div class="bg-secondary text-center rounded p-4">
             <h6 class="mb-3">Client Table</h6>
             <div class="d-flex align-items-center justify-content-between mb-4 shadow">
-                <!-- Search Bar -->
-                <input class="border-0" size="25" type="number" id="searchInput" placeholder="client phone number...">
+                <form method="GET">
+                    <input  type="text" name="q" placeholder="Search clients...">
+                    <button  type="submit" class="btn btn-info btn-sm mb-1">Search</button>
+                </form>
             </div>
-            <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
                 <table class="table text-start align-middle table-bordered table-hover mb-0 search-table">
-                <!--<table class="search-table">-->
                     <thead>
                         <tr class="text-info">
                             <th scope="col">Date</th>
-                           <!--  <th scope="col">DistributorName</th>-->
-                           <!--  <th scope="col">Name</th>-->
-                            <th scope="col">contact1</th>
-                            <th scope="col">Plot.No</th>
-                           <!--  <th scope="col">contact2</th>-->
-                            <!-- <th scope="col">Location</th>-->
-                            <!-- <th scope="col">Status</th>-->
+                            <th scope="col">Contact 1</th>
+                            <th scope="col">Plot No</th>
                             <th scope="col">Payment</th>
                         </tr>
                     </thead>
                     <tbody class="text-white">
-                        {% for client in all_clients %}
+                        {% for client in clients %}
                             {% for payment in client.client_payment.all %}
-                               {% if not payment.approved %}
-                               <tr>
-                                    <td>{{ client.date }}</td>
-                                    <!-- <td>{{ client.employee }}</td>-->
-                                    <!-- <td>{{ client.name }}</td>-->
-                                    <td>{{ client.phoneNumber1 }}</td>
-                                    <td>{{ client.plot_number }}</td>
-                                    <!--<td>{{ client.phoneNumber2 }}</td>-->
-                                    <!-- <td>{{ client.location }}</td>-->
-                                    <!-- <td><span class="btn-warning btn-lg" style="padding:1px;font-size:12px">pending</span></td>-->
-                                     <td>
-                                        <form action="{% url 'realestates:approve_payment' payment.id %}" method="post">
-                                            {% csrf_token %}
-                                            <button class="btn btn-sm btn-primary" type="submit">Approve</button>
-                                        </form>
-                                         <!--<form method="post">-->
-                                          <!--  {% csrf_token %}-->
-                                           <!-- <input type="hidden" name="client_id" value="{{ client.id }}">-->
-                                          <!--  <button type="button" client-id="{{ client.id }}" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal" name="confirm_client_payment">Archive</button>-->
-                                       <!-- </form>-->
-                                     </td>
-                               </tr>
-
-                               <!-- POP-UP -->
-                               <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                  <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                      <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">Offerings report archiving</h5>
-                                        <button type="button"  class="close" data-dismiss="modal" aria-label="Close" style="border:none;">
-                                          <span aria-hidden="true" style="color:red">&times;</span>
-                                        </button>
-                                      </div>
-                                      <div class="modal-body">
-                                        <h5 style="color:blue">Confirming the payment of <span class="text-danger">{{client}}</span></h5>
-                                           <form method="post">
-                                            {% csrf_token %}
-                                                 <input type="text" id="amountInput" oninput="formatAmount(this)" name="amount_paid" placeholder="Enter amount" required>
-                                                 <button type="submit" style="margin-top:5px" >confirm</button>
-                                           </form>
-                                      </div>
-                                      <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                      </div>
-                                    </div>
-                                  </div>
-                               </div>
-                               {% endif %}
+                                {% if not payment.approved %}
+                                    <tr>
+                                        <td>{{ client.date }}</td>
+                                        <td>{{ client.phoneNumber1 }}</td>
+                                        <td>{{ client.plot_number }}</td>
+                                        <td>
+                                            <form action="{% url 'realestates:approve_payment' client.id %}" method="post">
+                                                {% csrf_token %}
+                                                <input hidden type="text" name="employee_id" value="{{client.employee.id}}" >
+                                                <button class="btn btn-sm btn-primary" type="submit">Approve</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endif %}
                             {% endfor %}
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination Links -->
+            <div class="pagination">
+                <span class="step-links">
+                    {% if clients.has_previous %}
+                        <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">&laquo; first</a>
+                        <a href="?page={{ clients.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">previous</a>
+                    {% endif %}
+
+                    <span class="current">
+                        Page {{ clients.number }} of {{ clients.paginator.num_pages }}.
+                    </span>
+
+                    {% if clients.has_next %}
+                        <a href="?page={{ clients.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">next</a>
+                        <a href="?page={{ clients.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">last &raquo;</a>
+                    {% endif %}
+                </span>
+            </div>
+
+
         </div>
    </div>
     <!-- client table data End  -->
+
+
 {% endblock %}
 
+{% block add_js %}
+<script>
+        $(document).ready(function() {
+            $('#searchInput').on('keyup', function() {
+                var searchText = $(this).val().toLowerCase();
+                $(this).closest('.bg-secondary').find('.search-table tbody tr').filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(searchText) > -1);
+                });
+            });
+        });
+</script>
+{% endblock %}
 
 {% block footer %}
 {% endblock %}

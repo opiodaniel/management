@@ -4,7 +4,7 @@ from .views import (
                     employees_client, register, approve_payment, confirm_payment, add_client, login_page,
                     edit_user_profile_new, change_password, pay_employee, approve_employee_payment,
                     confirm_employee_payment, CustomLogoutView, UpdateClient, pending_payments_view,
-                    client_list, expired_clients_list)
+                    client_list, expired_clients_list,  truncate_model)
 
 
 app_name = 'realestates'
@@ -39,6 +39,8 @@ urlpatterns = [
     path('change-password/', change_password, name='change_password'),
 
     path('logout/', CustomLogoutView.as_view(), name='logout'),
+
+    path('truncate_model/', truncate_model, name='truncate_model'),
 
 ]
 

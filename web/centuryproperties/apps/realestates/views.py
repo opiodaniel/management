@@ -44,6 +44,10 @@ from django.contrib.auth import logout
 from django.views.generic import View
 from django import forms
 
+from django.apps import apps
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Count, Q
+import logging
 
 def login_page(request):
     company = Company.objects.get(id=1)
@@ -125,8 +129,8 @@ def get_total_sales_for_previous_months(request):
 @login_required
 def admin_dashboard(request, admin_id):
 
-    DEfault_thresholdInput1 = 1
-    DEfault_thresholdInput = 10
+    DEfault_thresholdInput1 = 2
+    DEfault_thresholdInput = 100
 
     if request.method == 'POST' and 'confirm_client_payment' in request.POST:
         # Reset the entry date of expired clients to the current date
@@ -212,59 +216,14 @@ def admin_dashboard(request, admin_id):
     # If no payments made in previous days, return 0
     if total_amount_previous_days is None:
         total_amount_previous_days = 0
-
-    # Print or use the total amounts
-    # print("Total amount made today:", total_amount_made_today)
-    # print("Total amount made in previous days:", total_amount_previous_days)
-
     total_sale_for_today_previous_days = total_amount_made_today + total_amount_previous_days
-
-    # today = date.today()
-    # # Query the TotalAmount model for the total amount made today
-    # total_amount_today_ = TotalAmount.objects.filter(date=today).first()
-    #
-    # print(total_amount_today_)
-    # if total_amount_today_ is None:
-    #     total_amount_today_ = 0
-    # print(total_amount_today_)
-
     admin = Employees.objects.get(id=admin_id)
     employees = Employees.objects.filter(is_administrator=False)
 
     payments = Payment.objects.filter(approved=False).order_by('approved', '-client__date')
-
-    expiry_date = timezone.now().date() - timedelta(days=7)
-
-    # Filter clients who have not exceeded the expiry date
-    active_clients = Client.objects.filter(date__date__gte=expiry_date)
-
-    all_clients = active_clients
-
-    # all_clients = Client.objects.all()
-
     profile_pic_url = admin.profile_pic.url
-
-    approved_clients = []
-    appending_clients = []
-    for e in employees:
-        # print('employee ', e.total_approved_clients())
-        approved_client = e.total_approved_clients()
-        approved_clients.append(approved_client)
-        appending_client = e.total_appending_clients()
-        appending_clients.append(appending_client)
-        clients_ = Client.objects.filter(employee=e)
-        for c in clients_:
-            pass
-            # print('employee ', e,  c)
-            # appending_clients.append(c)
-    total_number_of_approved_clients = sum(approved_clients)
-    # print("total_number_of_approved_clients ==", total_number_of_approved_clients)
-    total_number_of_appending_clients = sum(appending_clients)
-    # print("total_number_of_appending_clients ==", total_number_of_appending_clients)
     total_num_clients_ = Client.objects.all().count()
-    # print("total_num_clients_ ==", total_num_clients_)
     total_number_employees = Employees.objects.filter(is_administrator=False).count()
-    # print("total_num_employees_ ==", total_number_employees)
 
     context = {
         'employee': admin,
@@ -272,7 +231,6 @@ def admin_dashboard(request, admin_id):
         'profile_pic_url': profile_pic_url,
         'employees': employees,
         'payments': payments,
-        'all_clients': all_clients,
         'total_number_employees': total_number_employees,
         'total_num_clients_': total_num_clients_,
         'total_amount_made_today': total_amount_made_today,
@@ -365,27 +323,55 @@ def employee_dashboard(request, employee_id):
 @login_required
 def employees_client(request):
     employees = Employees.objects.filter(is_administrator=False)
+
+    # Annotate employees with the count of approved and appending clients
+    employees = employees.annotate(
+        approved_clients=Count('employee_payments', filter=Q(employee_payments__approved=True)),
+        appending_clients=Count('employee_payments', filter=Q(employee_payments__approved=False))
+    ).prefetch_related('employee_payments__client')
+
     dic_ = {}
 
     for employee in employees:
-        approved_clients = Payment.objects.filter(employee=employee, approved=True).count()
-        appending_clients = Payment.objects.filter(employee=employee, approved=False).count()
-
-        employee_clients = []
-        for payment in Payment.objects.filter(employee=employee):
-            client_dict = {
+        employee_clients = [
+            {
                 'id': payment.client.id,
                 'name': payment.client.name,
                 # Add other client fields as needed
             }
-            employee_clients.append(client_dict)
+            for payment in employee.employee_payments.all()
+        ]
 
         dic_[employee.user.username] = {
-            'approved_clients': approved_clients,
-            'appending_clients': appending_clients,
+            'approved_clients': employee.approved_clients,
+            'appending_clients': employee.appending_clients,
             'clients': employee_clients
         }
+
     return JsonResponse(dic_)
+# def employees_client(request):
+#     employees = Employees.objects.filter(is_administrator=False)
+#     dic_ = {}
+#
+#     for employee in employees:
+#         approved_clients = Payment.objects.filter(employee=employee, approved=True).count()
+#         appending_clients = Payment.objects.filter(employee=employee, approved=False).count()
+#
+#         employee_clients = []
+#         for payment in Payment.objects.filter(employee=employee):
+#             client_dict = {
+#                 'id': payment.client.id,
+#                 'name': payment.client.name,
+#                 # Add other client fields as needed
+#             }
+#             employee_clients.append(client_dict)
+#
+#         dic_[employee.user.username] = {
+#             'approved_clients': approved_clients,
+#             'appending_clients': appending_clients,
+#             'clients': employee_clients
+#         }
+#     return JsonResponse(dic_)
 
 
 @login_required
@@ -398,18 +384,22 @@ def expired_clients_list(request):
 
     profile_pic_url = employee.profile_pic.url
     expiry_date = timezone.now().date() - timedelta(days=7)
+    print(expiry_date)
 
     # Retrieve expired clients
     # all_expired_clients = Client.objects.filter(date__lt=expiry_date, client_payment__approved=False)
 
     # Retrieve expired clients for a specific employee
     expired_clients = employee.client_employee.filter(date__date__lt=expiry_date, client_payment__approved=False)
+    print(expired_clients)
     if request.method == 'POST' and 'reset_expired_clients' in request.POST:
         # Reset the entry date of expired clients to the current date
         client_id = request.POST.get('client_id')
+        print(client_id)
         # client = employee.client_employee.get(id=client_id)
         client = Client.objects.get(id=client_id)
         payment = Payment.objects.get(client=client)
+        print(payment)
         expiry_date = timezone.now().date() - timedelta(days=7)
         if client.date.date() < expiry_date:
             # Update the client's date to the current date
@@ -433,12 +423,15 @@ def expired_clients_list(request):
 
 @login_required
 def approve_payment(request, client_id):
-    # print(client_id)
+    print(client_id)
     payment_client_id = client_id
+    employee_id = request.POST.get('employee_id')
+    # print('employee_id============', employee_id)
     client = Client.objects.get(id=client_id)
     context = {
         'payment_client_id': payment_client_id,
         'client': client,
+        'employee_id': employee_id,
     }
     return render(request, 'realestates/confirm_client_payment.html', context)
 
@@ -511,12 +504,42 @@ def confirm_payment(request, client_id):
                 # payment.approved_by = admin_employee
                 # payment.save()
 
-                # Calculate commission for non-admin employees and update EmployeePaymentRecord
+                # TO USE THIS CODE SOON. IT'S A NEW UPDATE. ONLY CALCULATES FOR A PARTICULAR EMPLOYEE.
+                # employee_id = request.POST.get('employee_id')
+                # print('employee_id=1222222222222222', employee_id)
+                # employee__ = Employees.objects.get(id=employee_id)
+                # print('employee_id-----employee ', employee_id,  employee__)
+                # weekly_commission = employee__.calculate_weekly_commission()
+                # employee_payment_record, created = EmployeePaymentRecord.objects.get_or_create(
+                #     employee=employee__)
+                # employee_payment_record.total_commission += weekly_commission
+                # employee_payment_record.balance = employee_payment_record.total_commission - employee_payment_record.amount_paid
+                # employee_payment_record.save()
+                # END OF THE CODE
+
+                logging.basicConfig(level=logging.INFO)
+                # Update EmployeePaymentRecord
                 for employee in Employees.objects.filter(is_administrator=False):
-                    all_employee_payment_record = EmployeePaymentRecord.objects.get(employee=employee)
-                    all_employee_payment_record.total_commission = employee.calculate_weekly_commission()
-                    all_employee_payment_record.balance = employee.calculate_weekly_commission()-all_employee_payment_record.amount_paid
-                    all_employee_payment_record.save()
+                    try:
+                        weekly_commission = employee.calculate_weekly_commission()
+                        all_employee_payment_record, created = EmployeePaymentRecord.objects.get_or_create(
+                            employee=employee)
+
+                        logging.info(f'Employee: {employee.id}, Calculated Weekly Commission: {weekly_commission}')
+
+                        # Update total commission by adding the weekly commission
+                        all_employee_payment_record.total_commission += weekly_commission
+                        all_employee_payment_record.balance = all_employee_payment_record.total_commission - all_employee_payment_record.amount_paid
+                        all_employee_payment_record.save()
+
+                        logging.info(
+                            f'Updated Employee: {employee.id}, Total Commission: {all_employee_payment_record.total_commission}, Weekly Commission: {weekly_commission}, Balance: {all_employee_payment_record.balance}')
+
+                    except EmployeePaymentRecord.DoesNotExist:
+                        logging.error(
+                            f'Payment record for employee {employee.id} does not exist and could not be created.')
+                    except Exception as e:
+                        logging.error(f'An error occurred while updating employee {employee.id}: {e}')
 
                 # # Calculate commission for non-admin employees
                 # for employee in Employees.objects.filter(is_administrator=False):  # Exclude superuser (admin)
@@ -621,23 +644,38 @@ def add_client(request):
 
 @login_required
 def client_list(request):
+
     admin_id = request.user.id
     admin = Employees.objects.get(id=request.user.id)
     profile_pic_url = admin.profile_pic.url
     company = Company.objects.get(id=1)
     company_logo_url = company.company_logo.url
-    employees = Employees.objects.all().filter(is_administrator=False)
 
     expiry_date = timezone.now().now().date() - timedelta(days=7)
     # Filter clients who have not exceeded the expiry date
-    active_clients = Client.objects.filter(date__date__gte=expiry_date)
+    active_clients = Client.objects.filter(date__date__gte=expiry_date).order_by('-date')
 
     all_clients = active_clients
 
+    # Handle search query
+    query = request.GET.get('q')
+    if query:
+        all_clients = all_clients.filter(phoneNumber1__icontains=query)  # Adjust field ('name') based on search criteria
+    # Apply pagination
+    paginator = Paginator(all_clients, 50)  # Display 10 clients per page
+    page_number = request.GET.get('page')
+    try:
+        clients = paginator.page(page_number)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page
+        clients = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results
+        clients = paginator.page(paginator.num_pages)
+
     context = {
-        'all_clients': all_clients,
+        'clients': clients,
         'admin_id': admin_id,
-        'employees': employees,
         'company_logo_url': company_logo_url,
         'profile_pic_url': profile_pic_url,
     }
@@ -685,14 +723,14 @@ def register(request):
             email_message(semail, username, 'register')
             form.save()
             return redirect(reverse('realestates:admin_dashboard', args=[request.user.id]))
-    else:
-        form = RegistrationForm()
-        admin_id = request.user.id
-        admin = Employees.objects.get(id=request.user.id)
-        profile_pic_url = admin.profile_pic.url
-        company = Company.objects.get(id=1)
-        company_logo_url = company.company_logo.url
-        employees = Employees.objects.all().filter(is_administrator=False)
+
+    form = RegistrationForm()
+    admin_id = request.user.id
+    admin = Employees.objects.get(id=request.user.id)
+    profile_pic_url = admin.profile_pic.url
+    company = Company.objects.get(id=1)
+    company_logo_url = company.company_logo.url
+    employees = Employees.objects.all().filter(is_administrator=False)
     context = {
         'form': form,
         'admin_id': admin_id,
@@ -781,3 +819,21 @@ def pending_payments_view(request):
 
     return render(request, 'realestates/installment_lists.html', context)
 
+
+def truncate_model(request):
+    # print('9015 params')
+    # print(params)
+    dic = request.POST['dic']
+    print(dic)
+    dic_ = eval(dic)
+    app_ = dic_['app']
+    model_name_ = dic_['model_name']
+    try:
+        model = apps.get_model(app_label=app_, model_name=model_name_)
+        print(model)
+        model.truncate()
+    except Exception as ex:
+        print("9025 " + str(ex))
+
+    result = "Data truncated"
+    return result

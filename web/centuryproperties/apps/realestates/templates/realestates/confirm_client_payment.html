@@ -22,6 +22,7 @@
                         <h3 style="margin-bottom:15px">Confirming the payment for <span class="text-success">{{client}}</span></h3>
                             <form action="{% url 'realestates:confirm_payment' payment_client_id %}" method="post">
                                 {% csrf_token %}
+                                <input hidden type="text" name="employee_id" value="{{employee_id}}" >
                                 <label>Amount paid:</label>
                                 <br>
                                 <input type="text" id="amountInput" oninput="formatAmount(this)" name="amount_paid" placeholder="Enter amount" required>
