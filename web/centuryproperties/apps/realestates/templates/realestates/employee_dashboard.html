@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load custom_filters %}
+{% load extra_filters %}
 
         {% block title %}
           Distributor
@@ -28,7 +29,10 @@
                 <div class="navbar-nav w-100">
                     <a href="#" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
                     <a href="{% url 'realestates:add_client' %}" class="nav-item nav-link"><i class="fa fa-user-plus"></i>Add Client</a>
+
+                    <!--
                     <a href="{% url 'realestates:expired_clients_list' %}" class="nav-item nav-link"><i class="fas fa-exchange-alt"></i>Claim Clients</a>
+                    -->
                 </div>
 
             </nav>
@@ -76,8 +80,8 @@
                     <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
                         <i class="fa fa-chart-line fa-3x text-success"></i>
                         <div class="ms-3">
-                            <p class="mb-2">Commission Earned</p>
-                            <h6 class="mb-0">Shs:{{ employee_payment_record.total_commission|add_commas }}</h6>
+                            <p class="mb-2">Total Commission</p>
+                            <h6 class="mb-0">Shs:{{ total_commission|add_commas }}</h6>
                         </div>
                     </div>
                 </div>
@@ -175,11 +179,47 @@
         </div>
         <!-- Sales Chart End -->
 
-        <!-- Recent Sales Start -->
+        <!-- Clients Brought Start -->
         <div class="container-fluid pt-4 px-4">
             <div class="bg-secondary text-center rounded p-4">
                 <div class="d-flex align-items-center justify-content-between mb-4">
                     <h6 class="mb-0">Clients Brought</h6>
+                </div>
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table class="table text-start align-middle table-bordered table-hover mb-0">
+                        <thead>
+                            <tr class="text-success">
+                                <th scope="col">Client</th>
+                                <th scope="col">Contact</th>
+                                <th scope="col">Edit</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-white card-link popupbtn1">
+                            {% for client in clients %}
+                            <tr>
+                                <td>{{ client.name }}</td>
+                                <td>{{ client.phoneNumber1 }}</td>
+                                <td>
+                                    <a href="{% url 'realestates:edit_client' client.id %}">
+                                        <button type="button" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- Clients Brought End -->
+
+         <!-- Approved clients -->
+         <div class="container-fluid pt-4 px-4">
+            <div class="bg-secondary text-center rounded p-4">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h6 class="mb-0">Approved Clients</h6>
                 </div>
                 <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
                     <table class="table text-start align-middle table-bordered table-hover mb-0">
@@ -192,40 +232,35 @@
                                 <!--<th scope="col">ClientLocation</th>-->
                                 <!--<th scope="col">Amount</th>-->
                                 <th scope="col"><i class="fas fa-hand-holding-usd"></i></th>
-
-                                <th scope="col">Edit</th>
+                                <!--<th scope="col">Paid</th>-->
+                                <th scope="col">Commission</th>
                             </tr>
                         </thead>
                         <tbody class="text-white card-link popupbtn1">
-                            {% for client in clients %}
-                            <tr>
-                                <!--<td>{{ client.date }}</td>-->
-                                <td>{{ client.name }}</td>
-                                <td>{{ client.phoneNumber1 }}</td>
-                                <!--<td>{{ client.phoneNumber2 }}</td>-->
-                                <!--<td>{{ client.location }}</td>-->
-                                <!-- Loop through payments for the current client -->
-                                {% for payment in client.client_payment.all %}
-                                <!--<td>{{ payment.amount_paid|add_commas }}</td>-->
-                                <td>
-                                    {% if payment.approved %}<span class="btn-success btn-lg" style="padding:1px;font-size:12px"><i class="fas fa-check-circle"></i></span>{% else %}<span class="btn-warning btn-lg" style="padding:1px;font-size:12px"><i class="fas fa-question-circle"></i></span>{% endif %}
-                                </td>
-                                {% endfor %}
-                                <td>
-                                    <button type="button" style="border-radius: 50%; width: 30px; height: 30px; font-size: 10px;">
-                                        <a href="{% url 'realestates:edit_client' client.id %}">
-                                           <i class="fas fa-edit" style="padding:1px;font-size:12px"></i>
-                                        </a>
-                                    </button>
-                                </td>
-                            </tr>
+                            {% for c in commission_earned_per_client %}
+                                        <tr>
+                                            <!--<td>{{ client.date }}</td>-->
+                                            <td>{{ c.client.name }}</td>
+                                            <td>{{ c.client.phoneNumber1 }}</td>
+                                            <!--<td>{{ client.phoneNumber2 }}</td>-->
+                                            <!--<td>{{ client.location }}</td>-->
+                                            <!--<td>{{ payment.amount_paid|add_commas }}</td>-->
+                                            <td>
+                                                {% if c.client.client_lands.approved %}<span class="btn-success btn-lg" style="padding:1px;font-size:12px"><i class="fas fa-check-circle"></i></span>{% else %}<span class="btn-warning btn-lg" style="padding:1px;font-size:12px"><i class="fas fa-question-circle"></i></span>{% endif %}
+                                            </td>
+                                            <!--<td>{{ payment.amount_paid|add_commas }}</td>-->
+                                            <td>{{ c.total_commission|add_commas }}</td>
+
+                                        </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-        <!-- Recent Sales End -->
+         <!-- End -->
+
+
         {% endblock %}
 
         <!-- Footer Start -->
@@ -234,12 +269,12 @@
             <div class="bg-secondary rounded-top p-4">
                 <div class="row">
                     <div class="col-12 col-sm-6 text-center text-sm-start">
-                        &copy; <a href="https://academycity.org/en/e/" target="_blank">@AcDantez</a>, All Right Reserved.
+                        &copy; <a href="#">@AcDantez</a>, All Right Reserved.
                     </div>
                     <div class="col-12 col-sm-6 text-center text-sm-end">
                         <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
-                        Designed By <a href="https://academycity.org/en/e/" target="_blank">@AcDantez</a>
-                        <br>Distributed By: <a href="https://academycity.org/en/e/" target="_blank">@AcDantez</a>
+                        Designed By <a href="#">@AcDantez</a>
+                        <br>Distributed By: <a href="#">@AcDantez</a>
                     </div>
                 </div>
             </div>

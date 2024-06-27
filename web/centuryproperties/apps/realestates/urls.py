@@ -4,7 +4,9 @@ from .views import (
                     employees_client, register, approve_payment, confirm_payment, add_client, login_page,
                     edit_user_profile_new, change_password, pay_employee, approve_employee_payment,
                     confirm_employee_payment, CustomLogoutView, UpdateClient, pending_payments_view,
-                    client_list, expired_clients_list,  truncate_model)
+                    client_list, expired_clients_list,  truncate_model,  export_unapproved_payments,
+                    get_employee_with_clients_and_payments, activate_obj_function, upload_file,
+                    get_data_link, record_payment, add_land, edit_payment, delete_payment)
 
 
 app_name = 'realestates'
@@ -14,7 +16,7 @@ urlpatterns = [
     path('', login_page, name='login_page'),
 
     path('administrator/<int:admin_id>/', admin_dashboard, name='admin_dashboard'),
-    path('employee/<int:employee_id>/', employee_dashboard, name='employee_dashboard'),
+    path('employee/', employee_dashboard, name='employee_dashboard'),
     path('employees_client/', employees_client, name='employees_client'),
 
 
@@ -27,10 +29,19 @@ urlpatterns = [
 
     path('pending-payments/', pending_payments_view, name='pending_payments'),
 
+    path('export-unapproved-payments/', export_unapproved_payments, name='export_unapproved_payments'),
+    path('employee-clients-payments/', get_employee_with_clients_and_payments, name='get_employee_with_clients_and_payments'),
+
+
 
     path(r'register/', register, name='register'),
 
     path('client_list/', client_list, name='client_list'),
+    path('record_payment/<int:client_id>/', record_payment, name='record_payment'),
+    path('edit-payment/<int:payment_id>/',   edit_payment, name='edit_payment'),
+    path('delete-payment/<int:payment_id>/', delete_payment, name='delete_payment'),
+
+    path('add_land/', add_land, name='add_land'),
     path('add_client/', add_client, name='add_client'),
     path('edit_client/<pk>', UpdateClient, name='edit_client'),
     path('expired_clients_list/', expired_clients_list, name='expired_clients_list'),
@@ -39,6 +50,11 @@ urlpatterns = [
     path('change-password/', change_password, name='change_password'),
 
     path('logout/', CustomLogoutView.as_view(), name='logout'),
+
+
+    path('upload_file/', upload_file, name='upload_file'),
+    path('get_data_link', get_data_link, name='get_data_link'),
+    path('activate_obj_function/', activate_obj_function, name='activate_obj_function'),
 
     path('truncate_model/', truncate_model, name='truncate_model'),
 

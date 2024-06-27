@@ -26,6 +26,7 @@
                             <!--<th scope="col">Paid</th>-->
                             <!--<th scope="col">Balance</th>-->
                             <th scope="col">Payment</th>
+                            <th>Excel</th>
                         </tr>
                     </thead>
                     <tbody class="text-white">
@@ -42,7 +43,13 @@
                                     <button class="btn btn-sm btn-primary" type="submit">Approve Payment</button>
                                 </form>
                                 {% endif %}
-                            </tr>
+                            </td>
+
+<!--                            <td>-->
+<!--                                <a href="{% url 'realestates:get_employee_with_clients_and_payments' e.employee.id %}"><button class="btn btn-light btn-sm">Download Excel</button></a>-->
+<!--                            </td>-->
+
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>

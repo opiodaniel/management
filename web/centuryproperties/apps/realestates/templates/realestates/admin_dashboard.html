@@ -42,12 +42,19 @@
         </style>
 {% endblock %}
 
-
 {% block SubNavbar %}
     <div class="nav-item dropdown mr-4">
         <a href="{% url 'realestates:register' %}" class="nav-item nav-link"><i class="fa fa-user-plus"></i></a>
     </div>
-    <!--<button onclick="clean_data(event)" type="button" class="btn btn-light btn-sm">Clean Database</button>-->
+     <button onclick="clean_data_b(event)" type="button" class="btn btn-light btn-sm">Clean Database</button>
+<!--    <a href="{% url 'realestates:export_unapproved_payments' %}"><button class="btn btn-light btn-sm">Download Excel</button></a>-->
+    <a href="{% url 'realestates:get_employee_with_clients_and_payments' %}"><button class="btn btn-light btn-sm">Download Excel</button></a>
+    <div id="driver-uploader-detail"> <!--margin:0 auto;-->
+        <input id="driver-uploader-path"  type="file" class="filestyle" data-icon="true" data-buttonText="Browse" name="driver_file">
+        <br>
+        <span id="driver-uploader-success-alert" class='text-success' style="display:none">Success!</span>
+        <span id="driver-uploader-failure-alert" class='text-danger' style="display:none">Failed!</span>
+    </div>
 
 {% endblock SubNavbar %}
 
@@ -162,7 +169,7 @@
         <div class="col-sm-12 col-xl-6">
             <div class="bg-secondary text-center rounded h-100 p-4">
                  <input type="number" id="thresholdInput1" value="{{DEfault_thresholdInput1}}" style="text-align:center; width: 50px; height: 30px"  />
-                <button id="updateThresholdButton1" type="button" class="btn btn-info btn-sm mb-1">Update Threshold</button>
+                 <button id="updateThresholdButton1" type="button" class="btn btn-info btn-sm mb-1">Update Threshold</button>
                 <div class="d-flex align-items-center justify-content-between mb-4">
                     <h6 class="mb-0">Approved clients</h6>
                 </div>
@@ -220,12 +227,12 @@
     <div class="bg-secondary rounded-top p-4">
         <div class="row">
             <div class="col-12 col-sm-6 text-center text-sm-start">
-                &copy; <a href="https://academycity.org/en/e/" target="_blank">@AcDantez</a>, All Right Reserved.
+                &copy; <a href="#">@AcDantez</a>, All Right Reserved.
             </div>
             <div class="col-12 col-sm-6 text-center text-sm-end">
                 <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
-                Designed By <a href="https://academycity.org/en/e/" target="_blank">@AcDantez</a>
-                <br>Distributed By: <a href="https://academycity.org/en/e/" target="_blank">@AcDantez</a>
+                Designed By <a href="#">@AcDantez</a>
+                <br>Distributed By: <a href="#">@AcDantez</a>
             </div>
         </div>
     </div>
@@ -500,36 +507,12 @@
 
     </script>
 
-   <!-- clients brought horizontal bar graph -->
-    <script>
-        let myChart; // Declare myChart variable outside fetch function
+   <!-- clients brought line graph -->
+   <script>
+    let myChart; // Declare myChart variable outside fetch function
 
-        // Function to update the chart based on the threshold
-        const updateChart = (threshold) => {
-
-            // Fetch data from the server
-            fetch("{% url 'realestates:employees_client' %}")
-                .then(response => response.json())
-                .then(data => {
-                    // Extract employee names and client counts from the fetched data
-                    const employeeNames = Object.keys(data);
-                    const clientCounts = employeeNames.map(employee => data[employee].clients.length);
-
-                    // Filter employees based on the threshold
-                    const selectedEmployees = employeeNames.filter((employee, index) => clientCounts[index] >= threshold);
-                    const selectedClientCounts = clientCounts.filter((count, index) => count >= threshold);
-
-                    // Update the chart data
-                    myChart.data.labels = selectedEmployees;
-                    myChart.data.datasets[0].data = selectedClientCounts;
-
-                    // Update the chart
-                    myChart.update();
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                });
-        };
+    // Function to update the chart based on the threshold
+    const updateChart = (threshold) => {
 
         // Fetch data from the server
         fetch("{% url 'realestates:employees_client' %}")
@@ -539,54 +522,79 @@
                 const employeeNames = Object.keys(data);
                 const clientCounts = employeeNames.map(employee => data[employee].clients.length);
 
-                // Default threshold value
-                const defaultThreshold =parseInt(document.getElementById('thresholdInput').value);
+                // Filter employees based on the threshold
+                const selectedEmployees = employeeNames.filter((employee, index) => clientCounts[index] >= threshold);
+                const selectedClientCounts = clientCounts.filter((count, index) => count >= threshold);
 
-                // Create a line chart
-                const ctx = document.getElementById('employeeChart').getContext('2d');
-                myChart = new Chart(ctx, { // Assign myChart inside fetch function
-                    type: 'line',
-                    data: {
-                        labels: employeeNames,
-                        datasets: [{
-                            label: 'Total Clients Brought',
-                            data: clientCounts,
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 2,
-                            fill: false
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Total Clients Brought'
-                                }
-                            },
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Distributor'
-                                }
-                            }
-                        }
-                    }
-                });
+                // Update the chart data
+                myChart.data.labels = selectedEmployees;
+                myChart.data.datasets[0].data = selectedClientCounts;
 
-                // Update the chart with the default threshold value immediately
-                updateChart(defaultThreshold);
-
-                // Event listener for the threshold input field
-                document.getElementById('thresholdInput').addEventListener('change', function() {
-                    const threshold = parseInt(this.value); // Get the new threshold value
-                    updateChart(threshold); // Update the chart with the new threshold value
-                });
+                // Update the chart
+                myChart.update();
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
+    };
+
+    // Fetch data from the server
+    fetch("{% url 'realestates:employees_client' %}")
+        .then(response => response.json())
+        .then(data => {
+            // Extract employee names and client counts from the fetched data
+            const employeeNames = Object.keys(data);
+            const clientCounts = employeeNames.map(employee => data[employee].clients.length);
+
+            // Default threshold value
+            const defaultThreshold =parseInt(document.getElementById('thresholdInput').value);
+
+            // Create a line chart
+            const ctx = document.getElementById('employeeChart').getContext('2d');
+            myChart = new Chart(ctx, { // Assign myChart inside fetch function
+                type: 'line',
+                data: {
+                    labels: employeeNames,
+                    datasets: [{
+                        label: 'Total Clients Brought',
+                        data: clientCounts,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 2,
+                        fill: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Total Clients Brought'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Distributor'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Update the chart with the default threshold value immediately
+            updateChart(defaultThreshold);
+
+            // Event listener for the threshold input field
+            document.getElementById('thresholdInput').addEventListener('change', function() {
+                const threshold = parseInt(this.value); // Get the new threshold value
+                updateChart(threshold); // Update the chart with the new threshold value
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
+
     </script>
 
    <!-- Approval rate table -->
@@ -635,7 +643,7 @@
 
                 $.post(url, {}, function(data) {
                     // Filter departments based on the minimum approved clients threshold
-                    const filteredData = Object.entries(data).filter(([department, info]) => info.approved_clients > minApprovedClients);
+                    const filteredData = Object.entries(data).filter(([department, info]) => info.approved_clients >= minApprovedClients);
 
                     // Extract filtered department names and approved clients count
                     const departments = filteredData.map(([department, info]) => department);
@@ -690,13 +698,13 @@
 
    </script>
 
-    <script>
+   <script>
         //=============================================
         // cleaning database with button
         //==============================================
 
         var activate_function_link_ = "{% url 'realestates:truncate_model' %}"
-        truncate_model = function(model_name)
+        truncate_model_b = function(model_name)
         {
                var dic_ = { "model_name": model_name, "app":'realestates'}
 
@@ -715,15 +723,529 @@
               } catch(er){alert(er)}
 
         }
-        clean_data =function(event)
+        clean_data_b =function(event)
         {
             var seek_permission =  prompt("Are you sure you want to clear all data? if so type y" , 'No')
             if(seek_permission != 'y'){return;}
-            truncate_model("client")
-            //truncate_model("payment")
-            //truncate_model("measuregroupdim")
-            //truncate_model("fact")
+            truncate_model_b("Employees")
+            truncate_model_b("client")
+            truncate_model_b("payment")
+            truncate_model_b("Commission")
+            truncate_model_b("EmployeePaymentRecord")
+            truncate_model_b("Land")
         }
+    </script>
+
+   <script type="text/javaScript">
+        var csrftoken = Cookies.get('csrftoken');
+          function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+          }
+          $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+              if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+              }
+            }
+          });
+
+          $(document).ready(function(){
+
+            function AdvancedTabsManager(dic=null)
+                    {
+
+
+                    }
+
+                    var dic = {"obj_name":"AvicDataProcessing", "function_name":"data_upload","topic_id":"", "app":"realestates",
+                    "folder_type":"excel","entity_name":"country","dimensions":"time_dim,country_dim,measure_dim",
+                    "fact_model_field":"Fact,amount","sheet_name":"Data", "fields":"year,country_name,measure_name","table":""}
+
+                    var file_url = "{% url 'realestates:upload_file' %}"
+                    $('#driver-uploader-path').change(function(){
+                        var file = this.files[0];
+                        filename = '';
+                        if('name' in file)
+                          filename= file.name;
+                        else
+                          filename = file.fileName;
+                        var xhr = new XMLHttpRequest();
+                        (xhr.upload || xhr).addEventListener('progress', function(e) {
+                            var done = e.position || e.loaded
+                            var total = e.totalSize || e.total;
+                            console.log('xhr progress: ' + Math.round(done/total*100) + '%');
+                        });
+                        xhr.addEventListener('load', function(e) {
+                            data = JSON.parse(this.responseText);
+                            alert(JSON.stringify(data))
+                            if(this.status != 200){
+                              $('#driver-uploader-failure-alert').show();
+                              return;
+                            }
+                            $('#driver_source').val('Flat file on idisas');
+                            $('#driver_name').val(data['file_remote_path']).blur();
+                            $('#driver-uploader-success-alert').show();
+                        });
+                        xhr.open('post', file_url, true);
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                        var fd = new FormData();
+                        fd.append("filename", filename);
+                        fd.append("drive_file", file);
+                        fd.append("app", dic["app"]);
+                        fd.append("obj_name", dic["obj_name"]);
+                        fd.append("function_name", dic["function_name"]);
+                        fd.append("topic_id", dic["topic_id"]);
+                        fd.append("folder_type", dic["folder_type"]);
+                        fd.append("entity_name", dic["entity_name"]);
+                        fd.append("dimensions", dic["dimensions"]);
+                        fd.append("fields", dic["fields"]);
+                        fd.append("fact_model_field", dic["fact_model_field"]);
+                        fd.append("sheet_name", dic["sheet_name"]);
+                        //--
+                        //alert("903572-1 "+JSON.stringify(dic));
+                        var field = dic["field"]
+                        var table = dic["table"]
+                        fd.append("model_field_name", field);
+                        fd.append("model_name", table);
+
+                        xhr.send(fd);
+                    });
+                    //=============================================
+                       // cleaning database with button
+                    //==============================================
+
+                        var activate_function_link_ = "{% url 'realestates:activate_obj_function' %}"
+                        truncate_model = function(model_name, app=null)
+                        {
+                            var app_ = "realestates";
+                               var dic_ = {"obj" : "AvicDataProcessing", "atm": app_, "app": app_,
+                                           "fun": "truncate_model", "params": {"model_name": model_name, "app":app_},
+                                            "obj_param": {"topic_id": "", "app": app_, "entity_name": ""}}
+
+                               //alert(JSON.stringify(dic_))
+                               //alert(activate_function_link_)
+                               try{
+                                 $.post(activate_function_link_,
+                                  {
+                                    dic : JSON.stringify(dic_)
+                                  },
+                                  function(data){
+                                      var rr = data['status']
+                                      alert(rr)
+
+                                  });
+                              } catch(er){alert(er)}
+
+                        }
+                        clean_data =function(event)
+                        {
+                            var seek_permission =  prompt("Are you sure you want to clear all data? if so type y" , 'No')
+                           if(seek_permission != 'y'){return;}
+                           //truncate_model("department")
+                            //truncate_model("cell")
+                            //truncate_model("branch")
+
+                        }
+
+                    //================================================
+                       // get_general_data
+                    //===============================================
+
+                    this.titles = {}
+
+                    get_general_data = function (data_){
+                    try{
+                      var activate_function_link_ = "{% url 'realestates:activate_obj_function' %}"
+                      var app_ = "realestates";
+                      dependent_group_ = "";
+                      this.dic_=
+                        {"obj":"AvicDataProcessing",
+                         "atm":this.app_,
+                         "app":app_,
+                         "obj_param":{"topic_id":"conferenceGDP",
+                                            "app":app_,
+                                            "entity_name":"country",
+                                            "entity_model":"countrydim",
+                                            "measure_model":"MeasureDim",
+                                            "total_variables":[66,67],
+                                             "multiply_two_variables": {},
+                                             "do_not_include_measures_objs":[],
+                                             "do_not_include_groups":
+                                              ["General", "Output"],
+                                             "dependent_group":dependent_group_
+                                           },
+                                  "fun":"",
+                                  "params":{"app":app_,
+                                                   "value":"amount",
+                                                   "axes":["country_dim", "measure_dim"],
+                                                   "fact_model":"Fact",
+                                                   "output_fact_model":"OutputFact",
+                                                   "range_model":"RangeDim",
+                                                   "min_max_model":"MinMaxCut",
+                                                   "measure_model":"MeasureDim",
+                                                   "measure_group_model":"MeasureGroupDim",
+                                                   "is_calculate_min_max":"False",
+                                                   "dependent_group":dependent_group_}}
+
+                                  this.dic_["fun"]="get_general_data";
+                                  this.dic_["params"]["dimensions"]={
+                                                                     "time_dim": {"model":"timedim","field_name":"year"},
+                                                                     "country_dim": {"model":"countrydim",  "field_name":"country_name"},
+                                                                     "measure_dim": {"model":"measuredim", "field_name":"measure_name"}
+                                                                     }
+
+                                 $.post(activate_function_link_,
+                                  {
+                                    dic : JSON.stringify(this.dic_)
+                                  },
+                                  function(data)
+                                  {
+                                     atm.titles=data["result"];
+                                    //alert(JSON.stringify(this.titles));
+                                    //for(k in data)
+                                    //{
+                                    // alert(JSON.stringify(data[k]));
+                                    //}
+                                  }.bind(atm=this));
+                    } catch(er){alert('er9005: '+er)}}
+
+                    get_general_data()
+
+                    //================================================
+                       // Building Table For Report
+                    //===============================================
+
+                    var get_data_link_ = '{% url "realestates:get_data_link" %}',
+                    get_data = function(call_back_fun, dic_, tbody_)
+                    {
+                      dic_["app"]="realestates";
+                      if(dic_["company_obj_id"]==null){dic_["company_obj_id"]=3;}
+                      if(dic_["from_fun"]!=null){if(dic_["from_fun"]=="acReport.prototype.set_data"){alert(dic_["from_fun"]+"\n\n"+JSON.stringify(dic_))}}
+                      $.post(get_data_link_,
+                              {dic : JSON.stringify(dic_)},
+                              function(data){
+                              try{
+                                   if(dic_["from_fun"]!=null){if(dic_["from_fun"]=="set_data")
+                                   {
+                                     alert(dic_["from_fun"]+"\n\n"+JSON.stringify(data))
+                              }     }
+
+                               if(data["status"]!="ok"){return}
+                               //try{alert(call_back_fun)} catch(er){"call_back 9001-9001-200\n"+alert(er)}
+                               try{call_back_fun(data["dic"], tbody_)} catch(er){"call_back 9001-9001-300\n"+alert(er)}
+                              } catch(er){alert("ERROR\n9090-9090-1 AdvancedTabsManager.prototype.get_data:\n"+JSON.stringify(dic_)+"\n"+er)}
+                              try{tbody_.data=data["dic"];} catch(er){alert("ERROR\n9090-9090-2 AdvancedTabsManager.prototype.get_data:\n"+JSON.stringify(dic_)+"\n"+er)}
+
+                              });
+                    }
+
+                    var data = {"properties":{"order_by":"country_dim", "app":"realestates","table":"fact", "horizontal_field":"time_dim","vertical_field":"country_dim",
+                                "value_field":"amount", "obj_number":"100"}}
+
+                    acReport = function(event){
+                      this.filters={};
+                      // need to turn the order_by to a dictionary of dictionaries one for each field.
+                      var order_by={"field":data["properties"]["order_by"],"direction":"ascending"};
+                      this.get_data_dic={"app":data["properties"]["app"],
+                                         "model":data["properties"]["table"],
+                                         "parent_model": "new", "parent_id":"",
+                                         "number_of_rows":4000,
+                                         "filters":this.filters,
+                                         "order_by":order_by,
+                                         "fields":[
+                                                   data["properties"]["horizontal_field"],
+                                                   data["properties"]["vertical_field"],
+                                                   data["properties"]["value_field"]
+                                                  ]
+                                        }
+
+                      var dic=data;
+                      var container = document.getElementById("bdy_");
+                      this.table_=document.createElement("table");
+                      container.appendChild(table_);
+                      table_.setAttribute("class", "basic");
+                      table_.setAttribute("container_id", 3);
+                      table_.setAttribute("id", "1");
+                      table_.setAttribute("obj_type", "pivot");
+                      table_.setAttribute("type", "table");
+                      //for (i in dic["attributes"]){var s=dic["attributes"][i];
+                       //if(s in pp_){this.table_.setAttribute(s, pp_[s])}
+                       //else{this.table_.setAttribute(s, "")}}
+
+                      table_.setAttribute("style", "position:absolute;left:"+800+"px;top:"+150+"px");
+                      var thead=document.createElement("thead");
+                      thead.setAttribute("style", "display: block;overflow-x: hidden;");
+                      table_.appendChild(thead);
+                      var tr_h=document.createElement("tr");
+                      tr_h.addEventListener("click", function(event){
+                       var e=event.target;
+                      })
+                      var td = document.createElement("td");
+                      td.setAttribute("style", "background-color:black; color:white");
+
+                      var img_="default_table_img.png"
+                      td.innerHTML="<img id='img_"+2+"' src='/static/user/images/"+img_+"' style='width:300px;height:300x;'>";
+                      tr_h.appendChild(td);
+
+                      tr_h.setAttribute("style","cursor:pointer");
+                      thead.appendChild(tr_h);
+                      var tbody=document.createElement("tbody");
+                      tbody.setAttribute("id", "tbody_"+3);
+                      tbody.setAttribute("style", "display: block;height: "+300+"px;overflow-y: auto;overflow-x: hidden;");
+                      table_.appendChild(tbody);
+                      //table_.onclick=row_col_click;
+                    }
+
+                    //acReport.prototype.add_filter = function(f='id',v,ft="measure_dim"){this.filters[f]={"value":v,"foreign_table":ft}}
+
+                    acReport()
+
+                    set_data = function(type, is_level=true){
+
+                    zz = function(data_){
+                                         try{
+                                                //alert("danzzzzz=== "+ JSON.stringify(data_))
+                                                //alert("data_====== "+JSON.stringify(this.titles));
+                                                //alert("am next==)  "+JSON.stringify(this.titles["time_dim"]))
+                                                data_["dim_titles"]["time_dim"]=titles["time_dim"];
+                                                data_["dim_titles"]["country_dim"]=this.titles["country_dim"];
+                                                data_["dim_titles"]["time_dim"]=this.titles["time_dim"];
+                                                data_["dim_titles"]["country_dim"]=this.titles["country_dim"];
+                                            }catch(er){alert('err 9016-1: '+er)}
+                                         }
+
+                         var fun = function(data_,ll){
+
+                         data_["dim_titles"]= {}
+                         try{zz(data_)} catch(er){};
+                         //alert("danilop==xxxxxxx== "+ JSON.stringify(data_["dim_titles"]))
+
+                        //alert("90876-1 data=\n"+JSON.stringify(data_));
+                        //alert("90000876-1 data_=\n"+JSON.stringify(data_["country_dim"]));
+
+                         var html_obj = ll[0];var get_data_dic = ll[1];
+                        // alert("dan=== "+ JSON.stringify(data_))
+                        //alert("90000876-1 data_=\n"+JSON.stringify(data_["time_dim"]));
+                        //alert(JSON.stringify(get_data_dic));
+                         //alert(html_obj.outerHTML)
+
+                      //  alert("110=== "+JSON.stringify(data_["amount"]));
+                      //   alert("120=== "+JSON.stringify(data_["dim_titles"]));
+                    //alert("josh===" +JSON.stringify(data))
+                         var vertical_field_=data["properties"]["vertical_field"];
+                         //alert("after1 "+  vertical_field_)
+                         var horizontal_field_=data["properties"]["horizontal_field"];
+                       //  alert("after2 "+  horizontal_field_)
+                         var value_field=get_data_dic["fields"][(get_data_dic["fields"].length-1)]
+
+                         //alert("k="+vertical_field_+"\n"+JSON.stringify(data_[vertical_field_]))
+                        // alert("h="+horizontal_field_+"\n"+JSON.stringify(data_[horizontal_field_]))
+
+                    //alert("vertical_field_=\n"+vertical_field_)
+                    //alert("data_[vertical_field_]=\n"+data_[vertical_field_])
+                         var n_=data_[vertical_field_].length;
+                    //alert("n_=\n"+n_)
+                    //alert(n_)
+                         var pdata={};var v_=[];var h_=[];
+                         for(var j=0; j< n_; j++)
+                         {
+                                  if(!(data_[vertical_field_][j] in pdata))
+                                  {
+                                   pdata[data_[vertical_field_][j]]={};
+                                   v_.push(data_[vertical_field_][j])
+                                  }
+                                  if(!(data_[horizontal_field_][j] in pdata[data_[vertical_field_][j]]))
+                                  {
+                                     if(!(h_.includes(data_[horizontal_field_][j]))){h_.push(data_[horizontal_field_][j])}
+                                  }
+
+                                  //alert(data_[vertical_field_][j]+"\n"+data_[horizontal_field_][j]+"\n"+data_["amount"][j])
+
+                                  pdata[data_[vertical_field_][j]][data_[horizontal_field_][j]]={"value":data_[value_field][j],"color":"black"};
+                                  try{aa(v=data_[vertical_field_][j],
+                                         h=data_[horizontal_field_][j],
+                                         a=pdata[data_[vertical_field_][j]][data_[horizontal_field_][j]],
+                                         f=get_data_dic["filters"]
+                                  )} catch(er){}
+                         }
+                         // alert("pdata=\n"+JSON.stringify(pdata));
+                         //alert(h_)
+                         v_=v_.sort();
+                         h_=h_.sort();
+                         //alert("h_== "+ h_)
+                         this.axes={"v":v_, "h":h_}
+                         //alert("axes== "+ JSON.stringify(axes))
+                         this.pdata=pdata
+                         this.raw_data=data_
+                         //alert("comboni-3\n"+JSON.stringify(this.raw_data["dim_titles"][vertical_field_]));
+
+                        create_html(type)
+                       }
+                      //alert("90876-3\n"+JSON.stringify(get_data_dic));
+                      if(is_level==false){get_data_dic["fields"] = get_data_dic["fields"].filter(item => item !== "level")}
+                      //alert("90876-3\n"+JSON.stringify(get_data_dic));
+
+                       get_data(fun, get_data_dic, [table_, get_data_dic])
+                    }
+                    set_data()
+
+
+                    create_html = function(type=null)
+                    {
+                      //alert(JSON.stringify(this.axes));
+                      var p=this;
+                      var dic=data;
+                      //alert(JSON.stringify(dic))
+                      var h_=p.axes["h"];
+                    //alert("h_02020=== "+h_[1])
+                      var v_=p.axes["v"]
+
+                      var vertical_field_=data["properties"]["vertical_field"];
+                      var horizontal_field_=data["properties"]["horizontal_field"];
+
+                     // alert(JSON.stringify(v_))
+                     // alert("opio== " + JSON.stringify(p.raw_data["dim_titles"]))
+
+                      //alert(JSON.stringify(p.raw_data["dim_titles"][vertical_field_]));
+                      //alert(JSON.stringify(h_) +"\n"+JSON.stringify(p.raw_data["dim_titles"][horizontal_field_]));
+                      //alert("p.pdata[v_[0]]=== "+ JSON.stringify(p.pdata[v_[0]]))
+                      //alert(p.pdata[v_[0]][h_[1]]["value"])
+
+                    //alert(JSON.stringify(p.raw_data["dim_titles"]["country_dim"]))
+
+                    //alert(p.raw_data["dim_titles"][horizontal_field_])
+
+                      var sh="<thead id='thead_"+data["properties"]["obj_number"]+"'>"
+                      sh+="<tr id='tr_h_"+data["properties"]["obj_number"]+"' style='cursor:pointer'><th col_num=-1></th>";
+                      for(var j in h_){sh+="<th col_num="+j+">"+p.raw_data["dim_titles"][horizontal_field_][h_[j]]+"</th>"};
+                      try{
+                      if(data["properties"]["horizontal_title"]!=null && data["properties"]["horizontal_title"]!="")
+                      {sh+="<th>"+data["properties"]["horizontal_title"]+"</th>"}}catch(er){}
+                      sh+="</tr></thead>";
+                      var s="<table>"+sh+"<tbody id='tbody_"+data["properties"]["obj_number"]+"'>"
+                      if(this.sort_by_col_num!=null)
+                      {
+                       try{
+                          var kk={};var kk_=[]
+
+                          if(this.sort_by_col_num == -1)
+                          {
+                            for(var h in v_)
+                            {
+                             k_idx = p.raw_data["dim_titles"][vertical_field_][v_[h]];
+                             if(k_idx != null)
+                             {
+                               kk[k_idx] = v_[h];kk_.push(k_idx)}
+                            }
+                              if(this.sort_ascending==true){kk_=kk_.sort();this.sort_ascending=false}
+                              else{kk_=kk_.sort().reverse();this.sort_ascending=true}
+                          } else
+                          {
+                              for (var i in v_)
+                              {
+                                try{var k_idx=parseFloat(p.pdata[v_[i]][h_[this.sort_by_col_num]]["value"])} catch(er){k_idx = -999999999}
+                                while (kk_.includes(k_idx)){k_idx=1*k_idx+0.000001}
+                                kk[k_idx]=v_[i];kk_.push(k_idx);
+                              }
+                              if(this.sort_ascending==true){kk_=kk_.sort((a, b) => a - b);this.sort_ascending=false}
+                              else{kk_=kk_.sort((a, b) => b - a);this.sort_ascending=true}
+                          }
+                          //alert(JSON.stringify(kk_));
+                          var v_=[];for(var g in kk_){v_.push(kk[kk_[g]])}
+                       } catch(err){alert(err)}
+                      }
+
+                      var ht_="";
+                      if(dic["properties"]["horizontal_title"]!=null && dic["properties"]["horizontal_title"]!=""){ht_=dic["properties"]["horizontal_title"]}
+                      var vt_="";
+                      if(dic["properties"]["vertical_title"]!=null && dic["properties"]["vertical_title"]!=""){vt_=dic["properties"]["vertical_title"]};
+                      vt_ll=[];for(var j in h_){vt_ll.push(0)};if(vt_!="" && vt_!=""){vt_ll.push(0)};
+
+                      for (var i in v_)
+                      {
+                          //alert(i+"\n"+v_[i]+"\n"+vertical_field_+"\n")
+                          //alert(p.raw_data["dim_titles"][vertical_field_][v_[i]])
+                          s+="<tr><th style='white-space: break-spaces;text-align:left'>"+p.raw_data["dim_titles"][vertical_field_][v_[i]]+"</th>"
+                          var horizontal_total=0;
+                          var sss_=""
+                          for(var j in h_)
+                          {
+                           try{
+                                 var s_color="black"; try{s_color=p.pdata[v_[i]][h_[j]]["color"]}catch(er){}
+                                 var ssnn=nice_number(p.pdata[v_[i]][h_[j]]["value"])
+                                 s+="<td style='text-align:right;color:"+s_color+"'>"+ssnn+"</td>"
+                                 sss_+=ssnn
+                                 horizontal_total+=1*p.pdata[v_[i]][h_[j]]["value"]
+                                 vt_ll[j]+=1*p.pdata[v_[i]][h_[j]]["value"]
+                               } catch(er){s+="<td style='text-align:right'></td>"}
+                           }
+                          //alert(i + "  " + JSON.stringify(vt_ll));
+                          //alert(i + " " +v_[i] + "\n" + sss_)
+                          //alert(horizontal_total)
+                          //alert(dic["properties"]["horizontal_title"])
+                          horizontal_total=Math.round(100*horizontal_total)/100
+                          try{if(ht_!=""){s+="<td style='text-align:right'>"+horizontal_total+"</td>";
+                          //alert("j="+ j +"   vt_ll[j+1]=" + vt_ll[1*j+1] + "  i=" + i + "  horizontal_total=" + horizontal_total + " : vt_ll" + JSON.stringify(vt_ll));
+                          vt_ll[1*j+1]+=1*horizontal_total;
+                          //alert("j="+ j +"   vt_ll[j+1]=" + vt_ll[1*j+1] + "  i=" + i + "  horizontal_total=" + horizontal_total + " : vt_ll" + JSON.stringify(vt_ll));
+                          }}catch(er){}
+                          s+="</tr>"
+                      }
+                      var sv="<tr><th style='white-space: pre;text-align:left'>"+vt_+"</th>"
+                      for(var j in h_)
+                      {
+                        sv+="<td style='text-align:right'>"+vt_ll[j]+"</td>"
+                      }
+                      if(ht_!=""){
+                        sv+="<td style='text-align:right'>"+vt_ll[1*j+1]+"</td>"
+                      }
+                      sv+="</tr>"
+                      // --
+                      //alert("sv\n"+sv)
+                      if(vt_!=""){s+=sv}
+
+                      s+="</tbody></table></br></br>";
+                      p.table_.innerHTML=s;
+                      p.tbody=document.innerHTML=document.getElementById('tbody_'+data["properties"]["obj_number"])
+                      p.tr_h=document.innerHTML=document.getElementById('tr_h_'+data["properties"]["obj_number"])
+                      p.head=document.innerHTML=document.getElementById('thead_'+data["properties"]["obj_number"])
+                      p.tr_h.my_creator_obj=this;
+                      p.tr_h.addEventListener("click", function(event){
+                       var e=event.target;
+                       //alert(e.getAttribute("col_num"))
+                       this.my_creator_obj.sort_by_col_num=parseInt(e.getAttribute("col_num"));
+                       this.my_creator_obj.create_html()
+                      })
+                    }
+
+                    var row_col_click = function(event)
+                    {
+                     var e=event.target;
+                    alert(e.outerHTML)
+                         //alert(JSON.stringify(this.my_creator_obj.data["functions"]["onclick"]));
+                         //try{eval('var zz='+this.my_creator_obj.data["functions"]["onclick"]);zz(event);
+                        // } catch(er){
+                         //alert("er9013: "+er)
+                         //}
+                    }
+
+
+                    var nice_number = function(z){
+                     var kk="";if(z*1<0){kk="-";z=-1*z};
+                     var s=z+"";s_=s.split(".");
+                     var ns=s_[0];var dn=s_[1];
+                     var ns_=0;
+                     if(dn){if(dn.length<2){dn=dn+"0"} else if(dn.length>2)
+                     {dn=Math.round((100*dn)/Math.pow(10, dn.length))/100;if(dn==1 || dn==0){ns_=1*dn;dn="00"} else{dn=dn+"";dn=dn.split(".")[1]}}}
+                     else{dn="00"}
+
+                     var nss=ns.split(",");var n_="";for(var j=0;j<nss.length;j++){n_= n_+nss[j]};var n__="";n_=1*n_+ns_;n_=""+n_;
+                     while (n_.length>0) {if(n__.length>0){n__=","+n__};n__=n_.substring(n_.length-3,n_.length)+n__;n_=n_.substring(0,n_.length-3)}
+                     return kk+n__+"."+dn;
+                    }
+
+          });
     </script>
 {% endblock %}
 

@@ -4,17 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8c1124b6-6789-4251-99c8-d42593558513" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/management.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/management.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/base_admin_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/base_admin_dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/admin_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/admin_dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/client_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/client_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/employee_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/templates/realestates/employee_dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/views.py" afterDir="false" />
-    </list>
+    <list default="true" id="8c1124b6-6789-4251-99c8-d42593558513" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -62,7 +52,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-babbdf50b680-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.15989.155" />
+        <option value="bundled-python-sdk-5b207ade9991-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.17890.14" />
       </set>
     </attachedChunks>
   </component>

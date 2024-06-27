@@ -40,6 +40,7 @@
                                      <td>
                                         <form action="{% url 'realestates:approve_payment' payment.id %}" method="post">
                                             {% csrf_token %}
+                                            <input hidden type="text" name="employee_id" value="{{payment.client.employee.id}}" >
                                             <button class="btn btn-sm btn-primary" type="submit">Approve</button>
                                         </form>
                                      </td>

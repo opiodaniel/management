@@ -1,15 +1,11 @@
 from django import forms
-from .models import Client
+from .models import Client, Payment, Land, ClientLand
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import (UserCreationForm)
 from django.contrib.auth import get_user_model
 from .models import (Employees)
 from django.contrib.auth.models import User
-
-#class loginForm(forms.ModelForm):
-    #class Meta:
-        #model = Login
-        #fields = "__all__"
+from django.db.models import Q
 
 
 class ClientForm(forms.ModelForm):
@@ -17,37 +13,35 @@ class ClientForm(forms.ModelForm):
     phoneNumber1 = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     phoneNumber2 = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'required': False}))
     location = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
-    # date = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = Client
-        fields = (
-            'name',
-            'phoneNumber1',
-            'phoneNumber2',
-            'location',
-            # 'date',
-        )
+        fields = ('name', 'phoneNumber1', 'phoneNumber2', 'location', )
 
     def clean_phoneNumber1(self):
         phone_number1 = self.cleaned_data['phoneNumber1']
-        print('phone_number1', phone_number1)
-        if Client.objects.filter(phoneNumber1=phone_number1).exists():
-            raise forms.ValidationError('A client with the same phone number already exist')
+        if Client.objects.filter(phoneNumber1=phone_number1).exists() or Client.objects.filter(phoneNumber2=phone_number1).exists():
+            raise forms.ValidationError('A client with the same phone number already exists.')
         return phone_number1
 
     def clean_phoneNumber2(self):
-        phone_number2 = self.cleaned_data['phoneNumber2']
-        print('phone_number2', phone_number2)
-        if not phone_number2:
-            print('am empty')
-            return phone_number2
-        else:
-            if len(phone_number2) < 10:
-                raise forms.ValidationError("Phone number must be at least 10 characters long.")
-            if Client.objects.filter(phoneNumber2=phone_number2).exists():
-                raise forms.ValidationError('A client with the same phone number already exists')
+        phone_number2 = self.cleaned_data.get('phoneNumber2')
+        if phone_number2:
+            if len(phone_number2) < 7:
+                raise forms.ValidationError("Phone number must be at least 7 characters long.")
+            if Client.objects.filter(phoneNumber1=phone_number2).exists() or Client.objects.filter(phoneNumber2=phone_number2).exists():
+                raise forms.ValidationError('A client with the same phone number already exists.')
         return phone_number2
+
+    def clean(self):
+        cleaned_data = super().clean()
+        phone_number1 = cleaned_data.get("phoneNumber1")
+        phone_number2 = cleaned_data.get("phoneNumber2")
+
+        if phone_number1 and phone_number2 and phone_number1 == phone_number2:
+            raise forms.ValidationError("Phone number 1 and phone number 2 cannot be the same.")
+
+        return cleaned_data
 
 
 class ClientEditForm(forms.ModelForm):
@@ -57,16 +51,28 @@ class ClientEditForm(forms.ModelForm):
 
     def clean_phoneNumber1(self):
         phoneNumber1 = self.cleaned_data['phoneNumber1']
-        if Client.objects.exclude(id=self.instance.id).filter(phoneNumber1=phoneNumber1).exists():
-            raise forms.ValidationError("Phone number already exists.")
+        if Client.objects.exclude(id=self.instance.id).filter(Q(phoneNumber1=phoneNumber1) | Q(phoneNumber2=phoneNumber1)).exists():
+            raise forms.ValidationError("A client with the same phone number already exists.")
         return phoneNumber1
 
     def clean_phoneNumber2(self):
         phoneNumber2 = self.cleaned_data['phoneNumber2']
-        if phoneNumber2:  # Only validate if phoneNumber2 is provided
-            if Client.objects.exclude(id=self.instance.id).filter(phoneNumber2=phoneNumber2).exists():
-                raise forms.ValidationError("Phone number already exists.")
+        if phoneNumber2:
+            if len(phoneNumber2) < 7:
+                raise forms.ValidationError("Phone number must be at least 7 characters long.")
+            if Client.objects.exclude(id=self.instance.id).filter(Q(phoneNumber1=phoneNumber2) | Q(phoneNumber2=phoneNumber2)).exists():
+                raise forms.ValidationError("A client with the same phone number already exists.")
         return phoneNumber2
+
+    def clean(self):
+        cleaned_data = super().clean()
+        phoneNumber1 = cleaned_data.get("phoneNumber1")
+        phoneNumber2 = cleaned_data.get("phoneNumber2")
+
+        if phoneNumber1 and phoneNumber2 and phoneNumber1 == phoneNumber2:
+            raise forms.ValidationError("Phone number 1 and phone number 2 cannot be the same.")
+
+        return cleaned_data
 
 
 class EmployeeLoginForm(AuthenticationForm):
@@ -134,7 +140,92 @@ class ProfileEditForm(forms.ModelForm):
                   'phone',)  #'short_bio', 'bio',
 
 
-class MessageForm(forms.Form):
-    recipient = forms.ModelChoiceField(queryset=Employees.objects.all())
-    subject = forms.CharField(max_length=100)
-    content = forms.CharField(widget=forms.Textarea)
+class CommaSeparatedIntegerField(forms.IntegerField):
+    def to_python(self, value):
+        if value is None:
+            return None
+        # Remove commas from the input value and convert to integer
+        if isinstance(value, str):
+            value = value.replace(',', '')  # Remove commas
+        try:
+            return int(value)
+        except (ValueError, TypeError):
+            raise forms.ValidationError('Enter a valid integer.')
+
+
+# class CommaSeparatedNumberInput(forms.TextInput):
+#     def __init__(self, attrs=None):
+#         super().__init__(attrs={'class': 'form-control amount-input', 'oninput': 'formatAmount(this)', **(attrs or {})})
+#
+#     def format_value(self, value):
+#         if value is None:
+#             return ''
+#         return f'{value:,}'  # Format the value with commas
+
+class CommaSeparatedNumberInput(forms.TextInput):
+    def __init__(self, attrs=None):
+        super().__init__(attrs={'class': 'form-control amount-input', 'oninput': 'formatAmount(this)', **(attrs or {})})
+
+    def format_value(self, value):
+        if value is None or value == '':
+            return ''
+        try:
+            return f'{int(value):,}'  # Format the value with commas
+        except (ValueError, TypeError):
+            return value  # In case the value is not a number, return as is
+
+
+class ClientLandForm(forms.ModelForm):
+    class Meta:
+        model = ClientLand
+        fields = ['client', 'land']
+        widgets = {
+            'client': forms.Select(attrs={'class': 'form-control'}),
+            'land': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(ClientLandForm, self).__init__(*args, **kwargs)
+        self.fields['land'].queryset = Land.objects.filter(available=True)
+
+
+class PaymentForm(forms.ModelForm):
+    amount_paid = CommaSeparatedIntegerField(label='amount paid', widget=CommaSeparatedNumberInput(), initial=0)
+    approved = forms.BooleanField(required=True, initial=True,
+                                      widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
+    class Meta:
+        model = Payment
+        fields = ['client_land', 'amount_paid', 'timestamp', 'approved', 'employee']
+        widgets = {
+            'client_land': forms.Select(attrs={'class': 'form-control'}),
+            'timestamp': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            # 'approved': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'employee': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(PaymentForm, self).__init__(*args, **kwargs)
+        self.fields['employee'].queryset = Employees.objects.filter(is_administrator=True)
+        self.fields['employee'].label = 'Approved by:'
+
+
+class LandForm(forms.ModelForm):
+    price = CommaSeparatedIntegerField(label='land price', widget=CommaSeparatedNumberInput(), initial=0)
+
+    class Meta:
+        model = Land
+        fields = ['plot_number', 'location', 'price']
+        widgets = {
+            'plot_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'plot number'}),
+            'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'location'}),
+            'price': forms.NumberInput(attrs={'class': 'form-control', 'oninput': 'formatAmount(this)'}),
+        }
+
+    def clean_plot_number(self):
+        plot_number = self.cleaned_data.get('plot_number')
+        if Land.objects.filter(plot_number=plot_number).exists():
+            raise forms.ValidationError("A land with this plot number already exists.")
+        return plot_number
+
+
+

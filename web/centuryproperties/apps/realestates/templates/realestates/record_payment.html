@@ -1,0 +1,412 @@
+{% extends "base_admin_dashboard.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}
+   Record Payment for {{ client.name }}
+{% endblock %}
+
+{% block SubNavbar %}
+ <div class="nav-item dropdown">
+     <a href="{% url 'realestates:admin_dashboard' request.user.id %}" class="nav-item nav-link"><i class="fas fa-home"></i>Home</a>
+ </div>
+{% endblock SubNavbar %}
+
+{% block content %}
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary text-center rounded p-4">
+                {% if client_land %}
+                 <div class="d-flex align-items-center justify-content-between mb-4 text-warning">Client Land: {{ client_land }}</div>
+                {% endif %}
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    {% if client_land %}
+                      <p>Land Price: <span class="text-primary">{{ client_land.land.price|add_commas }}</span></p>
+                      <p>Balance: <span class="text-danger">{{ client_land.remaining_amount|add_commas }}</span></p>
+                      {% if client_land.payment_complete %}
+                      <p class="text-success">Payment Complete</p>
+                      {% else %}
+                      <p class="text-warning">Payment Incomplete</p>
+                      {% endif %}
+                    {% endif %}
+                </div>
+
+                <!-- Display the transaction history -->
+                <h6>Transaction History</h6>
+                <table class="table text-start align-middle table-bordered table-hover mb-0">
+                    <thead>
+                        <tr class="text-info">
+                            <th scope="col">Date</th>
+                            <th scope="col">Paid</th>
+                            <th scope="col">Approved</th>
+                            <th scope="col">Edit</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-white">
+                        {% for transaction in transactions %}
+                            <tr>
+                                <td>{{ transaction.timestamp|date:"Y-m-d" }}</td>
+                                <td>{{ transaction.amount_paid|add_commas }}</td>
+                                <td>{{ transaction.approved }}</td>
+                                <td>
+                                    <a href="{% url 'realestates:edit_payment' transaction.id %}">
+                                      <i class="fas fa-edit" style="padding:1px;font-size:12px"></i>
+                                    </a>
+                                    <span style="padding:2px"></span>
+                                    <!--
+                                    <a href="{% url 'realestates:delete_payment' transaction.id %}">
+                                       <i class="fa fa-trash" aria-hidden="true" style="color:red;padding:1px;font-size:12px"></i>
+                                    </a> -->
+                                </td>
+                                <!--
+                                <td>
+                                    <a href=" url 'realestates:edit_payment' transaction.id " class="btn btn-sm btn-warning">Edit</a>
+                                    <a href=" url 'realestates:delete_payment' transaction.id " class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this payment?');">Delete</a>
+                                </td> -->
+                            </tr>
+                        {% endfor %}
+                        <tr class="text-success">
+                            <td><strong>Total:</strong></td>
+                            <td><strong>{{ total_amount_paid|add_commas }}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded h-100 p-4">
+                <!-- Add Land -->
+                <button style="width:150px;" type="button" class="account-image-reset btn btn-info btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#password_change_modal">
+                    Add Land
+                </button>
+                <h6 class="mb-2">Record Payment for <span class="text-info">{{ client.name }}</span></h6>
+                <h6 class="mb-4">Brought By: <span class="text-info">{{ client.employee }}</span></h6>
+                <form method="POST" action="{% url 'realestates:record_payment' client.id %}">
+                    {% csrf_token %}
+                    {% if not client_land or client_land.payment_complete  %}
+                        <div class="form-group mb-3">
+                            {{ landform.client.label_tag }}
+                            {{ landform.client }}
+                        </div>
+                        <div class="form-group mb-3">
+                            {{ landform.land.label_tag }}
+                            {{ landform.land }}
+                        </div>
+                    {% else %}
+                    <div class="form-group mb-3">
+                        {{ form.client_land.label_tag }}
+                        {{ form.client_land }}
+                    </div>
+                    <div class="form-group mb-3">
+                        {{ form.amount_paid.label_tag }}
+                        {{ form.amount_paid }}
+                    </div>
+                    <div class="form-group mb-3">
+                        {{ form.timestamp.label_tag }}
+                        {{ form.timestamp }}
+                    </div>
+                    <div class="form-group mb-3">
+                        {{ form.approved.label_tag }}
+                        {{ form.approved }}
+                    </div>
+                    <div class="form-group mb-3">
+                        {{ form.employee.label_tag }}
+                        {{ form.employee }}
+                    </div>
+                    {% if client_land.payment_complete %}
+                        <div class="form-group mb-3">
+                            {{ landform.client.label_tag }}
+                            {{ landform.client }}
+                        </div>
+                        <div class="form-group mb-3">
+                            {{ landform.land.label_tag }}
+                            {{ landform.land }}
+                        </div>
+                    {% endif %}
+                    {% endif %}
+
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Add Land Modal -->
+<div class="modal fade pg-show-modal" id="password_change_modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="authentication-inner">
+                    <!-- Register Card -->
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="app-brand justify-content-center">
+                                <a href="#" class="app-brand-link gap-2"> <span class="app-brand-logo demo"> </span> </a>
+                            </div>
+                            <form id="formAuthentication" action="{% url 'realestates:add_land' %}" class="mb-3" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="client_id" value="{{ client.id }}">
+                                <div class="mb-3">
+                                    <label for="plot_number" class="form-label">Plot Number</label>
+                                    {{ addlandform.plot_number }}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="location" class="form-label">Location</label>
+                                    {{ addlandform.location }}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="price" class="form-label">Price</label>
+                                    {{ addlandform.price }}
+                                </div>
+                                <div id="form-errors"></div>
+                                <button class="btn btn-primary d-grid w-100" type="submit">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- Register Card -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+{% block add_js %}
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addLandForm = document.getElementById('formAuthentication');
+    addLandForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(addLandForm);
+        fetch(addLandForm.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                $('#password_change_modal').modal('hide');
+                location.reload();
+            } else {
+                const errorContainer = document.getElementById('form-errors');
+                errorContainer.innerHTML = '';
+                for (const [field, messages] of Object.entries(data.errors)) {
+                    messages.forEach(message => {
+                        const errorElement = document.createElement('div');
+                        errorElement.className = 'alert alert-danger';
+                        errorElement.innerText = `${field}: ${message}`;
+                        errorContainer.appendChild(errorElement);
+                    });
+                }
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+});
+</script>
+
+<script>
+        $(document).ready(function() {
+            $('#searchInput').on('keyup', function() {
+                var searchText = $(this).val().toLowerCase();
+                $(this).closest('.bg-secondary').find('.search-table tbody tr').filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(searchText) > -1);
+                });
+            });
+        });
+</script>
+<script>
+    function formatAmount(input) {
+        // Remove existing commas and non-numeric characters from the input
+        let value = input.value.replace(/[^\d]/g, '');
+
+        // Add commas to the value
+        value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+        // Update the input value
+        input.value = value;
+    }
+</script>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+
+
+
+
+<!--<div class="container-fluid pt-4 px-4">-->
+<!--    <div class="row g-4">-->
+<!--        <div class="col-sm-12 col-xl-3">-->
+<!--            <div class="bg-secondary text-center rounded p-4">-->
+<!--                <div class="d-flex align-items-center justify-content-between mb-4">-->
+<!--                    <h6>Approved/pending Clients</h6>-->
+<!--                </div>-->
+<!--                <canvas id="transaction-history" class="transaction-chart"></canvas>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div class="col-sm-12 col-xl-9">-->
+<!--            <div class="bg-secondary rounded h-100 p-4">-->
+<!--                &lt;!&ndash; Add Land &ndash;&gt;-->
+<!--                <button style="width:150px;" type="button" class="account-image-reset btn btn-info btn-sm mb-3 " data-bs-toggle="modal" data-bs-target="#password_change_modal">-->
+<!--                    Add Land-->
+<!--                </button>-->
+<!--                <h6 class="mb-4">Record Payment for <span class="text-info">{{ client.name }}</span></h6>-->
+<!--                <form method="POST" action="{% url 'realestates:record_payment' client.id %}">-->
+<!--                    {% csrf_token %}-->
+<!--                    {% if not client_land %}-->
+<!--                        <div class="form-group mb-3">-->
+<!--                            <label for="land">Select Land</label>-->
+<!--                            <select name="land" id="land" class="form-control select2">-->
+<!--                                &lt;!&ndash; Options will be loaded asynchronously &ndash;&gt;-->
+<!--                            </select>-->
+<!--                        </div>-->
+<!--                    {% else %}-->
+<!--                    <div class="form-group mb-3">-->
+<!--                        {{ form.client_land.label_tag }}-->
+<!--                        {{ form.client_land }}-->
+<!--                    </div>-->
+
+<!--                    {% endif %}-->
+
+<!--                    <div class="form-group mb-3">-->
+<!--                        {{ form.amount_paid.label_tag }}-->
+<!--                        {{ form.amount_paid }}-->
+<!--                    </div>-->
+<!--                    <div class="form-group mb-3">-->
+<!--                        {{ form.timestamp.label_tag }}-->
+<!--                        {{ form.timestamp }}-->
+<!--                    </div>-->
+<!--                    <div class="form-group mb-3">-->
+<!--                        {{ form.approved.label_tag }}-->
+<!--                        {{ form.approved }}-->
+<!--                    </div>-->
+<!--                    <div class="form-group mb-3">-->
+<!--                        {{ form.employee.label_tag }}-->
+<!--                        {{ form.employee }}-->
+<!--                    </div>-->
+<!--                    <button type="submit" class="btn btn-primary">Submit</button>-->
+<!--                </form>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+<!--&lt;!&ndash;Add More Department&ndash;&gt;-->
+<!--<div class="modal fade pg-show-modal" id="password_change_modal" tabindex="-1" role="dialog" aria-hidden="true">-->
+<!--    <div class="modal-dialog">-->
+<!--        <div class="modal-content">-->
+<!--            <div class="modal-header">-->
+<!--                <h4 class="modal-title">Add Department</h4>-->
+<!--                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
+<!--            </div>-->
+<!--            <div class="modal-body">-->
+<!--                <div class="authentication-inner">-->
+<!--                    &lt;!&ndash; Register Card &ndash;&gt;-->
+<!--                    <div class="card">-->
+<!--                        <div class="card-body">-->
+<!--                            <div class="app-brand justify-content-center">-->
+<!--                                <a href="#" class="app-brand-link gap-2"> <span class="app-brand-logo demo"> </span> </a>-->
+<!--                            </div>-->
+
+<!--                            <form id="formAuthentication" action="{% url 'realestates:add_land' %}" class="mb-3"  method="POST">-->
+<!--                                {% csrf_token %}-->
+<!--                                <input hidden="" type="text" id="client_id" name="{{client.id}}" >-->
+<!--                                <div class="mb-3">-->
+<!--                                    <label for="email" class="form-label">Plot Number</label>-->
+<!--                                    {{landform.plot_number}}-->
+<!--                                </div>-->
+<!--                                <div class="mb-3 form-password-toggle">-->
+<!--                                    <label class="form-label" for="password">&nbsp;Location</label>-->
+<!--                                    <div class="input-group input-group-merge">-->
+<!--                                        {{landform.location}}-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                                <div class="mb-3 form-password-toggle">-->
+<!--                                    <label class="form-label" for="password">&nbsp;Price</label>-->
+<!--                                    <div class="input-group input-group-merge">-->
+<!--                                        {{landform.price}}-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                                <div class="mb-3"></div>-->
+<!--                                <button class="btn btn-primary d-grid w-100" type="submit">Submit</button>-->
+<!--                            </form>-->
+<!--                            <p class="text-center"> <a href="auth-login-basic.html"> </a> </p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    &lt;!&ndash; Register Card &ndash;&gt;-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="modal-footer">-->
+<!--                <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+
+
+
+
+<!--<script>-->
+<!--$(document).ready(function() {-->
+<!--    $('.select2').select2({-->
+<!--        ajax: {-->
+<!--            url: '{% url "realestates:land_list_ajax" %}',-->
+<!--            dataType: 'json',-->
+<!--            delay: 250,-->
+<!--            processResults: function (data) { alert(data)-->
+<!--                return {-->
+<!--                    results: $.map(data, function (item) {-->
+<!--                        return {-->
+<!--                            text: item.plot_number + ' - ' + item.location,-->
+<!--                            id: item.id-->
+<!--                        }-->
+<!--                    })-->
+<!--                };-->
+<!--            },-->
+<!--            cache: true-->
+<!--        },-->
+<!--        minimumInputLength: 1-->
+<!--    });-->
+<!--});-->
+<!--</script>-->
+
+<!--<script>-->
+<!--        $(document).ready(function() {-->
+<!--            $('#searchInput').on('keyup', function() {-->
+<!--                var searchText = $(this).val().toLowerCase();-->
+<!--                $(this).closest('.bg-secondary').find('.search-table tbody tr').filter(function() {-->
+<!--                    $(this).toggle($(this).text().toLowerCase().indexOf(searchText) > -1);-->
+<!--                });-->
+<!--            });-->
+<!--        });-->
+<!--</script>-->
+<!--<script>-->
+<!--    function formatAmount(input) {-->
+<!--        // Remove existing commas and non-numeric characters from the input-->
+<!--        let value = input.value.replace(/[^\d]/g, '');-->
+
+<!--        // Add commas to the value-->
+<!--        value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');-->
+
+<!--        // Update the input value-->
+<!--        input.value = value;-->
+<!--    }-->
+<!--</script>-->
+

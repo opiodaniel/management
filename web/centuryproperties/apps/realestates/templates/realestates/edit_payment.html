@@ -1,0 +1,68 @@
+{% extends "base_admin_dashboard.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}
+   Edit Payment
+{% endblock %}
+
+{% block SubNavbar %}
+ <div class="nav-item dropdown">
+     <a href="{% url 'realestates:admin_dashboard' request.user.id %}" class="nav-item nav-link"><i class="fas fa-home"></i>Home</a>
+ </div>
+{% endblock SubNavbar %}
+
+{% block content %}
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded p-4">
+                <h6>Edit Payment for {{ payment.client_land.client.name }}</h6>
+                <form method="POST" action="{% url 'realestates:edit_payment' payment.id %}">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        {{ form.client_land.label_tag }}
+                        {{ form.client_land }}
+                    </div>
+                    <div class="form-group mb-3">
+                        {{ form.amount_paid.label_tag }}
+                        {{ form.amount_paid }}
+                    </div>
+                    <div class="form-group mb-3">
+                        {{ form.timestamp.label_tag }}
+                        {{ form.timestamp }}
+                    </div>
+                    <div class="form-group mb-3">
+                        {{ form.approved.label_tag }}
+                        {{ form.approved }}
+                    </div>
+                    <div class="form-group mb-3">
+                        {{ form.employee.label_tag }}
+                        {{ form.employee }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <input type="submit" class="btn btn-warning" value="Cancel" onclick="window.history.go(-1)" >
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block add_js %}
+<script>
+    function formatAmount(input) {
+        // Remove existing commas and non-numeric characters from the input
+        let value = input.value.replace(/[^\d]/g, '');
+
+        // Add commas to the value
+        value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+        // Update the input value
+        input.value = value;
+    }
+</script>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
