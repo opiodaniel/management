@@ -13,3 +13,8 @@ def add_commas(value):
         return "{:,}".format(value)
     except (TypeError, ValueError):
         return value
+
+
+@register.filter(name='to_11')
+def to_range(value):
+    return range(value)

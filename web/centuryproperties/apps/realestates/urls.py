@@ -3,10 +3,11 @@ from .views import (
                     employee_dashboard, admin_dashboard,
                     employees_client, register, approve_payment, confirm_payment, add_client, login_page,
                     edit_user_profile_new, change_password, pay_employee, approve_employee_payment,
-                    confirm_employee_payment, CustomLogoutView, UpdateClient, pending_payments_view,
-                    client_list, expired_clients_list,  truncate_model,  export_unapproved_payments,
-                    get_employee_with_clients_and_payments, activate_obj_function, upload_file,
-                    get_data_link, record_payment, add_land, edit_payment, delete_payment)
+                    confirm_employee_payment, CustomLogoutView, edit_client, pending_payments_view,
+                    client_list, free_clients, download_free_clients, assign_client, claim_free_client, truncate_model,
+                    export_unapproved_payments, get_employee_with_clients_and_payments, activate_obj_function,
+                    upload_file, get_data_link, record_payment, add_land, edit_payment, delete_payment,
+                    clients_with_lands, land_transaction_history)
 
 
 app_name = 'realestates'
@@ -40,11 +41,17 @@ urlpatterns = [
     path('record_payment/<int:client_id>/', record_payment, name='record_payment'),
     path('edit-payment/<int:payment_id>/',   edit_payment, name='edit_payment'),
     path('delete-payment/<int:payment_id>/', delete_payment, name='delete_payment'),
-
     path('add_land/', add_land, name='add_land'),
+    path('clients_with_lands/', clients_with_lands, name='clients_with_lands'),
+    path('land_transaction_history/<int:land_id>/', land_transaction_history, name='land_transaction_history'),
+
     path('add_client/', add_client, name='add_client'),
-    path('edit_client/<pk>', UpdateClient, name='edit_client'),
-    path('expired_clients_list/', expired_clients_list, name='expired_clients_list'),
+    path('edit_client/<pk>', edit_client, name='edit_client'),
+
+    path('free_clients/', free_clients, name='free_clients'),
+    path('free-clients/assign/<int:client_id>/', assign_client, name='assign_client'),
+    path('claim_free_client/', claim_free_client, name='claim_free_client'),
+    path('free-clients/download/', download_free_clients, name='download_free_clients'),
 
     path('edit_user_profile_new', edit_user_profile_new, name='edit_user_profile_new'),
     path('change-password/', change_password, name='change_password'),

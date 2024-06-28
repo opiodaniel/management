@@ -1,0 +1,35 @@
+{% extends "base_admin_dashboard.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Transaction History{% endblock %}
+
+{% block content %}
+<div class="container-fluid pt-4 px-4">
+    <div class="bg-secondary text-center rounded p-4">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h4 class="mb-0">Transaction History for {{ client_land.land.plot_number }} - {{ client_land.land.location }}</h4>
+        </div>
+        <table class="table text-start align-middle table-bordered table-hover mb-0">
+            <thead>
+                <tr class="text-info">
+                    <th scope="col">Date</th>
+                    <th scope="col">Paid</th>
+                </tr>
+            </thead>
+            <tbody class="text-white">
+                {% for transaction in transactions %}
+                    <tr>
+                        <td>{{ transaction.timestamp|date:"Y-m-d" }}</td>
+                        <td>{{ transaction.amount_paid|add_commas }}</td>
+                    </tr>
+                {% endfor %}
+            <tr class="text-danger">
+                <td><strong>Total:</strong></td>
+                <td><strong>{{ total_amount_paid|add_commas }}</strong></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

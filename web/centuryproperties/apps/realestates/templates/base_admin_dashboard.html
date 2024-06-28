@@ -79,7 +79,9 @@
                     <a href="#" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
                     <a href="{% url 'realestates:pay_employee' %}" class="nav-item nav-link"><i class="fa fa-credit-card custom"></i>Pay Distributor</a>
                     <a href="{% url 'realestates:client_list' %}" class="nav-item nav-link"><i class="fa fa-credit-card custom"></i>Client Payment</a>
-                    <a href="{% url 'realestates:pending_payments' %}" class="nav-item nav-link"><i class="fa fa-credit-card custom"></i>Client Installments</a>
+                    <a href="{% url 'realestates:clients_with_lands' %}" class="nav-item nav-link"><i class="fas fa-check-circle"></i></i>Complete Pay</a>
+                    <a href="{% url 'realestates:free_clients' %}" class="nav-item nav-link"><i class="fas fa-users"></i>Free Clients</a>
+
                 </div>
             </nav>
         {% endblock %}

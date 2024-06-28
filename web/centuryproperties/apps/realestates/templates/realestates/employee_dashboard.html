@@ -28,11 +28,6 @@
                 </div>
                 <div class="navbar-nav w-100">
                     <a href="#" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
-                    <a href="{% url 'realestates:add_client' %}" class="nav-item nav-link"><i class="fa fa-user-plus"></i>Add Client</a>
-
-                    <!--
-                    <a href="{% url 'realestates:expired_clients_list' %}" class="nav-item nav-link"><i class="fas fa-exchange-alt"></i>Claim Clients</a>
-                    -->
                 </div>
 
             </nav>
@@ -181,10 +176,30 @@
 
         <!-- Clients Brought Start -->
         <div class="container-fluid pt-4 px-4">
-            <div class="bg-secondary text-center rounded p-4">
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h6 class="mb-0">Clients Brought</h6>
+            <div class="row g-4">
+                <div class="col-sm-12 col-xl-3">
+                    <div class="bg-secondary rounded p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-4">
+                             <h5 class="mb-0">Add new client</h5>
+                        </div>
+                        <div id="form-errors"></div>
+                        <form id="add-client-form" method="post" action="{% url 'realestates:add_client' %}">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button class="btn-success btn-badge" type="submit">Add Client</button>
+                        </form>
+                    </div>
                 </div>
+                <div class="col-sm-12 col-xl-9">
+                    <div class="bg-secondary rounded h-100 p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-0">
+                            <h5 class="mb-0">Pending Clients</h5>
+                            <button style="width:150px;" type="button" class="account-image-reset btn btn-warning btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#password_change_modal">
+                              Claim Clients
+                            </button>
+                        </div>
+                        <!-- Search bar -->
+                <input type="text" id="searchInput" class="form-control mb-2" placeholder="Search by phone number...">
                 <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
                     <table class="table text-start align-middle table-bordered table-hover mb-0">
                         <thead>
@@ -194,7 +209,7 @@
                                 <th scope="col">Edit</th>
                             </tr>
                         </thead>
-                        <tbody class="text-white card-link popupbtn1">
+                        <tbody id="clientTableBody" class="text-white card-link popupbtn1">
                             {% for client in clients %}
                             <tr>
                                 <td>{{ client.name }}</td>
@@ -211,6 +226,9 @@
                         </tbody>
                     </table>
                 </div>
+                    </div>
+                </div>
+
             </div>
         </div>
         <!-- Clients Brought End -->
@@ -219,7 +237,7 @@
          <div class="container-fluid pt-4 px-4">
             <div class="bg-secondary text-center rounded p-4">
                 <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h6 class="mb-0">Approved Clients</h6>
+                    <h5 class="mb-0">Approved Clients</h5>
                 </div>
                 <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
                     <table class="table text-start align-middle table-bordered table-hover mb-0">
@@ -231,7 +249,6 @@
                                 <!--<th scope="col">PhoneNum2</th>-->
                                 <!--<th scope="col">ClientLocation</th>-->
                                 <!--<th scope="col">Amount</th>-->
-                                <th scope="col"><i class="fas fa-hand-holding-usd"></i></th>
                                 <!--<th scope="col">Paid</th>-->
                                 <th scope="col">Commission</th>
                             </tr>
@@ -245,9 +262,6 @@
                                             <!--<td>{{ client.phoneNumber2 }}</td>-->
                                             <!--<td>{{ client.location }}</td>-->
                                             <!--<td>{{ payment.amount_paid|add_commas }}</td>-->
-                                            <td>
-                                                {% if c.client.client_lands.approved %}<span class="btn-success btn-lg" style="padding:1px;font-size:12px"><i class="fas fa-check-circle"></i></span>{% else %}<span class="btn-warning btn-lg" style="padding:1px;font-size:12px"><i class="fas fa-question-circle"></i></span>{% endif %}
-                                            </td>
                                             <!--<td>{{ payment.amount_paid|add_commas }}</td>-->
                                             <td>{{ c.total_commission|add_commas }}</td>
 
@@ -260,7 +274,41 @@
         </div>
          <!-- End -->
 
-
+        <!-- Claim Client Modal -->
+        <div class="modal fade pg-show-modal" id="password_change_modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="authentication-inner">
+                            <!-- Register Card -->
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="app-brand justify-content-center">
+                                        <a href="#" class="app-brand-link gap-2"> <span class="app-brand-logo demo"> </span> </a>
+                                    </div>
+                                    <form id="formAuthentication" method="post">
+                                        {% csrf_token %}
+                                        <div class="form-group mb-3">
+                                            <label for="phone_number">Enter Client Phone Number:</label>
+                                            <input type="text" class="form-control" id="phone_number" name="phone_number" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Claim Client</button>
+                                    </form>
+                                    <div id="responseMessage" class="mt-4"></div>
+                                </div>
+                            </div>
+                            <!-- Register Card -->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         {% endblock %}
 
         <!-- Footer Start -->
@@ -524,6 +572,81 @@
                 }
 
             </script>
+           <!-- claim free clients -->
+            <script>
+                $(document).ready(function() {
+                $('#formAuthentication').on('submit', function(event) {
+                    event.preventDefault(); // Prevent the form from submitting the traditional way
+
+                    var phoneNumber = $('#phone_number').val();
+                    var csrfToken = $('[name=csrfmiddlewaretoken]').val();
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '{% url "realestates:claim_free_client" %}',
+                        data: {
+                            'phone_number': phoneNumber,
+                            'csrfmiddlewaretoken': csrfToken
+                        },
+                        success: function(response) {
+                            var messageElement = $('#responseMessage');
+                            if (response.success) {
+                                messageElement.html('<p class="text-success">' + response.message + '</p>');
+                            } else {
+                                messageElement.html('<p class="text-danger">' + response.message + '</p>');
+                            }
+                        }
+                    });
+                });
+                });
+            </script>
+           <!-- Add new clients -->
+            <script>
+                $(document).ready(function(){
+                $('#add-client-form').on('submit', function(event){
+                    event.preventDefault();
+                    $.ajax({
+                        url: $(this).attr('action'),
+                        type: $(this).attr('method'),
+                        data: $(this).serialize(),
+                        success: function(response){
+                            if(response.success){
+                                location.reload();  // Reload the page to update the client list
+                            } else {
+                                $('#form-errors').html('<div class="alert alert-danger">' + response.error + '</div>');
+                            }
+                        },
+                        error: function(xhr, status, error){
+                            $('#form-errors').html('<div class="alert alert-danger">An error occurred. Please try again.</div>');
+                        }
+                    });
+                });
+                });
+            </script>
+           <!-- Search clients -->
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    const searchInput = document.getElementById('searchInput');
+                    const tableBody = document.getElementById('clientTableBody');
+                    const tableRows = tableBody.getElementsByTagName('tr');
+
+                    searchInput.addEventListener('keyup', function() {
+                        const searchTerm = searchInput.value.toLowerCase();
+
+                        for (let row of tableRows) {
+                            const phoneNumberCell = row.getElementsByTagName('td')[1];
+                            const phoneNumber = phoneNumberCell.textContent || phoneNumberCell.innerText;
+
+                            if (phoneNumber.toLowerCase().includes(searchTerm)) {
+                                row.style.display = "";
+                            } else {
+                                row.style.display = "none";
+                            }
+                        }
+                    });
+                });
+            </script>
+
         {% endblock %}
 
 

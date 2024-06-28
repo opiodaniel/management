@@ -1,0 +1,136 @@
+{% extends "base_admin_dashboard.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}
+   Free Clients
+{% endblock %}
+
+{% block add_css %}
+<style>
+    .custom-border {
+        border: 2px solid #007BFF; /* Change the color and width as desired */
+        border-radius: 5px; /* Add some border-radius for rounded corners */
+        padding: 10px; /* Optional: Add some padding for better appearance */
+    }
+
+    .custom-border:focus {
+        border-color: #0056b3; /* Change the border color when focused */
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Optional: Add shadow on focus */
+    }
+
+
+    .pagination {
+        margin-top: 20px; /* Add margin to the top of pagination controls */
+    }
+</style>
+{% endblock %}
+
+{% block SubNavbar %}
+ <div class="nav-item dropdown">
+     <a href="{% url 'realestates:admin_dashboard' admin_id %}" class="nav-item nav-link"><i class="fas fa-home"></i>Home</a>
+ </div>
+{% endblock SubNavbar %}
+
+{% block content %}
+<!-- Recent Sales Start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="bg-secondary text-center rounded p-4">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h4 class="mb-0">Free Clients</h4>
+        </div>
+        <!-- Search Bar -->
+        <form method="get" action="{% url 'realestates:free_clients' %}" class="mb-4">
+            <div class="input-group">
+                <input type="text" class="form-control custom-border" placeholder="Search clients" name="q">
+                <button class="btn btn-outline-info" type="submit">Search</button>
+            </div>
+        </form>
+        <!-- Download Button -->
+        {% if clients %}
+        <div class="mb-4">
+            <a href="{% url 'realestates:download_free_clients' %}?q={{ query }}" class="btn btn-success">Download Free Clients</a>
+        </div>
+        {% endif %}
+        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+            <table class="table text-start align-middle table-bordered table-hover mb-0">
+                <thead>
+                    <tr class="text-info">
+                        <th>Name</th>
+                        <th>Contact</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="text-white card-link">
+                    {% for client in clients %}
+                    <tr>
+                        <td>{{ client.name }}</td>
+                        <td>{{ client.phoneNumber1 }}</td>
+                        <td>
+                            <form method="post" action="{% url 'realestates:assign_client' client.id %}">
+                                {% csrf_token %}
+                                <div class="input-group">
+                                    <select name="employee_id" class="form-select">
+                                        {% for e in employees %}
+                                            <option value="{{ e.id }}" {% if client.employee and client.employee.id == e.id %}selected{% endif %}>
+                                                {{ e.user.get_full_name }}
+                                            </option>
+                                        {% endfor %}
+
+                                    </select>
+                                    <button type="submit" class="btn btn-primary">Assign</button>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination">
+            <ul class="pagination justify-content-center">
+                {% if clients.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ clients.previous_page_number }}{% if query %}&q={{ query }}{% endif %}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% for num in clients.paginator.page_range %}
+                    {% if clients.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > clients.number|add:'-5' and num < clients.number|add:'5' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if clients.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ clients.next_page_number }}{% if query %}&q={{ query }}{% endif %}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- Recent Sales End -->
+{% endblock %}
+
+
+<!-- Footer Start -->
+{% block footer %}
+
+{% endblock %}
+<!-- Footer End -->
+
+{% block add_js %}
+
+{% endblock %}
+
+
+
+
+

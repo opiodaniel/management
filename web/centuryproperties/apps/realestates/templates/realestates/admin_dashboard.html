@@ -114,6 +114,7 @@
                     <tr class="text-info">
                         <th scope="col">Date</th>
                         <th scope="col">Amount</th>
+                        <th scope="col">More info</th>
                     </tr>
                 </thead>
                 <tbody style="cursor:pointer" class="text-white">
@@ -121,32 +122,29 @@
                     <tr onclick="showSubTable(this)">
                         <td>{{ data.date }}</td>
                         <td>{{ data.amount }}</td>
+                        <td><i class="fas fa-info-circle"></i></td>
                     </tr>
                     <!-- Hidden sub-table -->
                     <tr class="sub-table-row" style="display:none;">
                         <td colspan="2">
+                            <h5>Transactions made in {{data.date}} </h5>
                             <div style= "max-height: 200px; overflow-y: auto;">
-                            <table id="customers" style="max-height: 200px; overflow-y: auto;">
+                            <table id="customer" style="max-height: 200px; overflow-y: auto;">
+
                                   <tr>
                                      <th>{{data.date}}</th>
-                                     <th>AmountPaid</th>
-                                     <th>ClientName</th>
-                                     <th>PhoneNumber1</th>
-                                     <th>PhoneNumber2</th>
-                                     <th>Location</th>
-                                     <th>BroughtBy:</th>
-                                     <th>ApprovedBy:</th>
+                                     <th>Amount</th>
+                                      <!--
+                                     <th>Client</th>
+                                     <th>contact</th> -->
                                   </tr>
                                   {% for md in  data.month_detail  %}
                                   <tr>
                                     <td>{{ md.timestamp }}</td>
                                     <td>{{md.amount_paid|add_commas}}</td>
-                                    <td>{{ md.client }}</td>
-                                    <td>{{ md.client.phoneNumber1 }}</td>
-                                    <td>{{ md.client.phoneNumber2 }}</td>
-                                    <td>{{ md.client.location }}</td>
-                                    <td>{{ md.client.employee }}</td>
-                                    <td>{{ md.approved_by }}</td>
+                                    <!--
+                                    <td>{{ md.client_land.client.name }}</td>
+                                    <td>{{ md.client_land.client.phoneNumber1 }}</td> -->
                                   </tr>
                                  {% endfor %}
                             </table>
@@ -425,87 +423,7 @@
     </script>
    <!-- end  -->
 
-   <!-- clients brought bar graph -->
-   <script>
-    let myChart; // Declare myChart variable outside fetch function
 
-        // Function to fetch data and initialize/update the chart
-        const fetchDataAndInitializeChart = (threshold) => {
-            // Fetch data from the server
-            fetch("{% url 'realestates:employees_client' %}")
-                .then(response => response.json())
-                .then(data => {
-                    // Extract employee names and client counts from the fetched data
-                    const employeeNames = Object.keys(data);
-                    const clientCounts = employeeNames.map(employee => data[employee].clients.length);
-
-                    // Filter employees based on the threshold
-                    const selectedEmployees = employeeNames.filter((employee, index) => clientCounts[index] >= threshold);
-                    const selectedClientCounts = clientCounts.filter((count, index) => count >= threshold);
-
-                    // Initialize or update the chart
-                    if (!myChart) {
-                        // Create a new bar chart if myChart is not initialized
-                        const ctx = document.getElementById('employeebarChart').getContext('2d');
-                        myChart = new Chart(ctx, {
-                            type: 'bar',
-                            data: {
-                                labels: selectedEmployees,
-                                datasets: [{
-                                    label: 'Total Clients Brought',
-                                    data: selectedClientCounts,
-                                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                                    borderColor: 'rgba(54, 162, 235, 1)',
-                                    borderWidth: 1
-                                }]
-                            },
-                            options: {
-                                indexAxis: 'y', // Display labels on the y-axis
-                                scales: {
-                                    y: {
-                                        title: {
-                                            display: true,
-                                            text: 'Distributor'
-                                        }
-                                    },
-                                    x: {
-                                        beginAtZero: true,
-                                        title: {
-                                            display: true,
-                                            text: 'Total Clients Brought'
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    } else {
-                        // Update the existing chart with new data and options
-                        myChart.data.labels = selectedEmployees;
-                        myChart.data.datasets[0].data = selectedClientCounts;
-                        myChart.update(); // Update the chart
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                });
-        };
-
-        // Event listener for the threshold input field
-        document.getElementById('thresholdInput').addEventListener('change', function() {
-            const threshold = parseInt(this.value); // Get the new threshold value
-            fetchDataAndInitializeChart(threshold); // Fetch data and update the chart
-        });
-
-        // Initial data fetch and chart initialization
-        document.addEventListener('DOMContentLoaded', () => {
-            // Default threshold value
-            const defaultThreshold = parseInt(document.getElementById('thresholdInput').value);
-
-            // Fetch data and initialize the chart with default threshold
-            fetchDataAndInitializeChart(defaultThreshold);
-        });
-
-    </script>
 
    <!-- clients brought line graph -->
    <script>
@@ -597,106 +515,196 @@
 
     </script>
 
-   <!-- Approval rate table -->
-    <script>
-    // Fetch data from the server
-    fetch("{% url 'realestates:employees_client' %}")
-        .then(response => response.json())
-        .then(data => {
-            // Extract and sort employee data by the number of clients brought in
-            const sortedEmployees = Object.entries(data).sort((a, b) => {
-                return b[1].clients.length - a[1].clients.length; // Sort in descending order
-            });
 
-            // Populate table body with employee information
-            const tableBody = document.getElementById('employeeTableBody');
-            sortedEmployees.forEach(([employee, performanceData]) => {
-                const totalClientsBrought = performanceData.clients.length;
-                const approvedClients = performanceData.approved_clients;
-                const pendingClients = performanceData.appending_clients;
-                const approvalRate = approvedClients > 0 ? ((approvedClients / totalClientsBrought) * 100).toFixed(0) + '%' : '0%';
+   <!-- Approved client bar graph -->
+   <script>
+    // Define the employees_client function
+    const employees_client = function() {
+        // Function to update the chart based on the minimum approved clients threshold
+        const updateChart = function(minApprovedClients) {
+            const url = "{% url 'realestates:employees_client' %}";
 
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="truncate">${employee}</td>
-                    <td>${totalClientsBrought}</td>
-                    <td>${approvedClients}</td>
-                    <td>${pendingClients}</td>
-                    <td>${approvalRate}</td>
-                `;
-                tableBody.appendChild(row);
+            $.post(url, {}, function(data) {
+                // Filter employees based on the minimum approved clients threshold
+                const filteredData = Object.entries(data).filter(([employee, info]) => info.approved_clients.length >= minApprovedClients);
+
+                // Extract filtered employee names and approved clients count
+                const employees = filteredData.map(([employee, info]) => employee);
+                const approvedClients = filteredData.map(([employee, info]) => info.approved_clients.length);
+
+                // Get canvas element
+                const canvas = document.getElementById('clientsChart').getContext('2d');
+
+                // If chart already exists, destroy it to prevent duplicate charts
+                if (window.myChart) {
+                    window.myChart.destroy();
+                }
+
+                // Create new Chart.js bar chart
+                window.myChart = new Chart(canvas, {
+                    type: 'bar',
+                    data: {
+                        labels: employees,
+                        datasets: [{
+                            label: 'Approved Clients',
+                            data: approvedClients,
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)', // Blue color for bars
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
             });
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error);
+        };
+
+        const defaultThreshold = parseInt(document.getElementById('thresholdInput1').value);
+        // Call updateChart with initial threshold value
+        updateChart(defaultThreshold); // Default threshold value (e.g., 10)
+
+        // Event listener for update threshold button
+        document.getElementById('updateThresholdButton1').addEventListener('click', function() {
+            const thresholdValue = parseInt(document.getElementById('thresholdInput1').value);
+            updateChart(thresholdValue);
+        });
+    };
+
+    // Call the employees_client function to initialize the chart
+    employees_client();
+</script>
+
+    <!-- clients brought horizontal bar graph -->
+   <script>
+    let myChart; // Declare myChart variable outside fetch function
+
+        // Function to fetch data and initialize/update the chart
+        const fetchDataAndInitializeChart = (threshold) => {
+            // Fetch data from the server
+            fetch("{% url 'realestates:employees_client' %}")
+                .then(response => response.json())
+                .then(data => {
+                    // Extract employee names and client counts from the fetched data
+                    const employeeNames = Object.keys(data);
+                    const clientCounts = employeeNames.map(employee => data[employee].clients.length);
+
+                    // Filter employees based on the threshold
+                    const selectedEmployees = employeeNames.filter((employee, index) => clientCounts[index] >= threshold);
+                    const selectedClientCounts = clientCounts.filter((count, index) => count >= threshold);
+
+                    // Initialize or update the chart
+                    if (!myChart) {
+                        // Create a new bar chart if myChart is not initialized
+                        const ctx = document.getElementById('employeebarChart').getContext('2d');
+                        myChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: selectedEmployees,
+                                datasets: [{
+                                    label: 'Total Clients Brought',
+                                    data: selectedClientCounts,
+                                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                indexAxis: 'y', // Display labels on the y-axis
+                                scales: {
+                                    y: {
+                                        title: {
+                                            display: true,
+                                            text: 'Distributor'
+                                        }
+                                    },
+                                    x: {
+                                        beginAtZero: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Total Clients Brought'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        // Update the existing chart with new data and options
+                        myChart.data.labels = selectedEmployees;
+                        myChart.data.datasets[0].data = selectedClientCounts;
+                        myChart.update(); // Update the chart
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        };
+
+        // Event listener for the threshold input field
+        document.getElementById('thresholdInput').addEventListener('change', function() {
+            const threshold = parseInt(this.value); // Get the new threshold value
+            fetchDataAndInitializeChart(threshold); // Fetch data and update the chart
+        });
+
+        // Initial data fetch and chart initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            // Default threshold value
+            const defaultThreshold = parseInt(document.getElementById('thresholdInput').value);
+
+            // Fetch data and initialize the chart with default threshold
+            fetchDataAndInitializeChart(defaultThreshold);
         });
 
     </script>
 
-   <!-- Approved client bar graph -->
-   <script>
-       // Define the employees_client function
-        const employees_client = function() {
-            // Function to update the chart based on the minimum approved clients threshold
-            const updateChart = function(minApprovedClients) {
-                const url = "{% url 'realestates:employees_client' %}";
 
-                $.post(url, {}, function(data) {
-                    // Filter departments based on the minimum approved clients threshold
-                    const filteredData = Object.entries(data).filter(([department, info]) => info.approved_clients >= minApprovedClients);
-
-                    // Extract filtered department names and approved clients count
-                    const departments = filteredData.map(([department, info]) => department);
-                    const approvedClients = filteredData.map(([department, info]) => info.approved_clients);
-
-                    // Get canvas element
-                    const canvas = document.getElementById('clientsChart').getContext('2d');
-
-                    // If chart already exists, destroy it to prevent duplicate charts
-                    if (window.myChart) {
-                        window.myChart.destroy();
-                    }
-                    // Create new Chart.js bar chart
-                    window.myChart = new Chart(canvas, {
-                        type: 'bar',
-                        data: {
-                            labels: departments,
-                            datasets: [{
-                                label: 'Approved Clients',
-                                data: approvedClients,
-                                backgroundColor: 'rgba(54, 162, 235, 0.5)', // Blue color for bars
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            scales: {
-                                yAxes: [{
-                                    ticks: {
-                                        beginAtZero: true
-                                    }
-                                }]
-                            }
-                        }
-                    });
+    <!-- Approval rate table -->
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Fetch data from the server
+        fetch("{% url 'realestates:employees_client' %}")
+            .then(response => response.json())
+            .then(data => {
+                // Extract and sort employee data by the number of clients brought in
+                const sortedEmployees = Object.entries(data).sort((a, b) => {
+                    const totalClientsA = a[1].total_clients.length;
+                    const totalClientsB = b[1].total_clients.length;
+                    return totalClientsB - totalClientsA; // Sort in descending order
                 });
-            };
-            const defaultThreshold = parseInt(document.getElementById('thresholdInput1').value);
-            // Call updateChart with initial threshold value
-            updateChart(defaultThreshold); // Default threshold value (e.g., 10)
 
-            // Event listener for update threshold button
-            document.getElementById('updateThresholdButton1').addEventListener('click', function() {
-                const thresholdValue = parseInt(document.getElementById('thresholdInput1').value);
-                updateChart(thresholdValue);
+                // Populate table body with employee information
+                const tableBody = document.getElementById('employeeTableBody');
+                sortedEmployees.forEach(([employee, performanceData]) => {
+                    const totalClientsBrought = performanceData.total_clients.length;
+                    const approvedClients = performanceData.approved_clients.length;
+                    const pendingClients = performanceData.pending_clients.length;
+                    const clientsWithNoPayments = performanceData.clients_with_no_payments.length;
+                    const approvalRate = approvedClients > 0 ? ((approvedClients / totalClientsBrought) * 100).toFixed(0) + '%' : '0%';
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="truncate">${employee}</td>
+                        <td>${totalClientsBrought}</td>
+                        <td>${approvedClients}</td>
+                        <td>${clientsWithNoPayments}</td>
+                        <td>${approvalRate}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
             });
-        };
+    });
+</script>
 
-        // Call the employees_client function to initialize the chart
-        employees_client();
-
-   </script>
 
    <script>
         //=============================================

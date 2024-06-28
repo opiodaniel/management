@@ -1,5 +1,5 @@
 from django import forms
-from .models import Client, Payment, Land, ClientLand
+from .models import Client, Payment, Land, ClientLand, EmployeePaymentRecord
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import (UserCreationForm)
 from django.contrib.auth import get_user_model
@@ -21,7 +21,7 @@ class ClientForm(forms.ModelForm):
     def clean_phoneNumber1(self):
         phone_number1 = self.cleaned_data['phoneNumber1']
         if Client.objects.filter(phoneNumber1=phone_number1).exists() or Client.objects.filter(phoneNumber2=phone_number1).exists():
-            raise forms.ValidationError('A client with the same phone number already exists.')
+            raise forms.ValidationError('Client with the same phone number already exists.')
         return phone_number1
 
     def clean_phoneNumber2(self):
@@ -30,7 +30,7 @@ class ClientForm(forms.ModelForm):
             if len(phone_number2) < 7:
                 raise forms.ValidationError("Phone number must be at least 7 characters long.")
             if Client.objects.filter(phoneNumber1=phone_number2).exists() or Client.objects.filter(phoneNumber2=phone_number2).exists():
-                raise forms.ValidationError('A client with the same phone number already exists.')
+                raise forms.ValidationError('Client with the same phone number already exists.')
         return phone_number2
 
     def clean(self):

@@ -1,0 +1,104 @@
+{% extends "base_admin_dashboard.html" %}
+{% load static %}
+{% load custom_filters %}
+{% load humanize %}
+
+{% block title %}Clients and Purchased Lands{% endblock %}
+
+{% block add_css %}
+<style>
+        .custom-border {
+            border: 2px solid #007BFF; /* Change the color and width as desired */
+            border-radius: 5px; /* Add some border-radius for rounded corners */
+            padding: 10px; /* Optional: Add some padding for better appearance */
+        }
+
+        .custom-border:focus {
+            border-color: #0056b3; /* Change the border color when focused */
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Optional: Add shadow on focus */
+        }
+
+        .client-row {
+            background-color: #f8f9fa; /* Light background for better separation */
+            border-top: 2px solid #dee2e6; /* Border between clients */
+        }
+
+        .land-list {
+            list-style-type: none; /* Remove default list style */
+            padding-left: 0; /* Remove left padding */
+        }
+
+        .land-list li {
+            padding: 5px 0; /* Add padding between land items */
+        }
+
+        .pagination {
+            margin-top: 20px; /* Add margin to the top of pagination controls */
+        }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid pt-4 px-4">
+    <div class="bg-secondary text-center rounded p-4">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h4 class="mb-0">Clients and Their Purchased Lands</h4>
+        </div>
+         <!-- Search Form -->
+        <form method="get" action="{% url 'realestates:clients_with_lands' %}">
+            <div class="input-group mb-4">
+                <input type="text" name="search" class="form-control custom-border " placeholder="Search by Phone Number" value="{{ search_query }}">
+                <button class="btn btn-outline-info" type="submit">Search</button>
+            </div>
+        </form>
+
+        <table class="table table-striped">
+            <thead>
+                <tr class="text-info">
+                    <th>Client Name</th>
+                    <th>Phone Number</th>
+                    <th>Purchased Lands</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in page_obj %}
+                    <tr class="client-rowe">
+                        <td>{{ client.name }}</td>
+                        <td>{{ client.phoneNumber1 }}</td>
+                        <td>
+                            <ul class="land-list">
+                                {% for land in client.client_lands.all %}
+                                    {% if land.payment_complete %}
+                                        <li>
+                                            <a href="{% url 'realestates:land_transaction_history' land.id %}"> &#10004; {{ land.land.plot_number }} - {{ land.land.location }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Pagination Controls -->
+        <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?search={{ search_query }}&page=1">&laquo; first</a>
+                    <a href="?search={{ search_query }}&page={{ page_obj.previous_page_number }}">previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?search={{ search_query }}&page={{ page_obj.next_page_number }}">next</a>
+                    <a href="?search={{ search_query }}&page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+</div>
+{% endblock %}
