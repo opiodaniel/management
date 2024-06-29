@@ -8,14 +8,19 @@
  </div>
 {% endblock SubNavbar %}
 
- {% block content %}
+{% block content %}
     <!-- Recent Sales Start -->
    <div class="container-fluid pt-4 px-4">
         <div class="bg-secondary text-center rounded p-4">
             <h6 class="mb-3">Distributor Table</h6>
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <!-- Search Bar -->
-                <input  class="border-0" size="25"  type="text" id="searchInput" placeholder="distributor name...">
+                <form method="get" action="{% url 'realestates:pay_employee' %}" class="mb-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control custom-border" placeholder="Search by name...." name="q">
+                        <button class="btn btn-outline-info" type="submit">Search</button>
+                    </div>
+                </form>
             </div>
             <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
                 <table class="table text-start align-middle table-bordered table-hover mb-0 search-table">
@@ -26,40 +31,44 @@
                         </tr>
                     </thead>
                     <tbody class="text-white">
-                        {% for e in employees %}
+                        {% for employee in page_obj %}
                         <tr>
-                            <td>{{e.user.get_full_name}}</td>
+                            <td>{{ employee.user.get_full_name }}</td>
                             <td>
-                               <a href="{% url 'realestates:approve_employee_payment' e.id %}" class="btn btn-sm btn-primary">Payment</a>
+                                <a href="{% url 'realestates:employee_clients_made_payment' employee.id %}">
+                                    <button type="submit" class="btn btn-primary">Payment</button>
+                                </a>
                             </td>
-<!--                            <td>-->
-<!--                                <form action="{% url 'realestates:approve_employee_payment' e.id%}" method="post">-->
-<!--                                    {% csrf_token %}-->
-<!--                                    <button class="btn btn-sm btn-primary" type="submit">Approve Payment</button>-->
-<!--                                </form>-->
-<!--                            </td>-->
-                       </tr>
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+                <div class="pagination">
+                    <span class="step-links">
+                        {% if page_obj.has_previous %}
+                            <a href="?page=1{% if query %}&q={{ query }}{% endif %}">&laquo; first</a>
+                            <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">previous</a>
+                        {% endif %}
+
+                        <span class="current">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                        </span>
+
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}">next</a>
+                            <a href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}">last &raquo;</a>
+                        {% endif %}
+                    </span>
+                </div>
             </div>
         </div>
    </div>
     <!-- Recent Sales End -->
- {% endblock %}
+{% endblock %}
+
 
 
   {% block add_js %}
-     <script>
-        $(document).ready(function() {
-            $('#searchInput').on('keyup', function() {
-                var searchText = $(this).val().toLowerCase();
-                $(this).closest('.bg-secondary').find('.search-table tbody tr').filter(function() {
-                    $(this).toggle($(this).text().toLowerCase().indexOf(searchText) > -1);
-                });
-            });
-        });
-    </script>
   {% endblock %}
 
 {% block footer %}

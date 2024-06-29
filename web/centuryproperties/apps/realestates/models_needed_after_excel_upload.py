@@ -248,3 +248,4 @@ class EmployeePaymentRecord(TruncateTableMixin, models.Model):
         # Ensure balance is updated correctly
         self.balance = self.total_commission - self.amount_paid
         super().save(*args, **kwargs)
+

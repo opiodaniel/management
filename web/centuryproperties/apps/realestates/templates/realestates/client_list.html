@@ -18,9 +18,12 @@
         <div class="bg-secondary text-center rounded p-4">
             <h6 class="mb-3">Client Table</h6>
             <div class="d-flex align-items-center justify-content-between mb-4 shadow">
+                <!-- Search Bar -->
                 <form method="GET">
-                    <input  type="text" name="q" placeholder="Search clients...">
-                    <button  type="submit" class="btn btn-info btn-sm mb-1">Search</button>
+                    <div class="input-group">
+                        <input type="text" class="form-control " placeholder="Search client...." name="q">
+                        <button class="btn btn-outline-info" type="submit">Search</button>
+                    </div>
                 </form>
             </div>
             <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
@@ -33,25 +36,6 @@
                             <th scope="col">Payment</th>
                         </tr>
                     </thead>
-
-
-<!--                    <tbody class="text-white">-->
-<!--                        {% for client in clients %}-->
-<!--                            <tr>-->
-<!--                                <td>{{ client.date }}</td>-->
-<!--                                <td>{{ client.phoneNumber1 }}</td>-->
-<!--                                <td>{{ client.plot_number }}</td>-->
-<!--                                <td>-->
-<!--                                    <form action="{% url 'realestates:approve_payment' client.id %}" method="post">-->
-<!--                                        {% csrf_token %}-->
-<!--                                        <input hidden type="text" name="employee_id" value="{{client.employee.id}}" >-->
-<!--                                        <button class="btn btn-sm btn-primary" type="submit">Approve</button>-->
-<!--                                    </form>-->
-<!--                                </td>-->
-<!--                            </tr>-->
-<!--                        {% endfor %}-->
-<!--                    </tbody>-->
-
                      <tbody class="text-white">
                         {% for client in clients %}
                             <tr>

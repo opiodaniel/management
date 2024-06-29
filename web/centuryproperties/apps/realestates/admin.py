@@ -47,7 +47,7 @@ class CommissionAdmin(admin.ModelAdmin):
 
 
 class EmployeePaymentRecordAdmin(admin.ModelAdmin):
-    list_display = ('employee', 'total_commission', 'amount_paid', 'balance')
+    list_display = ('employee', 'total_commission', 'amount_paid', 'balance', 'client')
     search_fields = ('employee__user__username',)
     list_filter = ('employee',)
 

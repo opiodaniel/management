@@ -4,7 +4,7 @@
 {% load custom_filters %}
 
 {% block title %}
-   Record Payment for {{ client.name }}
+ Payment
 {% endblock %}
 
 {% block SubNavbar %}
@@ -16,65 +16,71 @@
 {% block content %}
 <div class="container-fluid pt-4 px-4">
     <div class="row g-4">
-        <div class="col-sm-12 col-xl-6">
+        <div class="col-sm-12 col-xl-12">
             <div class="bg-secondary text-center rounded p-4">
-                <div class="d-flex align-items-center justify-content-between mb-4 text-warning">Payment for: {{ employee.user.get_full_name }}</div>
-                <h6>Payment History</h6>
-                <table class="table text-start align-middle table-bordered table-hover mb-0">
-                    <thead>
-                        <tr class="text-info">
-                            <th scope="col">Date</th>
-                            <th scope="col">Paid</th>
-                            <th scope="col">Edit</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-white">
-                        {% for payment in all_payment %}
+                <div class="d-flex align-items-center justify-content-between mb-4 text-success">
+                    Clients Brought by: {{ employee_.user.get_full_name }}
+                    <span>
+                        <!-- Display messages -->
+                        {% if messages %}
+                        <div class="container mt-3">
+                            {% for message in messages %}
+                            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table class="table text-start align-middle table-bordered table-hover mb-0">
+                        <thead>
+                            <tr class="text-info">
+                                <th scope="col">Client</th>
+                                <th scope="col">Paid</th>
+                                <th scope="col">Commission</th>
+                                <th scope="col">Amount Paid to Employee</th>
+                                <th scope="col">Balance</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-white card-link popupbtn1">
+                            {% for data in client_data %}
                             <tr>
-                                <td>{{ payment.payment_date|date:"Y-m-d" }}</td>
-                                <td>{{ payment.amount_paid|add_commas }}</td>
+                                <td>{{ data.client_land.client.name }}</td>
+                                <td>{{ data.client_land.total_amount_paid|add_commas }}</td>
+                                <td>{{ data.commission|add_commas }}</td>
+                                <td>{{ data.amount_paid|add_commas }}</td>
+                                <td>{{ data.balance|add_commas }}</td>
                                 <td>
-                                    <a   name='{{employee.id}}' href="{% url 'realestates:edit_employee_payment' payment.id %}">
-                                      <i class="fas fa-edit" style="padding:1px;font-size:12px"></i>
-                                    </a>
-                                    <span style="padding:2px"></span>
+                                    <form method="post" action="{% url 'realestates:approve_employee_payment' employee_.id data.client_land.client.id %}">
+                                        {% csrf_token %}
+                                        <div class="mb-3">
+                                            <label for="amount_paid" class="form-label">Amount to Pay</label>
+                                            <input type="text" oninput="formatAmount(this)" name="amount_paid" class="form-control" required>
+                                        </div>
+                                        <div class="mb-3">
+                                        </div>
+                                        <button type="submit" class="btn btn-success">Pay</button>
+                                        <input type="button" class="btn btn-danger" value="Cancel" onclick="window.history.go(-1)">
+                                    </form>
                                 </td>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
+        <!--
         <div class="col-sm-12 col-xl-6">
             <div class="bg-secondary rounded h-100 p-4">
-                <form method="post" action="{% url 'realestates:approve_employee_payment' employee.id %}" class="needs-validation" novalidate>
-                    {% csrf_token %}
 
-                    <div class="mb-3">
-                        <label for="totalCommission" class="form-label">Total Commission:</label>
-                        <span class="form-control-plaintext" id="totalCommission">{{ total_commission|add_commas }}</span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="totalPaid" class="form-label">Total Paid:</label>
-                        <span class="form-control-plaintext" id="totalPaid">{{ total_paid|add_commas }}</span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="balance" class="form-label">Balance:</label>
-                        <span class="form-control-plaintext" id="balance">{{ balance|add_commas }}</span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="amountPaid" class="form-label">Amount to Pay:</label>
-                        <input type="text" oninput="formatAmount(this)" class="form-control" id="amountPaid" name="amount_paid" required>
-                        <div class="invalid-feedback">Please enter the amount to pay.</div>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">Pay</button>
-                </form>
             </div>
-        </div>
+        </div> -->
     </div>
 </div>
 {% endblock %}

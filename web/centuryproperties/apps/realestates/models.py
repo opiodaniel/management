@@ -236,6 +236,7 @@ def update_commission(sender, instance, created, **kwargs):
 
 class EmployeePaymentRecord(TruncateTableMixin, models.Model):
     employee = models.ForeignKey(Employees, on_delete=models.CASCADE, related_name='payment_records', null=True)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='payment_records', null=True)
     total_commission = models.IntegerField(default=0)
     amount_paid = models.IntegerField(default=0)
     balance = models.IntegerField(default=0)
@@ -248,4 +249,3 @@ class EmployeePaymentRecord(TruncateTableMixin, models.Model):
         # Ensure balance is updated correctly
         self.balance = self.total_commission - self.amount_paid
         super().save(*args, **kwargs)
-

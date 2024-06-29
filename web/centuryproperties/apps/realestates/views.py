@@ -64,8 +64,10 @@ from django.db.models import Sum, F, ExpressionWrapper, IntegerField
 from django.utils.timezone import now
 import openpyxl
 from openpyxl.utils import get_column_letter
+from django.views.decorators.http import require_POST
 
 
+# ======== LOGIN PAGE ========
 def login_page(request):
     company = Company.objects.get(id=1)
     company_logo_url = company.company_logo.url
@@ -106,9 +108,7 @@ def login_page(request):
     return render(request, 'realestates/registration/login.html', arg)
 
 
-@login_required
-# def home(request):
-#     return render(request, "home.html")
+# ======= CALCULATES MONTHLY SALE BASING ON THE PAYMENT MODEL =========
 def get_total_sales_for_month(request, year, month):
     # Define the start date of the month
     start_date = datetime(year, month, 1)
@@ -144,6 +144,7 @@ def get_total_sales_for_previous_months(request):
     return total_sales_previous_months, total_sales_previous_months_sum
 
 
+# ========== ADMIN DASHBOARD ============
 @login_required
 def admin_dashboard(request, admin_id):
 
@@ -281,6 +282,7 @@ def admin_dashboard(request, admin_id):
     return render(request, 'realestates/admin_dashboard.html', context)
 
 
+# ================ EMPLOYEE DASHBOARD ==============
 @login_required
 def employee_dashboard(request):
 
@@ -294,7 +296,7 @@ def employee_dashboard(request):
 
     profile_pic_url = ""
     try:
-        employee = Employees.objects.get(id=request.user.id)
+        employee = request.user.employee
         if employee.profile_pic:
             profile_pic_url = employee.profile_pic.url
     except Employees.DoesNotExist:
@@ -309,7 +311,6 @@ def employee_dashboard(request):
         company = None
 
     payments = Payment.objects.filter(employee=employee).order_by('approved', '-client_land__client__date')
-
 
     total_number_of_clients = employee.total_clients()
     total_approved_clients = employee.total_approved_clients()
@@ -345,6 +346,7 @@ def employee_dashboard(request):
     return render(request, 'realestates/employee_dashboard.html', context)
 
 
+# ========== DISPLAYS EMPLOYEES WITH THEIR CLIENTS =============
 @login_required
 def employees_client(request):
     employees = Employees.objects.filter(is_administrator=False)
@@ -387,37 +389,8 @@ def employees_client(request):
 
     return JsonResponse(dic_)
 
-# @login_required
-# def employees_client(request):
-#     employees = Employees.objects.filter(is_administrator=False)
-#
-#     # Annotate employees with the count of approved and appending clients
-#     employees = employees.annotate(
-#         approved_clients=Count('employee_payments', filter=Q(employee_payments__approved=True)),
-#         appending_clients=Count('employee_payments', filter=Q(employee_payments__approved=False))
-#     ).prefetch_related('employee_payments__client_land__client')
-#
-#     dic_ = {}
-#
-#     for employee in employees:
-#         employee_clients = [
-#             {
-#                 'id': payment.client_land.client.id,
-#                 'name': payment.client_land.client.name,
-#                 # Add other client fields as needed
-#             }
-#             for payment in employee.employee_payments.all()
-#         ]
-#
-#         dic_[employee.user.username] = {
-#             'approved_clients': employee.approved_clients,
-#             'appending_clients': employee.appending_clients,
-#             'clients': employee_clients
-#         }
-#
-#     return JsonResponse(dic_)
 
-
+# ========= LISTS OF FREE CLIENTS =========
 @login_required
 def free_clients(request):
     admin_id = request.user.id
@@ -477,6 +450,7 @@ def free_clients(request):
     return render(request, 'realestates/free_clients.html', context)
 
 
+# ======== DOWNLOAD EXCEL FILE CONTAINING LISTS OF FREE CLIENTS =========
 @login_required
 def download_free_clients(request):
     query = request.GET.get('q')
@@ -523,6 +497,7 @@ def download_free_clients(request):
     return response
 
 
+# ========== ADMIN TO ASSIGN FREE CLIENTS TO EMPLOYEES ==========
 @login_required
 def assign_client(request, client_id):
     if request.method == 'POST':
@@ -535,6 +510,7 @@ def assign_client(request, client_id):
         return redirect('realestates:free_clients')
 
 
+# ======= EMPLOYEES TO CLAIM FREE CLIENTS.(7 WEEK EXPIRED CLIENTS WITHOUT ANY PAYMENT ) ===========
 @login_required
 def claim_free_client(request):
     if request.method == "POST":
@@ -567,145 +543,7 @@ def claim_free_client(request):
         return JsonResponse(response)
 
 
-@login_required
-def approve_payment(request, client_id):
-    print(client_id)
-    payment_client_id = client_id
-    employee_id = request.POST.get('employee_id')
-    # print('employee_id============', employee_id)
-    client = Client.objects.get(id=client_id)
-    context = {
-        'payment_client_id': payment_client_id,
-        'client': client,
-        'employee_id': employee_id,
-    }
-    return render(request, 'realestates/confirm_client_payment.html', context)
-
-
-@transaction.atomic
-def confirm_payment(request, client_id):
-    if request.method == 'POST':
-        client = Client.objects.get(id=client_id)
-        amount_paid_str = request.POST.get('amount_paid', '0').replace(',', '')  # Remove commas
-        total_amount_str = request.POST.get('total_amount', '0').replace(',', '')  # Remove commas
-        plot_number = request.POST.get('plot_number', '')
-        amount_paid = int(amount_paid_str)
-        total_amount = int(total_amount_str)
-        if amount_paid <= 0 or total_amount <= 0:
-            message = 'You must enter a valid positive amount.'
-            return HttpResponse("Error: Amount cannot be zero or lower than zero.")
-            # return render(request, 'realestates/confirm_client_payment.html',
-            #               {'payment_client_id': client_id, 'message': message, 'client': client})
-
-        if amount_paid > total_amount:
-            message = 'Amount paid cannot be greater than the Expected amount.'
-            return HttpResponse("Error: Amount paid cannot be greater than the Expected amount.")
-            # return render(request, 'realestates/confirm_client_payment.html',
-            #           {'payment_client_id': client_id, 'message': message, 'client': client})
-
-        else:
-            # Assuming the request.user is the user making the request
-            current_user = request.user
-
-            # Check if the current user is a superuser (admin)
-            if current_user.is_staff:
-                # Get the associated employee record for the admin user
-                # print(current_user, 'I am a superuser')
-                try:
-                    admin_employee = Employees.objects.get(user=current_user)
-                except Employees.DoesNotExist as ex:
-                    # print('=======ex=============', ex)
-                    # Handle the case where the admin's employee record doesn't exist
-                    # This might occur if the admin's employee record is not properly set up
-                    # Log an error or handle the situation appropriately
-                    return HttpResponse("Error: Admin employee record not found.")
-                # employee = get_object_or_404(Employees, id=employee_id)
-                # commission_earned = employee.calculate_commission()
-
-                # Now you have the admin employee instance available (admin_employee)
-                # Perform actions based on the admin's status
-
-                # Assuming you have the client object
-                client = Client.objects.get(pk=client_id)
-
-                # Update the approved field of the client's payment
-                payment = Payment.objects.get(client=client)
-                payment.amount_paid += amount_paid
-                # Check if total_amount has been set
-                if payment.total_amount == 0:
-                    payment.total_amount = total_amount  # Set the initial total_amount
-
-                payment.remaining_amount = payment.total_amount - payment.amount_paid  # Update remaining amount
-                payment.timestamp = date.today()
-                payment.approved = True
-                payment.approved_by = admin_employee
-                payment.plot_number = plot_number
-                payment.save()
-                client.plot_number = plot_number
-                client.save()
-                # payment = Payment.objects.get(client=client)
-                # payment.amount_paid += amount_paid  # Increment the amount_paid
-                # payment.remaining_amount = payment.total_amount - payment.amount_paid  # Recalculate remaining_amount
-                # if payment.remaining_amount == 0:
-                #     payment.approved = True  # Mark as approved if fully paid
-                # payment.timestamp = date.today()
-                # payment.approved_by = admin_employee
-                # payment.save()
-
-                # TO USE THIS CODE SOON. IT'S A NEW UPDATE. ONLY CALCULATES FOR A PARTICULAR EMPLOYEE.
-                employee_id = request.POST.get('employee_id')
-                print('employee_id=1222222222222222', employee_id)
-                employee__ = Employees.objects.get(id=employee_id)
-                print('employee_id-----employee ', employee_id,  employee__)
-                weekly_commission = employee__.calculate_weekly_commission()
-                employee_payment_record, created = EmployeePaymentRecord.objects.get_or_create(
-                    employee=employee__)
-                employee_payment_record.total_commission = weekly_commission
-                employee_payment_record.balance = employee_payment_record.total_commission - employee_payment_record.amount_paid
-                employee_payment_record.save()
-                # END OF THE CODE
-
-                # THIS CODE CALCULATES ALL EMPLOYEES TOTAL COMMISSION
-
-                # logging.basicConfig(level=logging.INFO)
-                # # Update EmployeePaymentRecord
-                # for employee in Employees.objects.filter(is_administrator=False):
-                #     try:
-                #         weekly_commission = employee.calculate_weekly_commission()
-                #         all_employee_payment_record, created = EmployeePaymentRecord.objects.get_or_create(
-                #             employee=employee)
-                #
-                #         logging.info(f'Employee: {employee.id}, Calculated Weekly Commission: {weekly_commission}')
-                #
-                #         # Update total commission by adding the weekly commission
-                #         all_employee_payment_record.total_commission += weekly_commission
-                #         all_employee_payment_record.balance = all_employee_payment_record.total_commission - all_employee_payment_record.amount_paid
-                #         all_employee_payment_record.save()
-                #
-                #         logging.info(
-                #             f'Updated Employee: {employee.id}, Total Commission: {all_employee_payment_record.total_commission}, Weekly Commission: {weekly_commission}, Balance: {all_employee_payment_record.balance}')
-                #
-                #     except EmployeePaymentRecord.DoesNotExist:
-                #         logging.error(
-                #             f'Payment record for employee {employee.id} does not exist and could not be created.')
-                #     except Exception as e:
-                #         logging.error(f'An error occurred while updating employee {employee.id}: {e}')
-
-                # # Calculate commission for non-admin employees
-                # for employee in Employees.objects.filter(is_administrator=False):  # Exclude superuser (admin)
-                #     commission_earned = employee.calculate_weekly_commission()  # Implement this function according to your logic
-                #
-                #     # Update EmployeePaymentRecord for the employee
-                #     employee_payment_record, _ = EmployeePaymentRecord.objects.get_or_create(employee=employee)
-                #     employee_payment_record.total_commission = commission_earned
-                #     employee_payment_record.save()
-
-                return redirect(reverse('realestates:admin_dashboard', args=[request.user.id]))
-            else:
-                return HttpResponse("Error: You are not authorized to approve payments.")
-    return render(request, 'realestates/confirm_client_payment.html')
-
-
+# ========== LEADS TO THE PAYMENT PAGE FOR THE EMPLOYEE
 @login_required
 def pay_employee(request):
     admin_id = request.user.id
@@ -726,48 +564,31 @@ def pay_employee(request):
     except Company.DoesNotExist:
         company = None
 
-    # Filter employees who are not administrators and have clients with payments
-    employees = Employees.objects.filter(
-        is_administrator=False,
-        clients__client_lands__payments__isnull=False
-    ).distinct()
+    query = request.GET.get('q')
+    employees = Employees.objects.filter(is_administrator=False,
+                                         clients__client_lands__payments__isnull=False).distinct().order_by('-created')
+
+    if query:
+        employees = employees.filter(user__first_name__icontains=query) | employees.filter(user__last_name__icontains=query)
+
+    paginator = Paginator(employees, 10)  # Show 10 employees per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
     context = {
-        'employees': employees,
+        'page_obj': page_obj,
         'admin_id': admin_id,
         'company_logo_url': company_logo_url,
         'profile_pic_url': profile_pic_url,
+        'query': query,
     }
 
     return render(request, 'realestates/pay_employee.html', context)
 
 
-def make_employee_payment(employee_id, amount_paid):
-    employee = Employees.objects.get(id=employee_id)
-    total_commission = employee.commissions.aggregate(Sum('total_commission'))['total_commission__sum'] or 0
-
-    # Get the latest payment record or create a new one if none exists
-    latest_payment_record = EmployeePaymentRecord.objects.filter(employee=employee).order_by('-payment_date').first()
-
-    with transaction.atomic():
-        # Record the payment
-        payment_record = EmployeePaymentRecord.objects.create(
-            employee=employee,
-            total_commission=total_commission,
-            amount_paid=amount_paid,
-            balance=total_commission - amount_paid,
-        )
-
-        # Update the employee's total paid amount
-        employee_total_paid = EmployeePaymentRecord.objects.filter(employee=employee).aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
-        employee.balance = total_commission - employee_total_paid
-        employee.save()
-
-    return payment_record
-
-
+# ========= EMPLOYEE CLIENTS WHO MADE SOME PAYMENT FOR THE LAND  =========
 @login_required
-def approve_employee_payment(request, employee_id):
+def employee_clients_made_payment(request, employee_id):
     admin_id = request.user.id
 
     profile_pic_url = ""
@@ -786,112 +607,73 @@ def approve_employee_payment(request, employee_id):
     except Company.DoesNotExist:
         company = None
 
-    if request.method == 'POST':
+    employee = get_object_or_404(Employees, id=employee_id)
+    client_lands = ClientLand.objects.filter(client__employee=employee).select_related('client', 'land')
+    client_commissions = Commission.objects.filter(employee=employee).select_related('client')
+
+    client_data = []
+    for client_land in client_lands:
+        commission = client_commissions.filter(client=client_land.client).first()
+        total_commission = commission.total_commission if commission else 0
+        amount_paid = EmployeePaymentRecord.objects.filter(employee=employee, client=client_land.client).aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+        balance = total_commission - amount_paid
+
+        client_data.append({
+            'client_land': client_land,
+            'commission': total_commission,
+            'amount_paid': amount_paid,
+            'balance': balance,
+        })
+
+    context = {
+        'admin_id': admin_id,
+        'company_logo_url': company_logo_url,
+        'profile_pic_url': profile_pic_url,
+        'employee_': employee,
+        'client_data': client_data,
+    }
+
+    return render(request, 'realestates/employee_clients_made_payment.html', context)
+
+
+# ========= CONFIRM EMPLOYEE PAYMENT =========
+@require_POST
+@login_required
+def approve_employee_payment(request, employee_id, client_id):
+    if request.method == "POST":
         amount_paid_str = request.POST.get('amount_paid', '0').replace(',', '')
         amount_paid = int(amount_paid_str)
+        employee = get_object_or_404(Employees, id=employee_id)
+        client = get_object_or_404(Client, id=client_id)
 
         try:
-            make_employee_payment(employee_id, amount_paid)
-            messages.success(request, 'Payment processed successfully.')
-        except Exception as e:
-            messages.error(request, f'Error processing payment: {str(e)}')
+            commission = Commission.objects.get(employee=employee, client=client)
+            total_commission = commission.total_commission
+        except Commission.DoesNotExist:
+            total_commission = 0
 
-        return redirect('realestates:approve_employee_payment', employee_id=employee_id)
+        amount_already_paid = EmployeePaymentRecord.objects.filter(employee=employee, client=client).aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+        remaining_commission = total_commission - amount_already_paid
 
-    employee = Employees.objects.get(id=employee_id)
-    total_commission = employee.commissions.aggregate(Sum('total_commission'))['total_commission__sum'] or 0
-    total_paid = employee.payment_records.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
-    balance = total_commission - total_paid
-
-    all_payment = EmployeePaymentRecord.objects.filter(employee=employee)
-
-    context = {
-        'admin_id': admin_id,
-        'company_logo_url': company_logo_url,
-        'profile_pic_url': profile_pic_url,
-        'employee': employee,
-        'total_commission': total_commission,
-        'total_paid': total_paid,
-        'balance': balance,
-        'all_payment': all_payment,
-    }
-
-    return render(request, 'realestates/approve_employee_payment.html', context)
-
-
-def edit_employee_payment(request, payment_id):
-    admin_id = request.user.id
-
-    profile_pic_url = ""
-    try:
-        admin = Employees.objects.get(id=request.user.id)
-        if admin.profile_pic:
-            profile_pic_url = admin.profile_pic.url
-    except Employees.DoesNotExist:
-        admin = None
-
-    company_logo_url = ""
-    try:
-        company = Company.objects.get(id=1)
-        if company.company_logo:
-            company_logo_url = company.company_logo.url
-    except Company.DoesNotExist:
-        company = None
-
-    if request.method == 'POST':
-
-        employee_id = request.POST.get('name')
-
-        print(employee_id)
-        amount_paid_str = request.POST.get('amount_paid', '0').replace(',', '')
-        payment = EmployeePaymentRecord.objects.get(id=payment_id)
-        amount_paid = int(amount_paid_str)
-        payment.amount_paid = amount_paid
-        payment.save()
-        return redirect('realestates:approve_employee_payment', employee_id=employee_id)
-    payment = EmployeePaymentRecord.objects.get(id=payment_id)
-    context = {
-        'admin_id': admin_id,
-        'company_logo_url': company_logo_url,
-        'profile_pic_url': profile_pic_url,
-        'payment': payment
-    }
-    return render(request, 'realestates/edit_employee_payment.html', context)
-
-
-@login_required
-def confirm_employee_payment(request, employee_id):
-    if request.method == 'POST':
-        # Get the amount paid from the form data
-        amount_paid_str = request.POST.get('amount_paid', '0').replace(',', '')  # Remove commas
-        amount_paid = int(amount_paid_str)
-        if amount_paid <= 0:
-            message = 'Amount must be greater than zero.'
-            return render(request, 'realestates/confirm_employee_payment.html',
-                          {'employee_id': employee_id, 'message': message})
-
-        employee = Employees.objects.get(id=employee_id)
-        all_employee_payment_record = EmployeePaymentRecord.objects.get(employee=employee)
-        commission_earned = all_employee_payment_record.total_commission
-
-        if amount_paid > all_employee_payment_record.balance:
-            message = 'Amount cannot be greater than the balance.'
-            return render(request, 'realestates/confirm_employee_payment.html',
-                          {'employee_id': employee_id, 'message': message})
+        if amount_paid > remaining_commission:
+            messages.error(request, f"Amount to be paid exceeds the remaining commission of {'{:,}'.format(remaining_commission)}.")
         else:
-            all_employee_payment_record.amount_paid += amount_paid
-            all_employee_payment_record.save()
-            # print(all_employee_payment_record.amount_paid)
-            all_employee_payment_record.balance = commission_earned - all_employee_payment_record.amount_paid
-            all_employee_payment_record.save()
+            # Proceed with the payment
+            EmployeePaymentRecord.objects.create(
+                employee=employee,
+                client=client,
+                total_commission=total_commission,
+                amount_paid=amount_paid,
+                balance=remaining_commission - amount_paid
+            )
+            messages.success(request, f"Successfully paid {'{:,}'.format(amount_paid)} to {employee.user.get_full_name()} for client {client.name}.")
 
-        return redirect(reverse('realestates:admin_dashboard', args=[request.user.id]))
+        return redirect('realestates:employee_clients_made_payment', employee_id=employee.id)
 
-    # Handle GET requests if needed
-    # For example, you might display a confirmation page for approval
-    return render(request, 'realestates/confirm_employee_payment.html')
+    return redirect('realestates:employee_clients_made_payment', employee_id=employee_id)
 
 
+# ========== ENTER NEW CLIENT ==========
 @login_required
 def add_client(request):
     if request.method == 'POST':
@@ -910,6 +692,7 @@ def add_client(request):
     return JsonResponse({'success': False, 'error': 'Invalid request method.'})
 
 
+# ========== CLIENT LIST ============
 @login_required
 def client_list(request):
 
@@ -984,6 +767,7 @@ def edit_client(request, pk):
     return render(request, 'realestates/edit_client.html', {'form': client_form})
 
 
+# =========== SEND EMAIL WHEN NEW EMPLOYEE/DISTRIBUTOR IS CREATED ==========
 def email_message(semail, username,  type):
     if type == 'register':
         # print("0044444444444444")
@@ -996,6 +780,7 @@ def email_message(semail, username,  type):
     send_mail(subject, body, email_from, [semail], fail_silently=False)
 
 
+# ============ REGISTER MORE EMPLOYEES/DISTRIBUTOR ==================
 @login_required
 def register(request):
     if request.method == 'POST':
@@ -1027,6 +812,7 @@ def register(request):
     return render(request, 'realestates/registration/reg_form.html', context)
 
 
+# ============= EDIT USER PROFILE =================
 def edit_user_profile_new(request):
     # company_obj = WebSiteCompany(request, web_company_id=7).site_company()
     profile = Employees.objects.filter(user=request.user)
@@ -1052,6 +838,7 @@ def edit_user_profile_new(request):
                                                                                         'profile_form': profile_form, })
 
 
+# ============= CHANGE USER PASSWORD =================
 @login_required
 def change_password(request):
     if request.method == 'POST':
@@ -1074,6 +861,225 @@ def change_password(request):
         return render(request, 'realestates/registration/change_password.html', args)
 
 
+# ============ RECORDING CLIENT PAYMENT ==================
+def record_payment(request, client_id):
+
+    admin_id = request.user.id
+
+    profile_pic_url = ""
+    try:
+        admin = Employees.objects.get(id=request.user.id)
+        if admin.profile_pic:
+            profile_pic_url = admin.profile_pic.url
+    except Employees.DoesNotExist:
+        admin = None
+
+    company_logo_url = ""
+    try:
+        company = Company.objects.get(id=1)
+        if company.company_logo:
+            company_logo_url = company.company_logo.url
+    except Company.DoesNotExist:
+        company = None
+
+    client = get_object_or_404(Client, id=client_id)
+    # client_land = client.client_lands.first()  # Get the first associated land, if any
+    # Get the first associated land where the payment is not complete
+    client_land = client.client_lands.filter(payment_complete=False).first()
+
+    # Ensure transactions is always a queryset
+    if client_land:
+        transactions = Payment.objects.filter(client_land=client_land)
+    else:
+        transactions = Payment.objects.none()
+
+    # Calculate the total amount paid
+    total_amount_paid = transactions.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+
+    # Calculate the balance only if client_land is not None
+    if client_land:
+        land_price = client_land.land.price
+        balance = land_price - total_amount_paid
+    else:
+        balance = None
+
+    if request.method == 'POST':
+        if not client_land or client_land.payment_complete:
+            # Handle ClientLandForm submission
+            landform = ClientLandForm(request.POST)
+            if landform.is_valid():
+                client_land = landform.save()
+                return redirect('realestates:record_payment', client_id=client.id)
+        else:
+            # Handle PaymentForm submission
+            form = PaymentForm(request.POST)
+            if form.is_valid():
+                payment = form.save(commit=False)
+                payment.client_land = client_land
+                payment.approved_by = request.user.employee if request.user.employee.is_administrator else None
+                payment.save()
+                return redirect('realestates:record_payment', client_id=client.id)
+    else:
+        landform = ClientLandForm(initial={'client': client})
+
+        initial_data = {'employee': request.user.employee if request.user.employee.is_administrator else None}
+        if client_land:
+            initial_data['client_land'] = client_land
+        form = PaymentForm(initial=initial_data)
+
+    available_lands = Land.objects.filter(available=True)
+    addlandform = LandForm()
+
+    context = {
+        'form': form,
+        'landform': landform,
+        'addlandform': addlandform,
+        'client': client,
+        'client_land': client_land,
+        'transactions': transactions,
+        'total_amount_paid': total_amount_paid,
+        'balance': balance,
+        'available_lands': available_lands,
+        'admin_id': admin_id,
+        'company_logo_url': company_logo_url,
+        'profile_pic_url': profile_pic_url,
+    }
+    return render(request, 'realestates/record_payment.html', context)
+
+
+# ============ EDIT PAYMENT MADE BY CLIENT =================
+def edit_payment(request, payment_id):
+    admin_id = request.user.id
+
+    profile_pic_url = ""
+    try:
+        admin = Employees.objects.get(id=request.user.id)
+        if admin.profile_pic:
+            profile_pic_url = admin.profile_pic.url
+    except Employees.DoesNotExist:
+        admin = None
+
+    company_logo_url = ""
+    try:
+        company = Company.objects.get(id=1)
+        if company.company_logo:
+            company_logo_url = company.company_logo.url
+    except Company.DoesNotExist:
+        company = None
+
+    payment = get_object_or_404(Payment, id=payment_id)
+    client = payment.client_land.client
+
+    if request.method == 'POST':
+        form = PaymentForm(request.POST, instance=payment)
+        # print(form.errors)
+        if form.is_valid():
+            form.save()
+            return redirect('realestates:record_payment', client_id=client.id)
+    else:
+        form = PaymentForm(instance=payment)
+
+    context = {
+        'form': form,
+        'payment': payment,
+        'admin_id': admin_id,
+        'company_logo_url': company_logo_url,
+        'profile_pic_url': profile_pic_url,
+    }
+    return render(request, 'realestates/edit_payment.html', context)
+
+
+# ============== ADD NEW LAND INTO THE SYSTEM ================
+def add_land(request):
+    if request.method == 'POST':
+        form = LandForm(request.POST)
+        if form.is_valid():
+            land = form.save()
+            return JsonResponse({'status': 'success'})
+        else:
+            return JsonResponse({'status': 'error', 'errors': form.errors})
+    return JsonResponse({'status': 'invalid method'}, status=405)
+
+
+# ============= CLIENTS WITH LAND(MADE COMPLETE PAYMENT FOR THE LAND) ==============
+def clients_with_lands(request):
+    admin_id = request.user.id
+
+    profile_pic_url = ""
+    try:
+        admin = Employees.objects.get(id=request.user.id)
+        if admin.profile_pic:
+            profile_pic_url = admin.profile_pic.url
+    except Employees.DoesNotExist:
+        admin = None
+
+    company_logo_url = ""
+    try:
+        company = Company.objects.get(id=1)
+        if company.company_logo:
+            company_logo_url = company.company_logo.url
+    except Company.DoesNotExist:
+        company = None
+
+    clients = Client.objects.filter(client_lands__payment_complete=True).distinct().order_by('-date')
+
+    # Handle search query
+    search_query = request.GET.get('search', '')
+    if search_query:
+        clients = clients.filter(phoneNumber1__icontains=search_query)
+
+    paginator = Paginator(clients, 10)  # Show 10 clients per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'admin_id': admin_id,
+        'company_logo_url': company_logo_url,
+        'profile_pic_url': profile_pic_url,
+    }
+
+    return render(request, 'realestates/clients_with_lands.html', context)
+
+
+# ============== TRANSACTION HISTORY FOR THE CLIENTS WHO ALREADY BOUGHT LAND ===============
+def land_transaction_history(request, land_id):
+    admin_id = request.user.id
+
+    profile_pic_url = ""
+    try:
+        admin = Employees.objects.get(id=request.user.id)
+        if admin.profile_pic:
+            profile_pic_url = admin.profile_pic.url
+    except Employees.DoesNotExist:
+        admin = None
+
+    company_logo_url = ""
+    try:
+        company = Company.objects.get(id=1)
+        if company.company_logo:
+            company_logo_url = company.company_logo.url
+    except Company.DoesNotExist:
+        company = None
+
+    client_land = get_object_or_404(ClientLand, id=land_id)
+    transactions = Payment.objects.filter(client_land=client_land)
+    total_amount_paid = transactions.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+    context = {
+        'client_land': client_land,
+        'transactions': transactions,
+        'total_amount_paid': total_amount_paid,
+        'admin_id': admin_id,
+        'company_logo_url': company_logo_url,
+        'profile_pic_url': profile_pic_url,
+
+    }
+    return render(request, 'realestates/land_transaction_history.html',
+                  context)
+
+
+# ========= LOGOUT FUNCTION ===============
 class CustomLogoutView(View):
     def post(self, request):
         # Handle post request if needed
@@ -1084,27 +1090,28 @@ class CustomLogoutView(View):
     def get(self, request):
        pass
 
-# OLD VERSION FOR pending_payments
-def pending_payments_view(request):
-    admin_id = request.user.id
-    admin = Employees.objects.get(id=request.user.id)
-    profile_pic_url = admin.profile_pic.url
-    company = Company.objects.get(id=1)
-    company_logo_url = company.company_logo.url
-    employees = Employees.objects.all().filter(is_administrator=False)
-    clients_with_pending_payments = Payment.objects.filter(remaining_amount__gt=0).all()
 
-    context = {
-        'clients_with_pending_payments': clients_with_pending_payments,
-        'admin_id': admin_id,
-        'employees': employees,
-        'company_logo_url': company_logo_url,
-        'profile_pic_url': profile_pic_url,
-    }
+# ============= CLEANING THE DATABASE ================
+def truncate_model(request):
+    # print('9015 params')
+    # print(params)
+    dic = request.POST['dic']
+    print(dic)
+    dic_ = eval(dic)
+    app_ = dic_['app']
+    model_name_ = dic_['model_name']
+    try:
+        model = apps.get_model(app_label=app_, model_name=model_name_)
+        print(model)
+        model.truncate()
+    except Exception as ex:
+        print("9025 " + str(ex))
 
-    return render(request, 'realestates/installment_lists.html', context)
+    result = "Data truncated"
+    return result
 
 
+# ============  DOWNLOAD EXCEL CONTAINING CLIENTS WHO HAVEN'T MADE ANY PAYMENT ===============
 def export_unapproved_payments(request):
     one_week_ago = timezone.now() - timezone.timedelta(days=1)
     unapproved_payments = Payment.objects.filter(approved=False, timestamp__lte=one_week_ago)
@@ -1129,6 +1136,7 @@ def export_unapproved_payments(request):
     return response
 
 
+# ======== DOWNLOAD EXCEL CONTAINING EMPLOYEES WITH THE CLIENTS THEY BROUGHT INCLUDING THERE PAYMENT ========
 def get_employee_with_clients_and_payments(request):
     employees = Employees.objects.all()
 
@@ -1202,6 +1210,7 @@ def get_employee_with_clients_and_payments(request):
     return response
 
 
+#  ============ UPLOADING EXCEL FILE ================
 def upload_file(request):
     print("9005", "\n", "-"*30)
     upload_file_ = request.FILES['drive_file']
@@ -1308,6 +1317,7 @@ def upload_file(request):
     return HttpResponse(json.dumps(ret))
 
 
+#  ============ ASSISSTING FUNCTION TO UPLOAD EXCEL FILE ================
 def get_data_link(request):
     errors = ""
     dic_ = request.POST["dic"]
@@ -1575,245 +1585,3 @@ def get_data_link(request):
     dic = {'status': 'ok', "dic": dic}
     # print('core view 9055 get_data_link dic_= ', dic)
     return JsonResponse(dic)
-
-
-def truncate_model(request):
-    # print('9015 params')
-    # print(params)
-    dic = request.POST['dic']
-    print(dic)
-    dic_ = eval(dic)
-    app_ = dic_['app']
-    model_name_ = dic_['model_name']
-    try:
-        model = apps.get_model(app_label=app_, model_name=model_name_)
-        print(model)
-        model.truncate()
-    except Exception as ex:
-        print("9025 " + str(ex))
-
-    result = "Data truncated"
-    return result
-
-
-def record_payment(request, client_id):
-
-    admin_id = request.user.id
-
-    profile_pic_url = ""
-    try:
-        admin = Employees.objects.get(id=request.user.id)
-        if admin.profile_pic:
-            profile_pic_url = admin.profile_pic.url
-    except Employees.DoesNotExist:
-        admin = None
-
-    company_logo_url = ""
-    try:
-        company = Company.objects.get(id=1)
-        if company.company_logo:
-            company_logo_url = company.company_logo.url
-    except Company.DoesNotExist:
-        company = None
-
-    client = get_object_or_404(Client, id=client_id)
-    # client_land = client.client_lands.first()  # Get the first associated land, if any
-    # Get the first associated land where the payment is not complete
-    client_land = client.client_lands.filter(payment_complete=False).first()
-
-    # Ensure transactions is always a queryset
-    if client_land:
-        transactions = Payment.objects.filter(client_land=client_land)
-    else:
-        transactions = Payment.objects.none()
-
-    # Calculate the total amount paid
-    total_amount_paid = transactions.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
-
-    # Calculate the balance only if client_land is not None
-    if client_land:
-        land_price = client_land.land.price
-        balance = land_price - total_amount_paid
-    else:
-        balance = None
-
-    if request.method == 'POST':
-        if not client_land or client_land.payment_complete:
-            # Handle ClientLandForm submission
-            landform = ClientLandForm(request.POST)
-            if landform.is_valid():
-                client_land = landform.save()
-                return redirect('realestates:record_payment', client_id=client.id)
-        else:
-            # Handle PaymentForm submission
-            form = PaymentForm(request.POST)
-            if form.is_valid():
-                payment = form.save(commit=False)
-                payment.client_land = client_land
-                payment.approved_by = request.user.employee if request.user.employee.is_administrator else None
-                payment.save()
-                return redirect('realestates:record_payment', client_id=client.id)
-    else:
-        landform = ClientLandForm(initial={'client': client})
-
-        initial_data = {'employee': request.user.employee if request.user.employee.is_administrator else None}
-        if client_land:
-            initial_data['client_land'] = client_land
-        form = PaymentForm(initial=initial_data)
-
-    available_lands = Land.objects.filter(available=True)
-    addlandform = LandForm()
-
-    context = {
-        'form': form,
-        'landform': landform,
-        'addlandform': addlandform,
-        'client': client,
-        'client_land': client_land,
-        'transactions': transactions,
-        'total_amount_paid': total_amount_paid,
-        'balance': balance,
-        'available_lands': available_lands,
-        'admin_id': admin_id,
-        'company_logo_url': company_logo_url,
-        'profile_pic_url': profile_pic_url,
-    }
-    return render(request, 'realestates/record_payment.html', context)
-
-
-
-def edit_payment(request, payment_id):
-    admin_id = request.user.id
-
-    profile_pic_url = ""
-    try:
-        admin = Employees.objects.get(id=request.user.id)
-        if admin.profile_pic:
-            profile_pic_url = admin.profile_pic.url
-    except Employees.DoesNotExist:
-        admin = None
-
-    company_logo_url = ""
-    try:
-        company = Company.objects.get(id=1)
-        if company.company_logo:
-            company_logo_url = company.company_logo.url
-    except Company.DoesNotExist:
-        company = None
-
-    payment = get_object_or_404(Payment, id=payment_id)
-    client = payment.client_land.client
-
-    if request.method == 'POST':
-        form = PaymentForm(request.POST, instance=payment)
-        # print(form.errors)
-        if form.is_valid():
-            form.save()
-            return redirect('realestates:record_payment', client_id=client.id)
-    else:
-        form = PaymentForm(instance=payment)
-
-    context = {
-        'form': form,
-        'payment': payment,
-        'admin_id': admin_id,
-        'company_logo_url': company_logo_url,
-        'profile_pic_url': profile_pic_url,
-    }
-    return render(request, 'realestates/edit_payment.html', context)
-
-
-def delete_payment(request, payment_id):
-    payment = get_object_or_404(Payment, id=payment_id)
-    client = payment.client_land.client
-    payment.delete()
-    return redirect('realestates:record_payment', client_id=client.id)
-
-
-def add_land(request):
-    if request.method == 'POST':
-        form = LandForm(request.POST)
-        if form.is_valid():
-            land = form.save()
-            return JsonResponse({'status': 'success'})
-        else:
-            return JsonResponse({'status': 'error', 'errors': form.errors})
-    return JsonResponse({'status': 'invalid method'}, status=405)
-
-
-def clients_with_lands(request):
-    admin_id = request.user.id
-
-    profile_pic_url = ""
-    try:
-        admin = Employees.objects.get(id=request.user.id)
-        if admin.profile_pic:
-            profile_pic_url = admin.profile_pic.url
-    except Employees.DoesNotExist:
-        admin = None
-
-    company_logo_url = ""
-    try:
-        company = Company.objects.get(id=1)
-        if company.company_logo:
-            company_logo_url = company.company_logo.url
-    except Company.DoesNotExist:
-        company = None
-
-    clients = Client.objects.filter(client_lands__payment_complete=True).distinct().order_by('-date')
-
-    # Handle search query
-    search_query = request.GET.get('search', '')
-    if search_query:
-        clients = clients.filter(phoneNumber1__icontains=search_query)
-
-    paginator = Paginator(clients, 10)  # Show 10 clients per page
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    context = {
-        'page_obj': page_obj,
-        'search_query': search_query,
-        'admin_id': admin_id,
-        'company_logo_url': company_logo_url,
-        'profile_pic_url': profile_pic_url,
-    }
-
-    return render(request, 'realestates/clients_with_lands.html', context)
-
-
-def land_transaction_history(request, land_id):
-    admin_id = request.user.id
-
-    profile_pic_url = ""
-    try:
-        admin = Employees.objects.get(id=request.user.id)
-        if admin.profile_pic:
-            profile_pic_url = admin.profile_pic.url
-    except Employees.DoesNotExist:
-        admin = None
-
-    company_logo_url = ""
-    try:
-        company = Company.objects.get(id=1)
-        if company.company_logo:
-            company_logo_url = company.company_logo.url
-    except Company.DoesNotExist:
-        company = None
-
-    client_land = get_object_or_404(ClientLand, id=land_id)
-    transactions = Payment.objects.filter(client_land=client_land)
-    total_amount_paid = transactions.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
-    context = {
-        'client_land': client_land,
-        'transactions': transactions,
-        'total_amount_paid': total_amount_paid,
-        'admin_id': admin_id,
-        'company_logo_url': company_logo_url,
-        'profile_pic_url': profile_pic_url,
-
-    }
-    return render(request, 'realestates/land_transaction_history.html',
-                  context)
-
-
