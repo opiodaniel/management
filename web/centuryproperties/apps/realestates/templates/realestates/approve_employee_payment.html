@@ -1,0 +1,186 @@
+
+{% extends "base_admin_dashboard.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}
+   Record Payment for {{ client.name }}
+{% endblock %}
+
+{% block SubNavbar %}
+ <div class="nav-item dropdown">
+     <a href="{% url 'realestates:admin_dashboard' request.user.id %}" class="nav-item nav-link"><i class="fas fa-home"></i>Home</a>
+ </div>
+{% endblock SubNavbar %}
+
+{% block content %}
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary text-center rounded p-4">
+                <div class="d-flex align-items-center justify-content-between mb-4 text-warning">Payment for: {{ employee.user.get_full_name }}</div>
+                <h6>Payment History</h6>
+                <table class="table text-start align-middle table-bordered table-hover mb-0">
+                    <thead>
+                        <tr class="text-info">
+                            <th scope="col">Date</th>
+                            <th scope="col">Paid</th>
+                            <th scope="col">Edit</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-white">
+                        {% for payment in all_payment %}
+                            <tr>
+                                <td>{{ payment.payment_date|date:"Y-m-d" }}</td>
+                                <td>{{ payment.amount_paid|add_commas }}</td>
+                                <td>
+                                    <a   name='{{employee.id}}' href="{% url 'realestates:edit_employee_payment' payment.id %}">
+                                      <i class="fas fa-edit" style="padding:1px;font-size:12px"></i>
+                                    </a>
+                                    <span style="padding:2px"></span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded h-100 p-4">
+                <form method="post" action="{% url 'realestates:approve_employee_payment' employee.id %}" class="needs-validation" novalidate>
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="totalCommission" class="form-label">Total Commission:</label>
+                        <span class="form-control-plaintext" id="totalCommission">{{ total_commission|add_commas }}</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="totalPaid" class="form-label">Total Paid:</label>
+                        <span class="form-control-plaintext" id="totalPaid">{{ total_paid|add_commas }}</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="balance" class="form-label">Balance:</label>
+                        <span class="form-control-plaintext" id="balance">{{ balance|add_commas }}</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="amountPaid" class="form-label">Amount to Pay:</label>
+                        <input type="text" oninput="formatAmount(this)" class="form-control" id="amountPaid" name="amount_paid" required>
+                        <div class="invalid-feedback">Please enter the amount to pay.</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Pay</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+{% block add_js %}
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addLandForm = document.getElementById('formAuthentication');
+    addLandForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(addLandForm);
+        fetch(addLandForm.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                $('#password_change_modal').modal('hide');
+                location.reload();
+            } else {
+                const errorContainer = document.getElementById('form-errors');
+                errorContainer.innerHTML = '';
+                for (const [field, messages] of Object.entries(data.errors)) {
+                    messages.forEach(message => {
+                        const errorElement = document.createElement('div');
+                        errorElement.className = 'alert alert-danger';
+                        errorElement.innerText = `${field}: ${message}`;
+                        errorContainer.appendChild(errorElement);
+                    });
+                }
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+});
+</script>
+
+<script>
+        $(document).ready(function() {
+            $('#searchInput').on('keyup', function() {
+                var searchText = $(this).val().toLowerCase();
+                $(this).closest('.bg-secondary').find('.search-table tbody tr').filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(searchText) > -1);
+                });
+            });
+        });
+</script>
+<script>
+    function formatAmount(input) {
+        // Remove existing commas and non-numeric characters from the input
+        let value = input.value.replace(/[^\d]/g, '');
+
+        // Add commas to the value
+        value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+        // Update the input value
+        input.value = value;
+    }
+</script>
+<script>
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (function () {
+        'use strict'
+        window.addEventListener('load', function () {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation')
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        }, false)
+    })()
+</script>
+<script>
+function formatAmount(input) {
+    // Remove existing commas and non-numeric characters from the input
+    let value = input.value.replace(/[^\d]/g, '');
+
+    // Add commas to the value
+    value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+    // Update the input value
+    input.value = value;
+}
+</script>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+
+
+
+

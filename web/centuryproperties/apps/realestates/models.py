@@ -240,8 +240,6 @@ class EmployeePaymentRecord(TruncateTableMixin, models.Model):
     amount_paid = models.IntegerField(default=0)
     balance = models.IntegerField(default=0)
     payment_date = models.DateField(auto_now_add=True, null=True)
-    installment_number = models.PositiveIntegerField(default=1)
-    total_installments = models.PositiveIntegerField(default=1)
 
     def __str__(self):
         return f"{self.employee.user.username} - Payment Record {self.id}"
@@ -250,8 +248,4 @@ class EmployeePaymentRecord(TruncateTableMixin, models.Model):
         # Ensure balance is updated correctly
         self.balance = self.total_commission - self.amount_paid
         super().save(*args, **kwargs)
-
-
-
-
 

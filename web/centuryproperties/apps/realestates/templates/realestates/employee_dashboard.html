@@ -85,7 +85,7 @@
                         <i class="fa fa-chart-bar fa-3x text-info" aria-hidden="true" style='font-size:50px;'></i>
                         <div class="ms-3">
                             <p class="mb-2">Paid</p>
-                            <h6 class="mb-0">{{ employee_payment_record.amount_paid|add_commas }}</h6>
+                            <h6 class="mb-0">{{ total_paid|add_commas }}</h6>
                         </div>
                     </div>
                 </div>
@@ -94,7 +94,7 @@
                         <i class="fa fa-chart-area text-danger" aria-hidden="true" style='font-size:50px;'></i>
                         <div class="ms-3">
                             <p class="mb-2">Balance</p>
-                            <h6 class="mb-0">{{ employee_payment_record.balance|add_commas }}</h6>
+                            <h6 class="mb-0">{{ balance|add_commas }}</h6>
                         </div>
                     </div>
                 </div>

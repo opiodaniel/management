@@ -310,7 +310,7 @@ def employee_dashboard(request):
 
     payments = Payment.objects.filter(employee=employee).order_by('approved', '-client_land__client__date')
 
-    employee_payment_record, _ = EmployeePaymentRecord.objects.get_or_create(employee=employee)
+
     total_number_of_clients = employee.total_clients()
     total_approved_clients = employee.total_approved_clients()
     total_appending_clients = employee.total_appending_clients()
@@ -320,6 +320,8 @@ def employee_dashboard(request):
     commission_earned_per_client = Commission.objects.filter(employee=employee)
     total_commission = Commission.objects.filter(employee=employee).aggregate(Sum('total_commission'))[
                            'total_commission__sum'] or 0
+    total_paid = employee.payment_records.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+    balance = total_commission - total_paid
 
     form = ClientForm()
 
@@ -332,9 +334,10 @@ def employee_dashboard(request):
         'total_appending_clients': total_appending_clients,
         'payments': payments,
         'company_logo_url': company_logo_url,
-        'employee_payment_record': employee_payment_record,
         'commission_earned_per_client': commission_earned_per_client,
         'total_commission': total_commission,
+        'total_paid': total_paid,
+        'balance': balance,
         'form': form,
     }
 
@@ -723,7 +726,12 @@ def pay_employee(request):
     except Company.DoesNotExist:
         company = None
 
-    employees = Employees.objects.all().filter(is_administrator=False)
+    # Filter employees who are not administrators and have clients with payments
+    employees = Employees.objects.filter(
+        is_administrator=False,
+        clients__client_lands__payments__isnull=False
+    ).distinct()
+
     context = {
         'employees': employees,
         'admin_id': admin_id,
@@ -734,9 +742,32 @@ def pay_employee(request):
     return render(request, 'realestates/pay_employee.html', context)
 
 
+def make_employee_payment(employee_id, amount_paid):
+    employee = Employees.objects.get(id=employee_id)
+    total_commission = employee.commissions.aggregate(Sum('total_commission'))['total_commission__sum'] or 0
+
+    # Get the latest payment record or create a new one if none exists
+    latest_payment_record = EmployeePaymentRecord.objects.filter(employee=employee).order_by('-payment_date').first()
+
+    with transaction.atomic():
+        # Record the payment
+        payment_record = EmployeePaymentRecord.objects.create(
+            employee=employee,
+            total_commission=total_commission,
+            amount_paid=amount_paid,
+            balance=total_commission - amount_paid,
+        )
+
+        # Update the employee's total paid amount
+        employee_total_paid = EmployeePaymentRecord.objects.filter(employee=employee).aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+        employee.balance = total_commission - employee_total_paid
+        employee.save()
+
+    return payment_record
+
+
 @login_required
 def approve_employee_payment(request, employee_id):
-
     admin_id = request.user.id
 
     profile_pic_url = ""
@@ -755,70 +786,77 @@ def approve_employee_payment(request, employee_id):
     except Company.DoesNotExist:
         company = None
 
-    client = get_object_or_404(Client, id=client_id)
-    # client_land = client.client_lands.first()  # Get the first associated land, if any
-    # Get the first associated land where the payment is not complete
-    client_land = client.client_lands.filter(payment_complete=False).first()
-
-    # Ensure transactions is always a queryset
-    if client_land:
-        transactions = Payment.objects.filter(client_land=client_land)
-    else:
-        transactions = Payment.objects.none()
-
-    # Calculate the total amount paid
-    total_amount_paid = transactions.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
-
-    # Calculate the balance only if client_land is not None
-    if client_land:
-        land_price = client_land.land.price
-        balance = land_price - total_amount_paid
-    else:
-        balance = None
-
     if request.method == 'POST':
-        if not client_land or client_land.payment_complete:
-            # Handle ClientLandForm submission
-            landform = ClientLandForm(request.POST)
-            if landform.is_valid():
-                client_land = landform.save()
-                return redirect('realestates:record_payment', client_id=client.id)
-        else:
-            # Handle PaymentForm submission
-            form = PaymentForm(request.POST)
-            if form.is_valid():
-                payment = form.save(commit=False)
-                payment.client_land = client_land
-                payment.approved_by = request.user.employee if request.user.employee.is_administrator else None
-                payment.save()
-                return redirect('realestates:record_payment', client_id=client.id)
-    else:
-        landform = ClientLandForm(initial={'client': client})
+        amount_paid_str = request.POST.get('amount_paid', '0').replace(',', '')
+        amount_paid = int(amount_paid_str)
 
-        initial_data = {'employee': request.user.employee if request.user.employee.is_administrator else None}
-        if client_land:
-            initial_data['client_land'] = client_land
-        form = PaymentForm(initial=initial_data)
+        try:
+            make_employee_payment(employee_id, amount_paid)
+            messages.success(request, 'Payment processed successfully.')
+        except Exception as e:
+            messages.error(request, f'Error processing payment: {str(e)}')
 
-    available_lands = Land.objects.filter(available=True)
-    addlandform = LandForm()
+        return redirect('realestates:approve_employee_payment', employee_id=employee_id)
+
+    employee = Employees.objects.get(id=employee_id)
+    total_commission = employee.commissions.aggregate(Sum('total_commission'))['total_commission__sum'] or 0
+    total_paid = employee.payment_records.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+    balance = total_commission - total_paid
+
+    all_payment = EmployeePaymentRecord.objects.filter(employee=employee)
 
     context = {
-        'form': form,
-        'landform': landform,
-        'addlandform': addlandform,
-        'client': client,
-        'client_land': client_land,
-        'transactions': transactions,
-        'total_amount_paid': total_amount_paid,
-        'balance': balance,
-        'available_lands': available_lands,
         'admin_id': admin_id,
         'company_logo_url': company_logo_url,
         'profile_pic_url': profile_pic_url,
+        'employee': employee,
+        'total_commission': total_commission,
+        'total_paid': total_paid,
+        'balance': balance,
+        'all_payment': all_payment,
     }
-    # return render(request, 'realestates/record_payment.html', context)
-    return render(request, 'realestates/confirm_employee_payment.html', context)
+
+    return render(request, 'realestates/approve_employee_payment.html', context)
+
+
+def edit_employee_payment(request, payment_id):
+    admin_id = request.user.id
+
+    profile_pic_url = ""
+    try:
+        admin = Employees.objects.get(id=request.user.id)
+        if admin.profile_pic:
+            profile_pic_url = admin.profile_pic.url
+    except Employees.DoesNotExist:
+        admin = None
+
+    company_logo_url = ""
+    try:
+        company = Company.objects.get(id=1)
+        if company.company_logo:
+            company_logo_url = company.company_logo.url
+    except Company.DoesNotExist:
+        company = None
+
+    if request.method == 'POST':
+
+        employee_id = request.POST.get('name')
+
+        print(employee_id)
+        amount_paid_str = request.POST.get('amount_paid', '0').replace(',', '')
+        payment = EmployeePaymentRecord.objects.get(id=payment_id)
+        amount_paid = int(amount_paid_str)
+        payment.amount_paid = amount_paid
+        payment.save()
+        return redirect('realestates:approve_employee_payment', employee_id=employee_id)
+    payment = EmployeePaymentRecord.objects.get(id=payment_id)
+    context = {
+        'admin_id': admin_id,
+        'company_logo_url': company_logo_url,
+        'profile_pic_url': profile_pic_url,
+        'payment': payment
+    }
+    return render(request, 'realestates/edit_employee_payment.html', context)
 
 
 @login_required
@@ -1641,6 +1679,7 @@ def record_payment(request, client_id):
         'profile_pic_url': profile_pic_url,
     }
     return render(request, 'realestates/record_payment.html', context)
+
 
 
 def edit_payment(request, payment_id):

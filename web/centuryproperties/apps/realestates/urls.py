@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
                     employee_dashboard, admin_dashboard,
                     employees_client, register, approve_payment, confirm_payment, add_client, login_page,
-                    edit_user_profile_new, change_password, pay_employee, approve_employee_payment,
+                    edit_user_profile_new, change_password, pay_employee, approve_employee_payment, edit_employee_payment,
                     confirm_employee_payment, CustomLogoutView, edit_client, pending_payments_view,
                     client_list, free_clients, download_free_clients, assign_client, claim_free_client, truncate_model,
                     export_unapproved_payments, get_employee_with_clients_and_payments, activate_obj_function,
@@ -26,6 +26,8 @@ urlpatterns = [
 
     path('pay_employee/', pay_employee, name='pay_employee'),
     path('approve_employee_payment/<int:employee_id>/', approve_employee_payment, name='approve_employee_payment'),
+    path('edit_employee_payment/<int:payment_id>/', edit_employee_payment, name='edit_employee_payment'),
+
     path('confirm_employee_payment/<int:employee_id>/', confirm_employee_payment, name='confirm_employee_payment'),
 
     path('pending-payments/', pending_payments_view, name='pending_payments'),

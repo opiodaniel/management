@@ -81,7 +81,7 @@ class Employees(TruncateTableMixin, models.Model):
         return Payment.objects.filter(client_land__client__employee=self, approved=True).count()
 
     def total_appending_clients(self):
-        return Payment.objects.filter(client_land__client__employee=self, approved=False).count()
+        return Client.objects.filter(employee=self,  client_lands__isnull=True).count()
 
     @classmethod
     def total_approved_clients_for_all_employee(cls):
@@ -235,14 +235,16 @@ def update_commission(sender, instance, created, **kwargs):
 
 
 class EmployeePaymentRecord(TruncateTableMixin, models.Model):
+    employee = models.ForeignKey(Employees, on_delete=models.CASCADE, related_name='payment_records', null=True)
     total_commission = models.IntegerField(default=0)
     amount_paid = models.IntegerField(default=0)
     balance = models.IntegerField(default=0)
-    employee = models.ForeignKey(Employees, on_delete=models.CASCADE,
-                                 related_name='employee_employeepaymenrecord', null=True)
+    payment_date = models.DateField(auto_now_add=True, null=True)
 
+    def __str__(self):
+        return f"{self.employee.user.username} - Payment Record {self.id}"
 
-
-
-
-
+    def save(self, *args, **kwargs):
+        # Ensure balance is updated correctly
+        self.balance = self.total_commission - self.amount_paid
+        super().save(*args, **kwargs)
