@@ -1,12 +1,130 @@
 {% extends "base.html" %}
 {% load static %}
+{% load custom_filters %}
 
-{% block title %}
-  <title>Main</title>
-{% endblock title%}
+       {% block title %}
+         Admin
+       {% endblock %}
 
-{% block app_toolbar %}
+       {% block add_css %}
+       <!--<link type="text/css" rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}"/>-->
+         <script src="{% static 'js/jquery-3.3.1.js' %}"></script>
+         <script src="{% static 'js/bootstrap.min.js' %}"></script>
+         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+         <style>
+            table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+
+                    th, td {
+                        padding: 8px;
+                        border: 1px solid black;
+                    }
+
+                    /* Truncate long text and display ellipsis */
+                    .truncate {
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+
+                    /* Responsive styles */
+                    @media screen and (max-width: 600px) {
+                        th, td {
+                            padding: 4px;
+                        }
+
+                        .truncate {
+                                max-width: 90px; /* Adjust max-width as needed */
+                            }
+                    }
+        </style>
+         <style>
+            footer {
+                position: fixed;
+                bottom: 0;
+                width: 80%; /* Adjust the width as needed */
+                margin-left: 15%; /* Center the footer horizontally */
+                background-color: #f8f9fa; /* Add your desired background color */
+                border-top: 1px solid #dee2e6; /* Add your desired border */
+                padding: 20px; /* Add padding for better spacing */
+            }
+         </style>
+
+        <!-- Add this in your base template or record_payment template -->
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+       {% endblock %}
+
+        <!-- Sidebar Start -->
+        {% block Sidebar %}
+            <nav class="navbar bg-secondary navbar-dark">
+
+                <div class="navbar-brand mx-4 mb-3">
+                    <img class="rounded-circle" src="{{ company_logo_url }}" alt="" style="width: 70px; height: 70px; margin-left:45px">
+                    <h5 class="text-info" style="margin-top:5px;text-align:center">Century Properties  <br>& <br> Real Estates Ltd</h5>
+                </div>
+                <div class="d-flex align-items-center ms-4 mb-4">
+                    <div class="position-relative">
+                        <img class="rounded-circle" src="{{ profile_pic_url }}" alt="" style="width: 40px; height: 40px;">
+                        <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="mb-0">{{ employee.user.username }}</h6>
+                        <span>Distributor</span>
+                    </div>
+                </div>
+                <div class="navbar-nav w-100">
+                    <a href="#" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+                    <a href="{% url 'realestates:employee_pay_breakdown' %}" class="nav-item nav-link"><i class="fa fa-credit-card custom me-2"></i>Pay Breakdown</a>
+                </div>
+
+            </nav>
+        {% endblock %}
+        <!-- Sidebar End -->
+
+        <!-- Navbar Start -->
+        {% block Navbar %}
+         <nav class="navbar navbar-expand bg-secondary navbar-dark sticky-top px-4 py-0">
+            <a href="#" class="navbar-brand d-flex d-lg-none me-4">
+                 <img class="rounded-circle" src="{{ company_logo_url }}" alt="" style="width: 70px; height: 70px; margin-left:45px">
+            </a>
+            <a href="#" class="sidebar-toggler flex-shrink-0">
+                <i class="fa fa-bars"></i>
+            </a>
+            <form class="d-none d-md-flex ms-4">
+                <input class="form-control bg-dark border-0" type="search" placeholder="Search">
+            </form>
+            <div class="navbar-nav align-items-center ms-auto">
+                {% block SubNavbar %}
+                {% endblock SubNavbar %}
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                        <img class="rounded-circle me-lg-2" src="{{ profile_pic_url }}" alt="" style="width: 40px; height: 40px;">
+                        <span class="d-none d-lg-inline-flex">{{employee.user.username}}</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0">
+                        <a class="dropdown-item" href="{% url 'realestates:edit_user_profile_new' %}"><i class="fas fa-user-edit text-warning"></i> Edit Profile</a>
+                        <!-- <a href="#" class="dropdown-item">Settings</a> -->
+                        <a href="{% url 'realestates:change_password' %}" class="dropdown-item"><i class="fas fa-user-cog text-success"></i> Change Password</a>
+                        <form method="post" action="{% url 'realestates:logout' %}">
+                            {% csrf_token %}
+                            <button class="dropdown-item" ><i class="fas fa-sign-in-alt text-primary"></i> Log out</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        {% endblock %}
+        <!-- Navbar End -->
+
+        {% block content %}
+        {% endblock %}
 
 
-{% endblock app_toolbar %}
-
+        <!-- Footer Start -->
+        {% block footer %}
+        {% endblock %}
+        <!-- Footer End -->

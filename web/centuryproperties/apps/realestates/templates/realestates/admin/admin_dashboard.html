@@ -164,24 +164,22 @@
  <div class="container-fluid pt-4 px-4">
     <div class="row g-4">
 
-        <div class="col-sm-12 col-xl-6">
-            <div class="bg-secondary text-center rounded h-100 p-4">
-                 <input type="number" id="thresholdInput1" value="{{DEfault_thresholdInput1}}" style="text-align:center; width: 50px; height: 30px"  />
+        <div class="col-sm-12 col-xl-9">
+            <div class="bg-secondary text-center rounded h-100  p-4">
+                 <input type="number" id="thresholdInput1" value="{{default_threshold_input}}" style="text-align:center; width: 50px; height: 30px"  />
                  <button id="updateThresholdButton1" type="button" class="btn btn-info btn-sm mb-1">Update Threshold</button>
                 <div class="d-flex align-items-center justify-content-between mb-4">
                     <h6 class="mb-0">Approved clients</h6>
                 </div>
-                <canvas id="clientsChart" width="400" height="200"></canvas>
+                <canvas id="clientsChart" width="400" height="100"></canvas>
             </div>
         </div>
-        <div class="col-sm-12 col-xl-6">
-            <div class="bg-secondary text-center rounded h-100 p-4">
-                   <input type="number" id="thresholdInput" value="{{DEfault_thresholdInput}}" size="5" style="text-align:center; width: 50px; height: 30px"  />
-                   <button id="updateThresholdButton" type="button" class="btn btn-info btn-sm mb-1">Update Threshold</button>
-                   <div class="d-flex align-items-center justify-content-between mb-4">
-                     <h6 class="mb-0">Clients Brought</h6>
-                   </div>
-                <canvas id="employeebarChart" width="400" height="200"></canvas>
+        <div class="col-sm-12 col-xl-3">
+            <div class="bg-secondary text-center rounded h-80 p-4">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h6 class="mb-0">Clients Overview</h6>
+                </div>
+                <canvas id="clientsPieChart"></canvas>
             </div>
         </div>
 
@@ -376,146 +374,6 @@
         }
 </script>
 
-   <!-- horizontal bar graph for both approved and pending clients -->
-    <script>
-        fetch("{% url 'realestates:employees_client' %}")
-              .then(response => response.json())
-              .then(data => {
-                // Extract employee data and format it for the chart
-                const employeeData = Object.entries(data).map(([employee, employeeData]) => ({
-                  employee: employee,
-                  approvedClients: employeeData.approved_clients,
-                  appendingClients: employeeData.appending_clients
-                }));
-
-                // Extract employee names and client data
-                const employeeNames = employeeData.map(entry => entry.employee);
-                const approvedClients = employeeData.map(entry => entry.approvedClients);
-                const appendingClients = employeeData.map(entry => entry.appendingClients);
-
-                // Create a new Chart instance
-                const ctx = document.getElementById('clientChart2').getContext('2d');
-                const myChart = new Chart(ctx, {
-                  type: 'bar',
-                  data: {
-                    labels: employeeNames,
-                    datasets: [{
-                      label: 'Approved Clients',
-                      backgroundColor: 'blue',
-                      data: approvedClients
-                    }, {
-                      label: 'Appending Clients',
-                      backgroundColor: 'green',
-                      data: appendingClients
-                    }]
-                  },
-                  options: {
-                    indexAxis: 'y',
-                    plugins: {
-                      legend: {
-                        position: 'right'
-                      }
-                    }
-                  }
-                });
-              });
-
-    </script>
-   <!-- end  -->
-
-
-
-   <!-- clients brought line graph -->
-   <script>
-    let myChart; // Declare myChart variable outside fetch function
-
-    // Function to update the chart based on the threshold
-    const updateChart = (threshold) => {
-
-        // Fetch data from the server
-        fetch("{% url 'realestates:employees_client' %}")
-            .then(response => response.json())
-            .then(data => {
-                // Extract employee names and client counts from the fetched data
-                const employeeNames = Object.keys(data);
-                const clientCounts = employeeNames.map(employee => data[employee].clients.length);
-
-                // Filter employees based on the threshold
-                const selectedEmployees = employeeNames.filter((employee, index) => clientCounts[index] >= threshold);
-                const selectedClientCounts = clientCounts.filter((count, index) => count >= threshold);
-
-                // Update the chart data
-                myChart.data.labels = selectedEmployees;
-                myChart.data.datasets[0].data = selectedClientCounts;
-
-                // Update the chart
-                myChart.update();
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-    };
-
-    // Fetch data from the server
-    fetch("{% url 'realestates:employees_client' %}")
-        .then(response => response.json())
-        .then(data => {
-            // Extract employee names and client counts from the fetched data
-            const employeeNames = Object.keys(data);
-            const clientCounts = employeeNames.map(employee => data[employee].clients.length);
-
-            // Default threshold value
-            const defaultThreshold =parseInt(document.getElementById('thresholdInput').value);
-
-            // Create a line chart
-            const ctx = document.getElementById('employeeChart').getContext('2d');
-            myChart = new Chart(ctx, { // Assign myChart inside fetch function
-                type: 'line',
-                data: {
-                    labels: employeeNames,
-                    datasets: [{
-                        label: 'Total Clients Brought',
-                        data: clientCounts,
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 2,
-                        fill: false
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Total Clients Brought'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Distributor'
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Update the chart with the default threshold value immediately
-            updateChart(defaultThreshold);
-
-            // Event listener for the threshold input field
-            document.getElementById('thresholdInput').addEventListener('change', function() {
-                const threshold = parseInt(this.value); // Get the new threshold value
-                updateChart(threshold); // Update the chart with the new threshold value
-            });
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error);
-        });
-
-    </script>
-
-
    <!-- Approved client bar graph -->
    <script>
     // Define the employees_client function
@@ -582,86 +440,51 @@
     employees_client();
 </script>
 
-    <!-- clients brought horizontal bar graph -->
-   <script>
-    let myChart; // Declare myChart variable outside fetch function
+    <!-- graph showing clients with land and no land   -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the context of the canvas element we want to select
+            var ctx = document.getElementById('clientsPieChart').getContext('2d');
 
-        // Function to fetch data and initialize/update the chart
-        const fetchDataAndInitializeChart = (threshold) => {
-            // Fetch data from the server
-            fetch("{% url 'realestates:employees_client' %}")
-                .then(response => response.json())
-                .then(data => {
-                    // Extract employee names and client counts from the fetched data
-                    const employeeNames = Object.keys(data);
-                    const clientCounts = employeeNames.map(employee => data[employee].clients.length);
+            // Create the data for the pie chart
+            var data = {
+                labels: ['Clients with Land and Payment', 'Clients without Land'],
+                datasets: [{
+                    data: [{{ clients_with_land_and_payment }}, {{ clients_without_land }}],
+                    backgroundColor: ['#4CAF50', '#FF9800'],
+                    hoverBackgroundColor: ['#66BB6A', '#FFB74D']
+                }]
+            };
 
-                    // Filter employees based on the threshold
-                    const selectedEmployees = employeeNames.filter((employee, index) => clientCounts[index] >= threshold);
-                    const selectedClientCounts = clientCounts.filter((count, index) => count >= threshold);
-
-                    // Initialize or update the chart
-                    if (!myChart) {
-                        // Create a new bar chart if myChart is not initialized
-                        const ctx = document.getElementById('employeebarChart').getContext('2d');
-                        myChart = new Chart(ctx, {
-                            type: 'bar',
-                            data: {
-                                labels: selectedEmployees,
-                                datasets: [{
-                                    label: 'Total Clients Brought',
-                                    data: selectedClientCounts,
-                                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                                    borderColor: 'rgba(54, 162, 235, 1)',
-                                    borderWidth: 1
-                                }]
+            // Create the pie chart
+            var clientsPieChart = new Chart(ctx, {
+                type: 'pie',
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        datalabels: {
+                            color: '#000',  // Change the color to black
+                            font: {
+                                size: 14,     // Increase the font size
+                                weight: 'bold'
                             },
-                            options: {
-                                indexAxis: 'y', // Display labels on the y-axis
-                                scales: {
-                                    y: {
-                                        title: {
-                                            display: true,
-                                            text: 'Distributor'
-                                        }
-                                    },
-                                    x: {
-                                        beginAtZero: true,
-                                        title: {
-                                            display: true,
-                                            text: 'Total Clients Brought'
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    } else {
-                        // Update the existing chart with new data and options
-                        myChart.data.labels = selectedEmployees;
-                        myChart.data.datasets[0].data = selectedClientCounts;
-                        myChart.update(); // Update the chart
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                });
-        };
-
-        // Event listener for the threshold input field
-        document.getElementById('thresholdInput').addEventListener('change', function() {
-            const threshold = parseInt(this.value); // Get the new threshold value
-            fetchDataAndInitializeChart(threshold); // Fetch data and update the chart
+                            formatter: (value, ctx) => {
+                                let sum = ctx.chart._metasets[0].total;
+                                let percentage = (value * 100 / sum).toFixed(2) + '%';
+                                return value + ' (' + percentage + ')';
+                            },
+                        }
+                    },
+                },
+                plugins: [ChartDataLabels]
+            });
         });
-
-        // Initial data fetch and chart initialization
-        document.addEventListener('DOMContentLoaded', () => {
-            // Default threshold value
-            const defaultThreshold = parseInt(document.getElementById('thresholdInput').value);
-
-            // Fetch data and initialize the chart with default threshold
-            fetchDataAndInitializeChart(defaultThreshold);
-        });
-
     </script>
 
 
@@ -705,8 +528,8 @@
     });
 </script>
 
-
-   <script>
+   <!-- Cleaning database   -->
+    <script>
         //=============================================
         // cleaning database with button
         //==============================================
@@ -743,7 +566,7 @@
             truncate_model_b("Land")
         }
     </script>
-
+  <!--Uploading excel file -->
    <script type="text/javaScript">
         var csrftoken = Cookies.get('csrftoken');
           function csrfSafeMethod(method) {
@@ -1256,6 +1079,5 @@
           });
     </script>
 {% endblock %}
-
 
 

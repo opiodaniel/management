@@ -2,6 +2,26 @@
 {% load static %}
 {% load custom_filters %}
 
+{% block add_css %}
+<style>
+    .custom-border {
+        border: 2px solid #007BFF; /* Change the color and width as desired */
+        border-radius: 5px; /* Add some border-radius for rounded corners */
+        padding: 10px; /* Optional: Add some padding for better appearance */
+    }
+
+    .custom-border:focus {
+        border-color: #0056b3; /* Change the border color when focused */
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Optional: Add shadow on focus */
+    }
+
+
+    .pagination {
+        margin-top: 20px; /* Add margin to the top of pagination controls */
+    }
+</style>
+{% endblock %}
+
 {% block SubNavbar %}
  <div class="nav-item dropdown">
      <a href="{% url 'realestates:admin_dashboard' admin_id %}" class="nav-item nav-link"><i class="fas fa-home"></i>Home</a>
@@ -22,7 +42,7 @@
                     </div>
                 </form>
             </div>
-            <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
                 <table class="table text-start align-middle table-bordered table-hover mb-0 search-table">
                     <thead>
                         <tr class="text-info">
