@@ -18,7 +18,6 @@ urlpatterns = [
 
     # ====== Admin =======
     path('administrator/<int:admin_id>/', admin_dashboard, name='admin_dashboard'),
-    # path('administrator/', admin_dashboard, name='admin_dashboard'),
     path('pay_employee/', pay_employee, name='pay_employee'),
     path('employee_clients/<int:employee_id>/', employee_clients_made_payment, name='employee_clients_made_payment'),
     path('approve_employee_payment/<int:employee_id>/<int:client_id>/', approve_employee_payment,

@@ -19,7 +19,7 @@ class Command(BaseCommand):
 
         expired_clients = Client.objects.filter(
             client_lands__isnull=True
-        ).exclude(employee=admin)
+        )
 
         for expired_client in expired_clients:
             self.stdout.write(f"Expiring client {expired_client.name} (ID: {expired_client.id})")

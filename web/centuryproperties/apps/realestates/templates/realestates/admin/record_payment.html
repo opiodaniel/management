@@ -53,7 +53,8 @@
         </div>
         <div class="col-sm-12 col-xl-6">
             <div class="bg-secondary rounded h-100 p-4">
-                <h6 class="mb-4">Transaction History for <span class="text-info">{{ client.name }}</span></h6>
+                <h6 class="mb-1">Transaction History for <span class="text-info">{{ client.name }}</span> </h6>
+                <h6 class="mb-4">Client Brought By: <span class="text-success" >{{client.employee}} </span></h6>
                 {% if selected_client_land %}
                     <h6 class="mb-2">Selected Land: {{ selected_client_land.land.plot_number }} - {{ selected_client_land.land.location }}</h6>
                     <p>Land Price: <span class="text-primary">{{ selected_client_land.land.price|add_commas }}</span></p>

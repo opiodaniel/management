@@ -21,9 +21,6 @@ from datetime import date
 from django.utils import timezone
 
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from .tasks import remove_inactive_clients
-
-
 from django.views.generic.edit import FormView
 
 from django.urls import reverse, reverse_lazy
@@ -87,7 +84,7 @@ def login_page(request):
                 # print(user)
                 # print(user.id)
                 # messages.info(request, f"You are now logged in as {username}.")
-                return redirect(reverse('realestates:admin_dashboard', args=[user.id]))
+                return redirect(reverse('realestates:admin_dashboard', args=[user.employee.id]))
             else:
                 # messages.info(request, f"You are now logged in as {username}.")
                 return redirect(reverse('realestates:employee_dashboard'))
@@ -147,17 +144,10 @@ def get_total_sales_for_previous_months(request):
 @login_required
 def admin_dashboard(request, admin_id):
 
+    if not request.user.employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
+
     default_threshold_input = 10  # employees with more than 5 clients who have made some payment will be displayed
-
-    if request.method == 'POST' and 'confirm_client_payment' in request.POST:
-        client_id = request.POST.get('client_id')
-        client = Client.objects.get(id=client_id)
-        return redirect(reverse('realestates:employee_dashboard', args=[request.user.id]))
-
-    authenticated_admin = request.user.id
-
-    if authenticated_admin != int(admin_id):
-        return redirect(reverse('realestates:admin_dashboard', args=[request.user.id]))
 
     company_logo_url = ""
     try:
@@ -253,6 +243,9 @@ def admin_dashboard(request, admin_id):
 # ========= LISTS OF FREE CLIENTS =========
 @login_required
 def free_clients(request):
+
+    if not request.user.employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
 
     admin_id = request.user.employee.id
 
@@ -399,6 +392,10 @@ def claim_free_client(request):
 # ========== LEADS TO THE PAYMENT PAGE FOR THE EMPLOYEE
 @login_required
 def pay_employee(request):
+
+    if not request.user.employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
+
     admin_id = request.user.id
 
     profile_pic_url = ""
@@ -442,6 +439,10 @@ def pay_employee(request):
 # ========= EMPLOYEE CLIENTS WHO MADE SOME PAYMENT FOR THE LAND  =========
 @login_required
 def employee_clients_made_payment(request, employee_id):
+
+    if not request.user.employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
+
     admin_id = request.user.id
 
     profile_pic_url = ""
@@ -493,6 +494,10 @@ def employee_clients_made_payment(request, employee_id):
 @require_POST
 @login_required
 def approve_employee_payment(request, employee_id, client_id):
+
+    if not request.user.employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
+
     if request.method == "POST":
         amount_paid_str = request.POST.get('amount_paid', '0').replace(',', '')
         amount_paid = int(amount_paid_str)
@@ -529,6 +534,9 @@ def approve_employee_payment(request, employee_id, client_id):
 # ========== CLIENT LIST ============
 @login_required
 def client_list(request):
+
+    if not request.user.employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
 
     admin_id = request.user.id
 
@@ -635,6 +643,10 @@ def change_password(request):
 
 # ============ ATTACH LAND TO CLIENT ==================
 def attach_land_to_client(request, client_id):
+
+    if not request.user.employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
+
     admin_id = request.user.id
 
     profile_pic_url = ""
@@ -683,6 +695,10 @@ def attach_land_to_client(request, client_id):
 
 # ============ RECORDING CLIENT PAYMENT ==================
 def record_payment(request, client_id):
+
+    if not request.user.employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
+
     admin_id = request.user.id
 
     profile_pic_url = ""
@@ -754,6 +770,10 @@ def record_payment(request, client_id):
 
 # ============ EDIT PAYMENT MADE BY CLIENT =================
 def edit_payment(request, payment_id):
+
+    if not request.user.employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
+
     admin_id = request.user.id
 
     profile_pic_url = ""
@@ -808,6 +828,10 @@ def add_land(request):
 
 # ============= CLIENTS WITH LAND(MADE COMPLETE PAYMENT FOR THE LAND) ==============
 def clients_with_lands(request):
+
+    if not request.user.employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
+
     admin_id = request.user.id
 
     profile_pic_url = ""
@@ -850,6 +874,10 @@ def clients_with_lands(request):
 
 # ============== TRANSACTION HISTORY FOR THE CLIENTS WHO ALREADY BOUGHT LAND ===============
 def land_transaction_history(request, land_id):
+
+    if not request.user.employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
+
     admin_id = request.user.id
 
     profile_pic_url = ""

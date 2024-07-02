@@ -11,7 +11,11 @@ app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
     'expire_clients': {
-        'task': 'realestates.tasks.expire_clients',
-        'schedule': crontab(hour=10, minute=35),  # Adjust this to a few minutes ahead of the current time for testing
+        'task': 'centuryproperties.apps.realestates.tasks.expire_clients',
+        'schedule': crontab(hour=0, minute=0, day_of_week='sunday'),
     },
 }
+
+# Testing:
+# celery -A centuryproperties worker --loglevel=info
+# celery -A centuryproperties beat --loglevel=info
