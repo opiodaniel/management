@@ -78,10 +78,10 @@ class Employees(TruncateTableMixin, models.Model):
         return Client.objects.filter(employee=self).count()
 
     def total_approved_clients(self):
-        return Payment.objects.filter(client_landclientemployee=self, approved=True).count()
+        return Payment.objects.filter(client_land__client__employee=self, approved=True).count()
 
     def total_appending_clients(self):
-        return Payment.objects.filter(client_landclientemployee=self, approved=False).count()
+        return Client.objects.filter(employee=self, client_lands__isnull=True).count()
 
     @classmethod
     def total_approved_clients_for_all_employee(cls):
@@ -247,6 +247,7 @@ def update_commission(sender, instance, **kwargs):
 
 class EmployeePaymentRecord(TruncateTableMixin, models.Model):
     employee = models.ForeignKey(Employees, on_delete=models.CASCADE, related_name='payment_records', null=True)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='payment_records', null=True)
     total_commission = models.IntegerField(default=0)
     amount_paid = models.IntegerField(default=0)
     balance = models.IntegerField(default=0)

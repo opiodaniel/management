@@ -11,6 +11,12 @@ import os
 import pandas as pd
 from .models import Client, Employees
 
+
+@shared_task
+def expire_clients():
+    call_command('expire_clients')
+
+
 @shared_task
 def reset_total_amount():
     call_command('reset_total_amount')

@@ -6,7 +6,7 @@ from .views import (
                     CustomLogoutView, edit_client, client_list, free_clients, download_free_clients,
                     assign_client, claim_free_client, truncate_model,
                     export_unapproved_payments, get_employee_with_clients_and_payments, activate_obj_function,
-                    upload_file, get_data_link, attach_land_to_client, record_payment, add_land, edit_payment,
+                    upload_file, get_data_link, record_payment, add_land, edit_payment,
                     clients_with_lands, land_transaction_history, employee_clients_made_payment, employee_pay_breakdown)
 
 
@@ -18,12 +18,10 @@ urlpatterns = [
 
     # ====== Admin =======
     path('administrator/<int:admin_id>/', admin_dashboard, name='admin_dashboard'),
-    # path('administrator/', admin_dashboard, name='admin_dashboard'),
     path('pay_employee/', pay_employee, name='pay_employee'),
     path('employee_clients/<int:employee_id>/', employee_clients_made_payment, name='employee_clients_made_payment'),
     path('approve_employee_payment/<int:employee_id>/<int:client_id>/', approve_employee_payment,
          name='approve_employee_payment'),
-    path('attach_land/<int:client_id>/', attach_land_to_client, name='attach_land_to_client'),
     path('record_payment/<int:client_id>/', record_payment, name='record_payment'),
     path('edit-payment/<int:payment_id>/',   edit_payment, name='edit_payment'),
 
@@ -35,6 +33,7 @@ urlpatterns = [
 
     path('free_clients/', free_clients, name='free_clients'),
     path('free-clients/assign/<int:client_id>/', assign_client, name='assign_client'),
+    path('claim_free_client/', claim_free_client, name='claim_free_client'),
     path('free-clients/download/', download_free_clients, name='download_free_clients'),
 
 
@@ -42,7 +41,6 @@ urlpatterns = [
     path('employee/', employee_dashboard, name='employee_dashboard'),
     path('employees_client/', employees_client, name='employees_client'),
     path('add_client/', add_client, name='add_client'),
-    path('claim_free_client/', claim_free_client, name='claim_free_client'),
     path('edit_client/<pk>', edit_client, name='edit_client'),
     path('pay_breakdown/', employee_pay_breakdown, name='employee_pay_breakdown'),
 

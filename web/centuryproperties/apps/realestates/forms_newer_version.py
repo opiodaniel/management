@@ -216,33 +216,16 @@ class LandForm(forms.ModelForm):
         model = Land
         fields = ['plot_number', 'location', 'price']
         widgets = {
-            'plot_number': forms.TextInput(
-                attrs={'class': 'form-control', 'placeholder': 'plot number', 'required': 'required'}),
-            'location': forms.TextInput(
-                attrs={'class': 'form-control', 'placeholder': 'location', 'required': 'required'}),
-            'price': forms.NumberInput(
-                attrs={'class': 'form-control', 'oninput': 'formatAmount(this)', 'required': 'required'}),
+            'plot_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'plot number'}),
+            'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'location'}),
+            'price': forms.NumberInput(attrs={'class': 'form-control', 'oninput': 'formatAmount(this)'}),
         }
 
     def clean_plot_number(self):
         plot_number = self.cleaned_data.get('plot_number')
-        if not plot_number:
-            raise forms.ValidationError("Plot number is required.")
         if Land.objects.filter(plot_number=plot_number).exists():
             raise forms.ValidationError("A land with this plot number already exists.")
         return plot_number
-
-    def clean_location(self):
-        location = self.cleaned_data.get('location')
-        if not location:
-            raise forms.ValidationError("Location is required.")
-        return location
-
-    def clean_price(self):
-        price = self.cleaned_data.get('price')
-        if price is None or price <= 0:
-            raise forms.ValidationError("Price must be greater than zero.")
-        return price
 
 
 

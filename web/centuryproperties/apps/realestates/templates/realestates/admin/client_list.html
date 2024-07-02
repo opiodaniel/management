@@ -63,14 +63,11 @@
                                 <td>{{ client.name }}</td>
                                 <td>{{ client.phoneNumber1 }}</td>
                                 <td>
-                                    <a href="{% url 'realestates:record_payment' client.id %}" class="btn btn-sm btn-primary">Record Payment</a>
+                                    <a href="{% url 'realestates:attach_land_to_client' client.id %}" class="btn btn-sm btn-primary">Record Payment</a>
                                 </td>
                             </tr>
                         {% endfor %}
                     </tbody>
-
-
-
                 </table>
             </div>
 
