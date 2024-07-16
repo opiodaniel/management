@@ -4,7 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8c1124b6-6789-4251-99c8-d42593558513" name="Changes" comment="" />
+    <list default="true" id="8c1124b6-6789-4251-99c8-d42593558513" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/celerybeat-schedule" beforeDir="false" afterPath="$PROJECT_DIR$/web/celerybeat-schedule" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/management/commands/expire_clients.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/management/commands/expire_clients.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/apps/realestates/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/centuryproperties/celery.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/centuryproperties/celery.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -52,7 +61,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-5b207ade9991-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.17890.14" />
+        <option value="bundled-python-sdk-975db3bf15a3-31b6be0877a2-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.18034.82" />
       </set>
     </attachedChunks>
   </component>

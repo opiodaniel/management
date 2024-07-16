@@ -25,58 +25,34 @@
     }
 </style>
 <style>
-    .clients-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 16px;
+    .list-group-item {
+    background-color: #343a40;
+    border: none;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.list-group-item .btn {
+    margin-left: auto;
+}
+
+.pagination {
     margin-top: 20px;
-   }
+}
 
-    .client-card {
-        background-color: #343a40;
-        padding: 20px;
-        border-radius: 8px;
-        color: white;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        height: 200px;
-    }
+.pagination .step-links a, .pagination .current {
+    color: white;
+    margin: 0 5px;
+}
 
-    .client-info {
-        margin-bottom: 10px;
-    }
+.pagination .step-links a {
+    text-decoration: none;
+    color: #17a2b8;
+}
 
-    .client-date, .client-name, .client-contact {
-        margin-bottom: 5px;
-        font-weight: bold;
-    }
-
-    .client-action {
-        text-align: center;
-    }
-
-    .client-action .btn {
-        width: 100%;
-    }
-
-    .pagination {
-        margin-top: 20px;
-    }
-
-    .pagination .step-links a, .pagination .current {
-        color: white;
-        margin: 0 5px;
-    }
-
-    .pagination .step-links a {
-        text-decoration: none;
-        color: #17a2b8;
-    }
-
-    .pagination .step-links a:hover {
-        text-decoration: underline;
-    }
+.pagination .step-links a:hover {
+    text-decoration: underline;
+}
 
 </style>
 {% endblock %}
@@ -90,10 +66,9 @@
 {% block content %}
     <!-- client table data -->
     <div class="container-fluid pt-4 px-4">
-        <div class="bg-secondary text-center rounded p-4">
-            <div class="d-flex align-items-center justify-content-between mb-2 shadow">
-                <h6 class="mb-3">Client List</h6>
-            </div>
+    <div class="bg-secondary text-center rounded p-4">
+        <h6 class="mb-3">Client List</h6>
+        <div class="d-flex align-items-center justify-content-between mb-4 shadow">
             <!-- Search Bar -->
             <form method="GET">
                 <div class="input-group">
@@ -101,41 +76,42 @@
                     <button class="btn btn-outline-info" type="submit">Search</button>
                 </div>
             </form>
-            <div class="clients-grid">
-                {% for client in clients %}
-                <div class="client-card">
-                    <div class="client-info">
-                        <div class="client-date">{{ client.date }}</div>
-                        <div class="client-name">{{ client.name }}</div>
-                        <div class="client-contact">{{ client.phoneNumber1 }}</div>
-                    </div>
-                    <div class="client-action">
-                        <a href="{% url 'realestates:attach_land_to_client' client.id %}" class="btn btn-sm btn-danger">Record Payment</a>
-                    </div>
+        </div>
+        <div class="list-group">
+            {% for client in clients %}
+            <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center bg-dark text-white mb-2">
+                <div>
+                    <div class="fw-bold">{{ client.name }}</div>
+                    <small>{{ client.date }}</small>
+                    <br>
+                    <small>{{ client.phoneNumber1 }}</small>
                 </div>
-                {% endfor %}
+                <a href="{% url 'realestates:attach_land_to_client' client.id %}" class="btn btn-sm btn-primary">Record Payment</a>
             </div>
+            {% endfor %}
+        </div>
 
-            <!-- Pagination Links -->
-            <div class="pagination">
-                <span class="step-links">
-                    {% if clients.has_previous %}
-                        <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">&laquo; first</a>
-                        <a href="?page={{ clients.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">previous</a>
-                    {% endif %}
+        <!-- Pagination Links -->
+        <div class="pagination">
+            <span class="step-links">
+                {% if clients.has_previous %}
+                    <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">&laquo; first</a>
+                    <a href="?page={{ clients.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">previous</a>
+                {% endif %}
 
-                    <span class="current">
-                        Page {{ clients.number }} of {{ clients.paginator.num_pages }}.
-                    </span>
-
-                    {% if clients.has_next %}
-                        <a href="?page={{ clients.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">next</a>
-                        <a href="?page={{ clients.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">last &raquo;</a>
-                    {% endif %}
+                <span class="current">
+                    Page {{ clients.number }} of {{ clients.paginator.num_pages }}.
                 </span>
-            </div>
+
+                {% if clients.has_next %}
+                    <a href="?page={{ clients.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">next</a>
+                    <a href="?page={{ clients.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">last &raquo;</a>
+                {% endif %}
+            </span>
         </div>
     </div>
+</div>
+
 
     <!-- client table data End  -->
 

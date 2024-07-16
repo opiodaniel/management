@@ -19,3 +19,7 @@ app.conf.beat_schedule = {
 # Testing:
 # celery -A centuryproperties worker --loglevel=info
 # celery -A centuryproperties beat --loglevel=info
+
+
+# cd /home/centuryproperties/web && /home/centuryproperties/.virtualenvs/venv/bin/celery -A centuryproperties worker -l info
+# cd /home/centuryproperties/web && /home/centuryproperties/.virtualenvs/venv/bin/celery -A centuryproperties beat -l info

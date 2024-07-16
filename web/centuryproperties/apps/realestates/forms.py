@@ -6,6 +6,11 @@ from django.contrib.auth import get_user_model
 from .models import (Employees)
 from django.contrib.auth.models import User
 from django.db.models import Q
+import re
+
+
+def normalize_phone_number(phone_number):
+    return re.sub(r'\D', '', phone_number)
 
 
 class ClientForm(forms.ModelForm):
@@ -19,7 +24,7 @@ class ClientForm(forms.ModelForm):
         fields = ('name', 'phoneNumber1', 'phoneNumber2', 'location', )
 
     def clean_phoneNumber1(self):
-        phone_number1 = self.cleaned_data['phoneNumber1']
+        phone_number1 = normalize_phone_number(self.cleaned_data['phoneNumber1'])
         if Client.objects.filter(phoneNumber1=phone_number1).exists() or Client.objects.filter(phoneNumber2=phone_number1).exists():
             raise forms.ValidationError('Client with the same phone number already exists.')
         return phone_number1
@@ -27,6 +32,7 @@ class ClientForm(forms.ModelForm):
     def clean_phoneNumber2(self):
         phone_number2 = self.cleaned_data.get('phoneNumber2')
         if phone_number2:
+            phone_number2 = normalize_phone_number(phone_number2)
             if len(phone_number2) < 7:
                 raise forms.ValidationError("Phone number must be at least 7 characters long.")
             if Client.objects.filter(phoneNumber1=phone_number2).exists() or Client.objects.filter(phoneNumber2=phone_number2).exists():

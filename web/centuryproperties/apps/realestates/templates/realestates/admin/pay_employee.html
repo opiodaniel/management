@@ -20,6 +20,14 @@
         margin-top: 20px; /* Add margin to the top of pagination controls */
     }
 </style>
+<style>
+.employee-image {
+    width: 100%;
+    height: auto;
+    max-height: 200px; /* Adjust this value as needed */
+    object-fit: cover;
+}
+</style>
 {% endblock %}
 
 {% block SubNavbar %}
@@ -31,6 +39,69 @@
 {% block content %}
     <!-- Recent Sales Start -->
    <div class="container-fluid pt-4 px-4">
+        <div class="bg-secondary text-center rounded p-4">
+            <!-- Search Bar -->
+            <form method="get" action="{% url 'realestates:pay_employee' %}" class="mb-4">
+                <div class="input-group">
+                    <input type="text" class="form-control custom-border" placeholder="Search by name...." name="q">
+                    <button class="btn btn-outline-info" type="submit">Search</button>
+                </div>
+            </form>
+            <div class="row">
+                {% for employee in page_obj %}
+                <div class="col-md-3">
+                    <div class="card text-white bg-dark mb-4">
+                        {% if employee.profile_pic %}
+                        <img src="{{ employee.profile_pic.url }}" class="card-img-top employee-image" alt="{{ employee.user.get_full_name }}" >
+                        {% else %}
+                        <img src="{{ employee.profile_pic.url }}" class="card-img-top employee-image" alt="Default Image" >
+                        {% endif %}
+                        <div class="card-header bg-danger text-center">
+                            {{ employee.user.get_full_name }}
+                        </div>
+                        <div class="card-body text-center">
+                            <p class="card-text">Role: Distributor</p>
+                            <p class="card-text">Email: {{ employee.user.email }}</p>
+                            <!-- Add more employee details here if needed -->
+                            <a href="{% url 'realestates:employee_clients_made_payment' employee.id %}" class="btn btn-info">Payment</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="pagination">
+                <span class="step-links">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1{% if query %}&q={{ query }}{% endif %}">&laquo; first</a>
+                        <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">previous</a>
+                    {% endif %}
+                    <span class="current">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                    </span>
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}">next</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}">last &raquo;</a>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+    <!-- Recent Sales End -->
+{% endblock %}
+
+
+
+  {% block add_js %}
+  {% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+
+
+
+<!--========= OLD VERSION ======== -->
+<div class="container-fluid pt-4 px-4">
         <div class="bg-secondary text-center rounded p-4">
             <h6 class="mb-3">Distributor Table</h6>
             <div class="d-flex align-items-center justify-content-between mb-4">
@@ -83,13 +154,3 @@
             </div>
         </div>
    </div>
-    <!-- Recent Sales End -->
-{% endblock %}
-
-
-
-  {% block add_js %}
-  {% endblock %}
-
-{% block footer %}
-{% endblock %}

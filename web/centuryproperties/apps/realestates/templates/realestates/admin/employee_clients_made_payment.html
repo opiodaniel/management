@@ -1,10 +1,38 @@
-
 {% extends "base_admin_dashboard.html" %}
 {% load static %}
 {% load custom_filters %}
 
 {% block title %}
  Payment
+{% endblock %}
+
+{% block add_css %}
+<style>
+.form-control {
+    border: 1px solid #ced4da;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: #80bdff;
+}
+
+.card-header {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.card-body p {
+    margin-bottom: 0.5em;
+}
+
+.card {
+    color: white;
+    background-color: #343a40; /* Dark background for cards */
+}
+
+
+</style>
 {% endblock %}
 
 {% block SubNavbar %}
@@ -14,12 +42,13 @@
 {% endblock SubNavbar %}
 
 {% block content %}
+
 <div class="container-fluid pt-4 px-4">
     <div class="row g-4">
         <div class="col-sm-12 col-xl-12">
             <div class="bg-secondary text-center rounded p-4">
-                <div class="d-flex align-items-center justify-content-between mb-4 text-success">
-                    Clients Brought by: {{ employee_.user.get_full_name }}
+                <div class="d-flex mb-4">
+                    Distributor: <span class="text-info">{{ employee_.user.get_full_name }}</span>
                     <span>
                         <!-- Display messages -->
                         {% if messages %}
@@ -34,61 +63,46 @@
                         {% endif %}
                     </span>
                 </div>
-                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-                    <table class="table text-start align-middle table-bordered table-hover mb-0">
-                        <thead>
-                            <tr class="text-info">
-                                <th scope="col">Client</th>
-                                <th scope="col">Paid</th>
-                                <th scope="col">Commission</th>
-                                <th scope="col">Amount Paid to Employee</th>
-                                <th scope="col">Balance</th>
-                                <th scope="col">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-white card-link popupbtn1">
-                            {% for data in client_data %}
-                            <tr>
-                                <td>{{ data.client_land.client.name }}</td>
-                                <td>{{ data.client_land.total_amount_paid|add_commas }}</td>
-                                <td>{{ data.commission|add_commas }}</td>
-                                <td>{{ data.amount_paid|add_commas }}</td>
-                                <td>{{ data.balance|add_commas }}</td>
-                                <td>
-                                    <form method="post" action="{% url 'realestates:approve_employee_payment' employee_.id data.client_land.client.id %}">
-                                        {% csrf_token %}
-                                        <div class="mb-3">
-                                            <label for="amount_paid" class="form-label">Amount to Pay</label>
-                                            <input type="text" oninput="formatAmount(this)" name="amount_paid" class="form-control" required>
-                                        </div>
-                                        <div class="mb-3">
-                                        </div>
-                                        <button type="submit" class="btn btn-success">Pay</button>
-                                        <input type="button" class="btn btn-danger" value="Cancel" onclick="window.history.go(-1)">
-                                    </form>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="row">
+                    {% for data in client_data %}
+                    <div class="col-md-3">
+                        <div class="card text-white bg-dark mb-4">
+                            <div class="card-header bg-danger text-center">
+                                {{ data.client_land.client.name }}-{{ data.client_land.client.phoneNumber1 }}
+                            </div>
+                            <div class="card-body text-center">
+                                <p class="card-text">Client Paid: {{ data.client_land.total_amount_paid|add_commas }}</p>
+                                <p class="card-text">Commission Earned: {{ data.commission|add_commas }}</p>
+                                <p class="card-text">Amount Paid to Employee: {{ data.amount_paid|add_commas }}</p>
+                                <p class="card-text">Balance: {{ data.balance|add_commas }}</p>
+                                <form method="post" action="{% url 'realestates:approve_employee_payment' employee_.id data.client_land.client.id %}">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label for="amount_paid" class="form-label">Amount to Pay</label>
+                                        <input type="text" oninput="formatAmount(this)" name="amount_paid" class="form-control bg-light text-dark" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-success">Pay</button>
+                                </form>
+                            </div>
+                            <div class="d-flex justify-content-center mt-2">
+                                <input type="button" class="btn btn-danger" value="Cancel" onclick="window.history.go(-1)">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
-
             </div>
         </div>
-        <!--
-        <div class="col-sm-12 col-xl-6">
-            <div class="bg-secondary rounded h-100 p-4">
-
-            </div>
-        </div> -->
     </div>
 </div>
+
+
+
 {% endblock %}
 
 
 
 {% block add_js %}
-
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -187,6 +201,77 @@ function formatAmount(input) {
 {% endblock %}
 
 
+<!--========= OLD VERSION ======== -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-sm-12 col-xl-12">
+            <div class="bg-secondary text-center rounded p-4">
+                <div class="d-flex align-items-center justify-content-between mb-4 text-success">
+                    Clients Brought by: {{ employee_.user.get_full_name }}
+                    <span>
+                        <!-- Display messages -->
+                        {% if messages %}
+                        <div class="container mt-3">
+                            {% for message in messages %}
+                            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table class="table text-start align-middle table-bordered table-hover mb-0">
+                        <thead>
+                            <tr class="text-info">
+                                <th scope="col">Client</th>
+                                <th scope="col">Paid</th>
+                                <th scope="col">Commission</th>
+                                <th scope="col">Employee Pay</th>
+                                <th scope="col">Balance</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-white card-link popupbtn1">
+                            {% for data in client_data %}
+                            <tr>
+                                <td>{{ data.client_land.client.name }}</td>
+                                <td>{{ data.client_land.total_amount_paid|add_commas }}</td>
+                                <td>{{ data.commission|add_commas }}</td>
+                                <td>{{ data.amount_paid|add_commas }}</td>
+                                <td>{{ data.balance|add_commas }}</td>
+                                <td>
+                                    <form method="post" action="{% url 'realestates:approve_employee_payment' employee_.id data.client_land.client.id %}">
+                                        {% csrf_token %}
+                                        <div class="mb-3">
+                                            <label for="amount_paid" class="form-label">Amount to Pay</label>
+                                            <input type="text" oninput="formatAmount(this)" name="amount_paid" class="form-control" required>
+                                        </div>
+                                        <div class="mb-3">
+                                        </div>
+                                        <button type="submit" class="btn btn-success">Pay</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="d-flex align-items-center justify-content-between mb-4 text-success">
+              <input type="button" class="btn btn-danger" value="Cancel" onclick="window.history.go(-1)">
+            </div>
+        </div>
+        <!--
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded h-100 p-4">
+
+            </div>
+        </div> -->
+    </div>
+</div>
 
 
 

@@ -27,7 +27,7 @@ class Company(TruncateTableMixin, models.Model):
 class Employees(TruncateTableMixin, models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='employee')
     is_administrator = models.BooleanField(default=False)
-
+    exclude_from_reassignment = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True, null=True)
     updated = models.DateTimeField(auto_now=True)
     is_confirmed = models.BooleanField(default=True)
@@ -102,6 +102,12 @@ class Client(TruncateTableMixin, models.Model):
     location = models.CharField(max_length=30, default='', blank=True, null=True)
     date = models.DateTimeField(auto_now_add=True, null=True)
     employee = models.ForeignKey(Employees, on_delete=models.SET_NULL, null=True, related_name="clients")
+    expired_date = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['phoneNumber1'], name='unique_phoneNumber1'),
+        ]
 
     def __str__(self):
         return self.name

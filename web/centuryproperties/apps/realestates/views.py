@@ -144,7 +144,12 @@ def get_total_sales_for_previous_months(request):
 @login_required
 def admin_dashboard(request, admin_id):
 
-    if not request.user.employee.is_administrator:
+    try:
+        employee = request.user.employee
+    except Employees.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to view this page.")
+
+    if not employee.is_administrator:
         return redirect(reverse('realestates:employee_dashboard'))
 
     default_threshold_input = 10  # employees with more than 5 clients who have made some payment will be displayed
@@ -243,8 +248,12 @@ def admin_dashboard(request, admin_id):
 # ========= LISTS OF FREE CLIENTS =========
 @login_required
 def free_clients(request):
+    try:
+        employee = request.user.employee
+    except Employees.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to view this page.")
 
-    if not request.user.employee.is_administrator:
+    if not employee.is_administrator:
         return redirect(reverse('realestates:employee_dashboard'))
 
     admin_id = request.user.employee.id
@@ -303,16 +312,17 @@ def free_clients(request):
 
 @login_required
 def download_free_clients(request):
-
     admin = Employees.objects.filter(is_administrator=True).first()
-    print(admin)
+    if not admin:
+        return HttpResponse("Administrator not found.", status=404)
 
+    # Filter clients who expired recently (you can adjust the time range as needed)
+    one_week_ago = timezone.now() - timedelta(days=7)
     expired_clients = Client.objects.filter(
         employee=admin,
-        client_lands__isnull=True
+        client_lands__isnull=True,
+        expired_date__gte=one_week_ago
     )
-
-    print(expired_clients)
 
     # Create an in-memory workbook and worksheet
     workbook = openpyxl.Workbook()
@@ -393,9 +403,13 @@ def claim_free_client(request):
 @login_required
 def pay_employee(request):
 
-    if not request.user.employee.is_administrator:
-        return redirect(reverse('realestates:employee_dashboard'))
+    try:
+        employee = request.user.employee
+    except Employees.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to view this page.")
 
+    if not employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
     admin_id = request.user.id
 
     profile_pic_url = ""
@@ -421,7 +435,7 @@ def pay_employee(request):
     if query:
         employees = employees.filter(user__first_name__icontains=query) | employees.filter(user__last_name__icontains=query)
 
-    paginator = Paginator(employees, 50)  # Show 50 employees per page
+    paginator = Paginator(employees, 15)  # Show 50 employees per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -644,10 +658,17 @@ def change_password(request):
 # ============ ATTACH LAND TO CLIENT ==================
 def attach_land_to_client(request, client_id):
 
-    if not request.user.employee.is_administrator:
+    try:
+        employee = request.user.employee
+    except Employees.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to view this page.")
+
+    if not employee.is_administrator:
         return redirect(reverse('realestates:employee_dashboard'))
 
     admin_id = request.user.id
+
+    print(admin_id)
 
     profile_pic_url = ""
     try:
@@ -694,9 +715,15 @@ def attach_land_to_client(request, client_id):
 
 
 # ============ RECORDING CLIENT PAYMENT ==================
+@login_required
 def record_payment(request, client_id):
 
-    if not request.user.employee.is_administrator:
+    try:
+        employee = request.user.employee
+    except Employees.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to view this page.")
+
+    if not employee.is_administrator:
         return redirect(reverse('realestates:employee_dashboard'))
 
     admin_id = request.user.id
@@ -771,7 +798,12 @@ def record_payment(request, client_id):
 # ============ EDIT PAYMENT MADE BY CLIENT =================
 def edit_payment(request, payment_id):
 
-    if not request.user.employee.is_administrator:
+    try:
+        employee = request.user.employee
+    except Employees.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to view this page.")
+
+    if not employee.is_administrator:
         return redirect(reverse('realestates:employee_dashboard'))
 
     admin_id = request.user.id
@@ -829,7 +861,12 @@ def add_land(request):
 # ============= CLIENTS WITH LAND(MADE COMPLETE PAYMENT FOR THE LAND) ==============
 def clients_with_lands(request):
 
-    if not request.user.employee.is_administrator:
+    try:
+        employee = request.user.employee
+    except Employees.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to view this page.")
+
+    if not employee.is_administrator:
         return redirect(reverse('realestates:employee_dashboard'))
 
     admin_id = request.user.id
@@ -875,7 +912,12 @@ def clients_with_lands(request):
 # ============== TRANSACTION HISTORY FOR THE CLIENTS WHO ALREADY BOUGHT LAND ===============
 def land_transaction_history(request, land_id):
 
-    if not request.user.employee.is_administrator:
+    try:
+        employee = request.user.employee
+    except Employees.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to view this page.")
+
+    if not employee.is_administrator:
         return redirect(reverse('realestates:employee_dashboard'))
 
     admin_id = request.user.id

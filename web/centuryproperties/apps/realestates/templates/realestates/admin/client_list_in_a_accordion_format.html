@@ -25,39 +25,20 @@
     }
 </style>
 <style>
-    .clients-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 16px;
-    margin-top: 20px;
-   }
+    .accordion-button {
+    background-color: #343a40;
+    color: white;
+    border: none;
+    }
 
-    .client-card {
-        background-color: #343a40;
-        padding: 20px;
-        border-radius: 8px;
+    .accordion-button:not(.collapsed) {
         color: white;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        height: 200px;
+        background-color: #495057;
     }
 
-    .client-info {
-        margin-bottom: 10px;
-    }
-
-    .client-date, .client-name, .client-contact {
-        margin-bottom: 5px;
-        font-weight: bold;
-    }
-
-    .client-action {
-        text-align: center;
-    }
-
-    .client-action .btn {
-        width: 100%;
+    .accordion-body {
+        background-color: #495057;
+        color: white;
     }
 
     .pagination {
@@ -91,26 +72,30 @@
     <!-- client table data -->
     <div class="container-fluid pt-4 px-4">
         <div class="bg-secondary text-center rounded p-4">
-            <div class="d-flex align-items-center justify-content-between mb-2 shadow">
-                <h6 class="mb-3">Client List</h6>
-            </div>
-            <!-- Search Bar -->
-            <form method="GET">
-                <div class="input-group">
-                    <input type="text" class="form-control custom-border" placeholder="Search client...." name="q">
-                    <button class="btn btn-outline-info" type="submit">Search</button>
-                </div>
-            </form>
-            <div class="clients-grid">
-                {% for client in clients %}
-                <div class="client-card">
-                    <div class="client-info">
-                        <div class="client-date">{{ client.date }}</div>
-                        <div class="client-name">{{ client.name }}</div>
-                        <div class="client-contact">{{ client.phoneNumber1 }}</div>
+            <h6 class="mb-3">Client List</h6>
+            <div class="d-flex align-items-center justify-content-between mb-4 shadow">
+                <!-- Search Bar -->
+                <form method="GET">
+                    <div class="input-group">
+                        <input type="text" class="form-control custom-border" placeholder="Search client...." name="q">
+                        <button class="btn btn-outline-info" type="submit">Search</button>
                     </div>
-                    <div class="client-action">
-                        <a href="{% url 'realestates:attach_land_to_client' client.id %}" class="btn btn-sm btn-danger">Record Payment</a>
+                </form>
+            </div>
+            <div class="accordion" id="clientAccordion">
+                {% for client in clients %}
+                <div class="accordion-item bg-dark text-white mb-2">
+                    <h2 class="accordion-header" id="heading{{ client.id }}">
+                        <button class="accordion-button collapsed bg-dark text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ client.id }}" aria-expanded="false" aria-controls="collapse{{ client.id }}">
+                            {{ client.name }}
+                        </button>
+                    </h2>
+                    <div id="collapse{{ client.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ client.id }}" data-bs-parent="#clientAccordion">
+                        <div class="accordion-body">
+                            <p><strong>Date:</strong> {{ client.date }}</p>
+                            <p><strong>Contact:</strong> {{ client.phoneNumber1 }}</p>
+                            <a href="{% url 'realestates:attach_land_to_client' client.id %}" class="btn btn-sm btn-primary">Record Payment</a>
+                        </div>
                     </div>
                 </div>
                 {% endfor %}
@@ -136,10 +121,7 @@
             </div>
         </div>
     </div>
-
     <!-- client table data End  -->
-
-
 {% endblock %}
 
 {% block add_js %}

@@ -19,11 +19,12 @@ class Command(BaseCommand):
 
         expired_clients = Client.objects.filter(
             client_lands__isnull=True
-        )
+        ).exclude(employee__exclude_from_reassignment=True).exclude(employee=admin)
 
         for expired_client in expired_clients:
             self.stdout.write(f"Expiring client {expired_client.name} (ID: {expired_client.id})")
             expired_client.employee = admin
+            expired_client.expired_date = timezone.now()
             expired_client.save()
 
         self.stdout.write(self.style.SUCCESS("Expired clients have been reassigned to the administrator."))
