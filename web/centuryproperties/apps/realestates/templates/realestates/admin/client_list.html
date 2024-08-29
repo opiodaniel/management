@@ -40,7 +40,7 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        height: 200px;
+        height: 150px;
     }
 
     .client-info {
@@ -81,65 +81,67 @@
 </style>
 {% endblock %}
 
-{% block SubNavbar %}
- <div class="nav-item dropdown">
-     <a href="{% url 'realestates:admin_dashboard' admin_id %}" class="nav-item nav-link"><i class="fas fa-home"></i>Home</a>
- </div>
-{% endblock SubNavbar %}
 
 {% block content %}
-    <!-- client table data -->
-    <div class="container-fluid pt-4 px-4">
-        <div class="bg-secondary text-center rounded p-4">
-            <div class="d-flex align-items-center justify-content-between mb-2 shadow">
-                <h6 class="mb-3">Client List</h6>
-            </div>
-            <!-- Search Bar -->
-            <form method="GET">
-                <div class="input-group">
-                    <input type="text" class="form-control custom-border" placeholder="Search client...." name="q">
-                    <button class="btn btn-outline-info" type="submit">Search</button>
-                </div>
-            </form>
-            <div class="clients-grid">
-                {% for client in clients %}
-                <div class="client-card">
-                    <div class="client-info">
-                        <div class="client-date">{{ client.date }}</div>
-                        <div class="client-name">{{ client.name }}</div>
-                        <div class="client-contact">{{ client.phoneNumber1 }}</div>
-                    </div>
-                    <div class="client-action">
-                        <a href="{% url 'realestates:attach_land_to_client' client.id %}" class="btn btn-sm btn-danger">Record Payment</a>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-
-            <!-- Pagination Links -->
-            <div class="pagination">
-                <span class="step-links">
-                    {% if clients.has_previous %}
-                        <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">&laquo; first</a>
-                        <a href="?page={{ clients.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">previous</a>
-                    {% endif %}
-
-                    <span class="current">
-                        Page {{ clients.number }} of {{ clients.paginator.num_pages }}.
-                    </span>
-
-                    {% if clients.has_next %}
-                        <a href="?page={{ clients.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">next</a>
-                        <a href="?page={{ clients.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">last &raquo;</a>
-                    {% endif %}
-                </span>
-            </div>
+<!-- Search Bar -->
+<form method="GET">
+    <div class="input-group">
+        <input type="text" class="form-control custom-border" placeholder="Search client..." name="q">
+        <button class="btn btn-outline-dark" type="submit">Search</button>
+    </div>
+</form>
+<div class="clients-grid">
+    {% for client in clients %}
+    <div class="client-card border rounded p-2 mb-2 bg-white">
+        <div class="client-info">
+            <div class="client-date text-muted">{{ client.date }}</div>
+            <div class="client-name text-dark">{{ client.name }}</div>
+            <div class="client-contact text-secondary">{{ client.phoneNumber1 }}</div>
+        </div>
+        <div class="client-action">
+            <!--{% url 'realestates:attach_land_to_client' client.id %}-->
+            <a href="#" class="btn btn-sm btn-danger"> {% if client.employee.is_administrator %} Free Client {% elif not client.employee %} Free Client {% else %}Entered by: {{client.employee}} {% endif %}</a>
         </div>
     </div>
+    {% endfor %}
+</div>
 
-    <!-- client table data End  -->
+<!-- Pagination Links -->
+<div class="pagination mt-4">
+    <ul class="pagination justify-content-center">
+        {% if clients.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">&laquo; first</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ clients.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+        {% endif %}
 
+        {% for num in clients.paginator.page_range %}
+            {% if clients.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > clients.number|add:'-5' and num < clients.number|add:'5' %}
+                <li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a></li>
+            {% endif %}
+        {% endfor %}
 
+        {% if clients.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ clients.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ clients.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">last &raquo;</a>
+            </li>
+        {% endif %}
+    </ul>
+</div>
+
+<!-- client table data End  -->
 {% endblock %}
 
 {% block add_js %}

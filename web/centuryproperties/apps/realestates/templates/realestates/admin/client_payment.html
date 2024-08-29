@@ -1,0 +1,179 @@
+{% extends "base_admin_dashboard.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}
+   Re-Assign/Record Payment
+{% endblock %}
+
+
+{% block content %}
+
+<div class="row g-6">
+  <!-- Vehicles overview -->
+  <div class="col-xxl-6">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <div class="card-title mb-0">
+             <h5 class="m-0 me-2">Record Payment for client in system</h5>
+        </div>
+      </div>
+      <div class="card-body">
+          {% if messages %}
+            <div>
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+          {% endif %}
+           <form method="post">
+              {% csrf_token %}
+              <!-- Attach Land Button -->
+              <button id="attach-land-btn" class="btn btn-info mb-4" type="button" style="display: none;">
+                  Attach Land / Record client payment
+              </button>
+              <!-- Select client with current employee display -->
+              <div class="form-group mt-4">
+                <label for="{{ reassign_form.client.id_for_label }}">Select Client</label>
+                <div class="input-group">
+                  {{ reassign_form.client }}
+                  <div class="input-group-append">
+                    <!-- The Edit Client Info button -->
+                    <button id="edit-client-info-btn" class="btn btn-info btn-sm" type="button" style="display: none;">
+                      Edit Client Info
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+               <h4 class="mt-4">Reassign Client</h4>
+              <!-- Display current employee -->
+              <div id="current-employee-container" class="form-group" style="display: none;">
+                <label>Current Distributor:</label>
+                <input type="text" id="current-employee" class="form-control" readonly>
+              </div>
+
+              <!-- New employee reassignment dropdown -->
+              <div class="form-group">
+                <label for="{{ reassign_form.new_employee.id_for_label }}">Re-assign to Distributor</label>
+                <div class="input-group">
+                  {{ reassign_form.new_employee }}
+                  <div class="input-group-append">
+                    <!-- The Edit Client Info button -->
+                    <button type="submit" class="btn btn-danger btn-sm">Re-assign the client</button>
+                  </div>
+                </div>
+              </div>
+           </form>
+      </div>
+    </div>
+  </div>
+  <!--/ Vehicles overview -->
+
+  <!-- Shipment statistics-->
+  <div class="col-xxl-6 col-lg-7">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center justify-content-between">
+            <div class="card-title mb-0">
+                <h5 class="m-0 me-2">Register Clients</h5>
+            </div>
+        </div>
+        <div class="card-body">
+            <div id="form-success"></div>
+              <div id="form-errors"></div>
+              <form id="add-client-form" method="post" action="{% url 'realestates:admin_add_client' %}">
+                {% csrf_token %}
+                {{ admin_client_form.as_p }}
+                <button style="width:120px;" type="submit" class="btn btn-warning btn-sm mb-3">
+                    Add Client
+                </button>
+              </form>
+        </div>
+    </div>
+  </div>
+  <!--/ Shipment statistics -->
+</div>
+
+{% endblock %}
+
+{% block add_js %}
+<script>
+    function formatAmount(input) {
+        // Remove existing commas and non-numeric characters from the input
+        let value = input.value.replace(/[^\d]/g, '');
+
+        // Add commas to the value
+        value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+        // Update the input value
+        input.value = value;
+    }
+</script>
+<script>
+  $(document).ready(function() {
+    $('.select2').select2({
+      placeholder: "Select an option",
+      allowClear: true
+    });
+
+    // Handle client selection changes
+    $('#id_client').on('change', function() {
+      var clientId = $(this).val();
+      if (clientId) {
+        // Fetch client data and update current employee and edit button
+        $.ajax({
+          url: "{% url 'realestates:get_client_details' %}",
+          data: { client_id: clientId },
+          success: function(data) {
+            // Display current employee information
+            $('#current-employee-container').show();
+            $('#current-employee').val(data.employee_name);
+
+            // Update the edit button's URL and show it
+            var editUrl = "{% url 'realestates:edit_client' pk=0 %}".replace('0', clientId);
+            $('#edit-client-info-btn').attr('onclick', 'window.location.href="' + editUrl + '"').show();
+
+            // Update the attauch land button's URL and show it
+            var attachLandUrl = "{% url 'realestates:attach_land_to_client' 0 %}".replace('0', clientId);
+            $('#attach-land-btn').attr('onclick', 'window.location.href="' + attachLandUrl + '"');
+
+          }
+        });
+      } else {
+        // Hide the employee info and edit button if no client is selected
+        $('#current-employee-container').hide();
+        $('#edit-client-info-btn').hide();
+      }
+    });
+  });
+</script>
+
+<!-- Add new clients -->
+<script>
+    $(document).ready(function(){
+        $('#add-client-form').on('submit', function(event){
+            event.preventDefault();
+            $.ajax({
+                url: $(this).attr('action'),
+                type: $(this).attr('method'),
+                data: $(this).serialize(),
+                success: function(response){
+                    if(response.success){
+                        $('#form-success').html('<div class="alert alert-success">' + response.message + '</div>');
+                        setTimeout(function(){
+                            location.reload();  // Reload the page to update the client list
+                        }, 1000); // Reload the page after 2 seconds
+                    } else {
+                        $('#form-errors').html('<div class="alert alert-danger">' + response.error + '</div>');
+                    }
+                },
+                error: function(xhr, status, error){
+                    $('#form-errors').html('<div class="alert alert-danger">An error occurred. Please try again.</div>');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -11,7 +11,7 @@ class CompanyAdmin(admin.ModelAdmin):
 
 
 class EmployeesAdmin(admin.ModelAdmin):
-    list_display = ('user', 'is_administrator', 'phone', 'date_of_birth')
+    list_display = ('user', 'is_administrator', 'is_show', 'phone', 'date_of_birth')
     search_fields = ('user__username', 'user__first_name', 'user__last_name', 'phone')
     list_filter = ('is_administrator',)
 
@@ -36,18 +36,18 @@ class ClientLandAdmin(admin.ModelAdmin):
 
 class PaymentAdmin(admin.ModelAdmin):
     list_display = ('client_land', 'amount_paid',  'approved', 'approved_by', 'employee', 'timestamp') #'total_amount', 'remaining_amount', 'installment_number', 'total_installments',
-    search_fields = ('employee__user__username', )
+    search_fields = ('employee__user__username', 'employee__user__first_name', 'employee__user__last_name', )
     list_filter = ('approved', 'timestamp')
 
 
 class CommissionAdmin(admin.ModelAdmin):
-    list_display = ('employee', 'client', 'total_commission', 'date_paid')
+    list_display = ('employee', 'client', 'client_land', 'total_commission', 'date_paid')
     search_fields = ('employee__user__username', 'client__name')
     list_filter = ('date_paid',)
 
 
 class EmployeePaymentRecordAdmin(admin.ModelAdmin):
-    list_display = ('employee', 'total_commission', 'amount_paid', 'balance', 'client')
+    list_display = ('employee', 'client_land', 'client', 'total_commission', 'amount_paid', 'balance')
     search_fields = ('employee__user__username',)
     list_filter = ('employee',)
 

@@ -1,0 +1,282 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"/>
+        <title>Dashboard | Christ Heart</title>
+        <meta name="description" content=""/>
+        <!-- Favicon -->
+        <link rel="icon" type="image/x-icon" href="../assets/img/rise_icon_spiral(300x300).png"/>
+        <!-- Fonts -->
+        <link rel="" href="https://fonts.googleapis.com"/>
+        <!-- Icons. Uncomment required icon fonts -->
+        <link rel="stylesheet" href="{% static 'rise/css/boxicons.css' %}"/>
+        <!-- Core CSS -->
+        <link rel="stylesheet" href="{% static 'rise/css/core.css' %}" class="template-customizer-core-css"/>
+        <link rel="stylesheet" href="{% static 'rise/css/theme-default.css' %}" class="template-customizer-theme-css"/>
+        <link rel="stylesheet" href="{% static 'rise/css/demo.css' %}"/>
+        <link rel="stylesheet" href="{% static 'rise/css/perfect-scrollbar.css' %}"/>
+        <link rel="stylesheet" href="{% static 'rise/css/apex-charts.css' %}"/>
+        <script src="{% static 'rise/js/helpers.js' %}"></script>
+        <script src="{% static 'rise/js/config.js' %}"></script>
+        <link rel="stylesheet" href="{% static 'rise/css/font-awesome.min.css' %}"/>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=AR+One+Sans&display=swap"/>
+        <script src="{% static 'rise/js/jquery.js' %}"></script>
+
+        <style>
+          /* custom.css */
+            #layout-menu {
+                background-color: #483d8b !important; /* Dark Slate Blue */
+                color: #fff; /* White text color for better contrast */
+            }
+
+            #layout-menu .menu-item a.menu-link {
+                color: #fff; /* Ensure the text inside menu links is white */
+            }
+
+            #layout-menu .menu-item a.menu-link:hover {
+                background-color: #6a5acd; /* Slate Blue for hover effect */
+            }
+        </style>
+
+        <!-- Icon Font Stylesheet -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+
+        {% block add_css %}
+        {% endblock %}
+
+    </head>
+    <body>
+        <!-- Layout wrapper -->
+        <div class="layout-wrapper layout-content-navbar">
+            <div class="layout-container">
+                <!-- Menu -->
+                <aside id="layout-menu" class="bg-menu-theme layout-menu menu menu-vertical">
+                    <a href="#" class="navbar-brand mx-4 mb-3">
+                        <img class="rounded-circle" src="{% static 'rise/img/com_logo.jpeg' %}" alt="" style="width: 100px;">
+                    </a>
+                    <div class="d-flex align-items-center ms-4 mb-4">
+                        <div class="position-relative">
+                            <img class="rounded-circle" src="{{user.employee.profile_pic.url}}" alt="" style="width: 40px; height: 40px;">
+                            <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
+                        </div>
+                        <div class="ms-3">
+                            {% if user.is_authenticated %}
+                            <h6 class="mb-0 text-success">{{user.username}}</h6>
+                            {% endif %}
+                            <span>Admin</span>
+                        </div>
+                    </div>
+                    <div class="menu-inner-shadow"></div>
+                    {% if user.is_authenticated %}
+                        {% if user.is_staff %}
+                            <ul class="menu-inner py-1">
+                                <!-- Dashboard -->
+                                <li class="menu-item active"><a href="{% url 'realestates:admin_dashboard' user.id %}" class="menu-link"> <i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+                                </li>
+                                <li class="menu-item">
+                                    <a href="javascript:void(0);" class="menu-link menu-toggle">
+                                        <i class="fas fa-users me-2"></i>
+                                        <div data-i18n="Layouts">Distributor Register</div> </a>
+                                    <ul class="menu-sub">
+                                         <li class="menu-item">
+                                            <a href="{% url 'realestates:register' %}" class="menu-link">
+                                                <div data-i18n="Without navbar">Distributor Form</div>
+                                            </a>
+                                         </li>
+                                    </ul>
+                                </li>
+                                <li class="menu-item">
+                                    <a href="javascript:void(0);" class="menu-link menu-toggle">
+                                        <i class="fa fa-credit-card custom me-2"></i>
+                                        <div data-i18n="Layouts">Payments</div> </a>
+                                    <ul class="menu-sub">
+                                         <li class="menu-item">
+                                            <a href="{% url 'realestates:pay_employee' %}" class="menu-link">
+                                                <div data-i18n="Without navbar">Pay Distributor</div>
+                                            </a>
+                                         </li>
+                                        <li class="menu-item">
+                                            <a href="{% url 'realestates:client_list' %}" class="menu-link">
+                                            <div data-i18n="Without menu">Record Client Payment</div>
+                                            </a>
+                                         </li>
+                                         <li class="menu-item">
+                                            <a href="{% url 'realestates:clients_with_lands' %}" class="menu-link">
+                                            <div data-i18n="Without menu">Complete Land Pay</div>
+                                            </a>
+                                         </li>
+                                    </ul>
+                                </li>
+
+                                <li class="menu-item">
+                                    <a href="{% url 'realestates:free_clients' %}" class="menu-link">
+                                        <i class="fas fa-users me-2"></i>Free Clients</a>
+                                </li>
+
+
+                                {% if user.is_superuser %}
+                                <li class="menu-item">
+                                    <a href="javascript:void(0);" class="menu-link menu-toggle"> <i class="fa fa-gear me-2"></i> <div data-i18n="Layouts">Settings</div> </a>
+                                    <ul class="menu-sub">
+                                        <li class="menu-item"><a href="{% url 'realestates:get_employee_with_clients_and_payments' %}" class="menu-link"> <div data-i18n="Without menu">Download Data</div> </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                {% endif %}
+
+                            </ul>
+                        {% else %}
+                        <!-- Student -->
+                        <ul class="menu-inner py-1">
+                                <!-- Dashboard -->
+                                <li class="menu-item active"><a href="{% url 'realestates:employee_dashboard' %}" class="menu-link"> <i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+                                </li>
+                                <li class="menu-item">
+                                    <a href="javascript:void(0);" class="menu-link menu-toggle">
+                                        <i class="fa fa-credit-card custom me-2"></i>
+                                        <div data-i18n="Layouts">Payments</div> </a>
+                                    <ul class="menu-sub">
+                                         <li class="menu-item">
+                                            <a href="{% url 'realestates:employee_pay_breakdown' %}" class="menu-link">
+                                                <div data-i18n="Without navbar">Distributor Pay</div>
+                                            </a>
+                                         </li>
+                                    </ul>
+                                </li>
+                                <li class="menu-item">
+                                    <a href="javascript:void(0);" class="menu-link menu-toggle">
+                                        <i class="fa fa-keyboard me-2"></i>
+                                        <div data-i18n="Layouts">Data Entry</div> </a>
+                                    <ul class="menu-sub">
+                                         <li class="menu-item">
+                                            <a href="{% url 'realestates:client_entry' %}" class="menu-link">
+                                                <div data-i18n="Without navbar">Add Client</div>
+                                            </a>
+                                         </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        {% endif %}
+                    {% endif %}
+
+
+                </aside>
+                <!-- / Menu -->
+
+                <!-- Layout container -->
+                <div class="layout-page">
+                    <!-- Navbar -->
+                    <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
+                        <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+                            <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)"> <i class="fa fa-bars" aria-hidden="true"></i> </a>
+                        </div>
+                        <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+                            <!-- Search -->
+                            <div class="navbar-nav align-items-center">
+                                <div class="nav-item d-flex align-items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24">
+                                        <path fill="currentColor" d="M10 18a7.952 7.952 0 0 0 4.897-1.688l4.396 4.396l1.414-1.414l-4.396-4.396A7.952 7.952 0 0 0 18 10c0-4.411-3.589-8-8-8s-8 3.589-8 8s3.589 8 8 8m0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6s-6-2.691-6-6s2.691-6 6-6"/>
+                                    </svg>
+                                    <input type="text" class="form-control border-0 shadow-none" placeholder="Search..." aria-label="Search..."/>
+                                </div>
+                            </div>
+                            <!-- /Search -->
+                            <ul class="navbar-nav flex-row align-items-center ms-auto">
+                                <li class="nav-item navbar-dropdown dropdown-user dropdown">
+                                    <div class="nav-item dropdown">
+                                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                                            <img class="rounded-circle" src="{{user.employee.profile_pic.url}}" alt="" style="width: 50px; height: 50px;">
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
+                                            <a class="dropdown-item" href="{% url 'realestates:edit_user_profile_new' %}"><i class="fas fa-user-edit text-warning"></i> Edit Profile</a>
+                                            <a href="{% url 'realestates:change_password' %}" class="dropdown-item"><i class="fas fa-user-cog text-success"></i> Change Password</a>
+                                            <form method="post" action="{% url 'realestates:logout' %}">
+                                                {% csrf_token %}
+                                                <button class="dropdown-item"><i class="fas fa-sign-in-alt text-primary"></i> Log out</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </li>
+                                <!--/ User -->
+                            </ul>
+                        </div>
+                    </nav>
+                    <!-- Content wrapper -->
+                    <div class="content-wrapper">
+                        <div class="container-xxl flex-grow-1 container-p-y">
+                            {% block content %}
+                            {% endblock %}
+                        </div>
+
+
+                        {% block footer %}
+                        {% endblock %}
+                        <div class="content-backdrop fade"></div>
+
+                    </div>
+
+
+
+
+                </div>
+                <!-- / Layout page -->
+            </div>
+            <!-- Overlay -->
+            <div class="layout-overlay layout-menu-toggle"></div>
+            <div class="drag-target" style="touch-action: pan-y; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></div>
+        </div>
+
+        <!-- / Layout wrapper -->
+        <!-- Core JS -->
+        <!-- build:js assets/vendor/js/core.js -->
+        <script src="{% static 'rise/js/jquery.js' %}"></script>
+        <script src="{% static 'rise/js/popper.js' %}"></script>
+
+
+        <script src="{% static 'rise/js/bootstrap.js' %}"></script>
+
+        <script src="{% static 'rise/js/perfect-scrollbar.js' %}"></script>
+        <script src="{% static 'rise/js/menu.js' %}"></script>
+        <!-- endbuild -->
+        <!-- Vendors JS -->
+        <script src="{% static 'rise/js/apexcharts.js' %}"></script>
+        <!-- Main JS -->
+        <script src="{% static 'rise/js/main.js' %}"></script>
+        <!-- Page JS -->
+        <script src="{% static 'rise/js/dashboards-analytics.js' %}"></script>
+        <!-- My scriptys-->
+        <script type="text/javascript" src="{% static 'rise/js/loader.js' %}"></script>
+
+        <!--
+        <script src="{% static 'rise/js/dashboard.js' %}"></script>
+        -->
+        <script src="{% static 'rise/js/jquery.min.js' %}"></script>
+        <script src="{% static 'rise/js/js.cookie.min.js' %}"></script>
+        <script type="text/javascript">
+          var csrftoken = Cookies.get('csrftoken');
+              function csrfSafeMethod(method) {
+                // these HTTP methods do not require CSRF protection
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+              }
+              $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                  if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                  }
+                }
+              });
+
+            $(document).ready(function () {
+
+                {% block domready %}
+                {% endblock %}
+
+            });
+        </script>
+        {% block add_js %}
+        {% endblock %}
+    </body>
+</html>

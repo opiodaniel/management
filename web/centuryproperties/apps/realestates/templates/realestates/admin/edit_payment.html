@@ -6,46 +6,56 @@
    Edit Payment
 {% endblock %}
 
-{% block SubNavbar %}
- <div class="nav-item dropdown">
-     <a href="{% url 'realestates:admin_dashboard' request.user.id %}" class="nav-item nav-link"><i class="fas fa-home"></i>Home</a>
- </div>
-{% endblock SubNavbar %}
 
 {% block content %}
-<div class="container-fluid pt-4 px-4">
-    <div class="row g-4">
-        <div class="col-sm-12 col-xl-6">
-            <div class="bg-secondary rounded p-4">
-                <h6>Edit Payment for {{ payment.client_land.client.name }}</h6>
-                <form method="POST" action="{% url 'realestates:edit_payment' payment.id %}">
-                    {% csrf_token %}
-                    <div class="form-group mb-3">
-                        {{ form.client_land.label_tag }}
-                        {{ form.client_land }}
-                    </div>
-                    <div class="form-group mb-3">
-                        {{ form.amount_paid.label_tag }}
-                        {{ form.amount_paid }}
-                    </div>
-                    <div class="form-group mb-3">
-                        {{ form.timestamp.label_tag }}
-                        {{ form.timestamp }}
-                    </div>
-                    <div class="form-group mb-3">
-                        {{ form.approved.label_tag }}
-                        {{ form.approved }}
-                    </div>
-                    <div class="form-group mb-3">
-                        {{ form.employee.label_tag }}
-                        {{ form.employee }}
-                    </div>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                    <input type="submit" class="btn btn-warning" value="Cancel" onclick="window.history.go(-1)" >
-                </form>
-            </div>
+<div class="row g-6">
+  <!-- Vehicles overview -->
+  <div class="col-xxl-6">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <div class="card-title mb-0">
+            <h6 class="m-0 me-2">Edit Payment for <span class="text-primary">{{ payment.client_land.client.name }}</span></h6>
         </div>
+      </div>
+      <div class="card-body">
+          {% if messages %}
+            <div>
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+          {% endif %}
+          <form method="POST" action="{% url 'realestates:edit_payment' payment.id %}">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                    {{ form.client_land.label_tag }}
+                    {{ form.client_land }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form.amount_paid.label_tag }}
+                    {{ form.amount_paid }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form.timestamp.label_tag }}
+                    {{ form.timestamp }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form.approved.label_tag }}
+                    {{ form.approved }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form.employee.label_tag }}
+                    {{ form.employee }}
+                </div>
+                <button type="submit" class="btn btn-info">Save Changes</button>
+                <button type="button" class="btn btn-danger" onclick="window.history.back()">Cancel</button>
+          </form>
+      </div>
     </div>
+  </div>
+  <!--/ Vehicles overview -->
 </div>
 {% endblock %}
 
@@ -62,7 +72,4 @@
         input.value = value;
     }
 </script>
-{% endblock %}
-
-{% block footer %}
 {% endblock %}

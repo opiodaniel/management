@@ -39,66 +39,83 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid pt-4 px-4">
-    <div class="bg-secondary text-center rounded p-4">
-        <div class="d-flex align-items-center justify-content-between mb-4">
-            <h4 class="mb-0">Clients and Their Purchased Lands</h4>
+
+<div class="col-12">
+    <div class="card">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <div class="card-title mb-0">
+          <h5 class="m-0 me-2">Clients and Their Purchased Lands</h5>
         </div>
-         <!-- Search Form -->
-        <form method="get" action="{% url 'realestates:clients_with_lands' %}">
-            <div class="input-group mb-4">
-                <input type="text" name="search" class="form-control custom-border " placeholder="Search by Phone Number" value="{{ search_query }}">
-                <button class="btn btn-outline-info" type="submit">Search</button>
+      </div>
+      <div class="card-datatable table-responsive">
+            <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                <div class="table-responsive">
+                   <table class="table table-striped">
+                        <thead>
+                            <tr class="text-info">
+                                <th>Client Name</th>
+                                <th>Phone Number</th>
+                                <th>Purchased Lands</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for client in page_obj %}
+                                <tr class="client-rowe">
+                                    <td>{{ client.name }}</td>
+                                    <td>{{ client.phoneNumber1 }}</td>
+                                    <td>
+                                        <ul class="land-list">
+                                            {% for land in client.client_lands.all %}
+                                                {% if land.payment_complete %}
+                                                    <li>
+                                                        <a href="{% url 'realestates:land_transaction_history' land.id %}"> &#10004; {{ land.land.plot_number }} - {{ land.land.location }}</a>
+                                                    </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                   </table>
+                </div>
             </div>
-        </form>
-
-        <table class="table table-striped">
-            <thead>
-                <tr class="text-info">
-                    <th>Client Name</th>
-                    <th>Phone Number</th>
-                    <th>Purchased Lands</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for client in page_obj %}
-                    <tr class="client-rowe">
-                        <td>{{ client.name }}</td>
-                        <td>{{ client.phoneNumber1 }}</td>
-                        <td>
-                            <ul class="land-list">
-                                {% for land in client.client_lands.all %}
-                                    {% if land.payment_complete %}
-                                        <li>
-                                            <a href="{% url 'realestates:land_transaction_history' land.id %}"> &#10004; {{ land.land.plot_number }} - {{ land.land.location }}</a>
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
+      </div>
         <!-- Pagination Controls -->
-        <div class="pagination">
-            <span class="step-links">
+       <div class="pagination mt-1" style="margin-left:4px">
+            <ul class="pagination justify-content-center">
                 {% if page_obj.has_previous %}
-                    <a href="?search={{ search_query }}&page=1">&laquo; first</a>
-                    <a href="?search={{ search_query }}&page={{ page_obj.previous_page_number }}">previous</a>
+                    <li class="page-item">
+                        <a class="page-link" href="?search={{ search_query }}&page=1">&laquo; first</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?search={{ search_query }}&page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
                 {% endif %}
 
-                <span class="current">
-                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-                </span>
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > page_obj.number|add:'-5' and num < page_obj.number|add:'5' %}
+                        <li class="page-item"><a class="page-link" href="?search={{ search_query }}&page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
 
                 {% if page_obj.has_next %}
-                    <a href="?search={{ search_query }}&page={{ page_obj.next_page_number }}">next</a>
-                    <a href="?search={{ search_query }}&page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                    <li class="page-item">
+                        <a class="page-link" href="?search={{ search_query }}&page={{ page_obj.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?search={{ search_query }}&page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                    </li>
                 {% endif %}
-            </span>
-        </div>
+            </ul>
+       </div>
+
     </div>
 </div>
 {% endblock %}

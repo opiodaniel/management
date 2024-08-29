@@ -6,76 +6,90 @@
    Attach Land to {{ client.name }}
 {% endblock %}
 
-{% block SubNavbar %}
- <div class="nav-item dropdown">
-     <a href="{% url 'realestates:admin_dashboard' request.user.id %}" class="nav-item nav-link"><i class="fas fa-home"></i>Home</a>
- </div>
-{% endblock SubNavbar %}
+
 
 {% block content %}
-<div class="container-fluid pt-4 px-4">
-    <div class="row g-4">
-        <div class="col-sm-12 col-xl-6">
-            <div class="bg-secondary rounded p-4">
-                <h6 class="mb-4">Attach Land to <span class="text-info">{{ client.name }}</span></h6>
 
-                {% if messages %}
-                    <div>
-                        {% for message in messages %}
-                            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
+<div class="row g-6">
+  <!-- Vehicles overview -->
+  <div class="col-xxl-6">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <div class="card-title mb-0">
+              <span class="text-danger">NOTE:
+                  <span class="text-info">IF YOU ENTER A WRONG LAND PRICE OR WRONG PLOT NUMBER,
+                  PLEASE GO TO THE LAND LIST TAB AND EDIT IT BEFORE RECORDING CLIENT PAYMENT.</span>
+              </span>
+          <h6 class="m-0 me-2">Attach Land to <span class="text-primary">{{ client.name }}</span></h6>
+        </div>
+      </div>
+      <div class="card-body">
+          {% if messages %}
+            <div>
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                        {{ message }}
                     </div>
-                {% endif %}
+                {% endfor %}
+            </div>
+          {% endif %}
+          <form method="POST" action="{% url 'realestates:attach_land_to_client' client.id %}">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                    {{ landform.plot_number.label_tag }}
+                    {{ landform.plot_number }}
+                    {% if landform.plot_number.errors %}
+                        <div class="text-danger">
+                            {{ landform.plot_number.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="form-group mb-3">
+                    {{ landform.location.label_tag }}
+                    {{ landform.location }}
+                    {% if landform.location.errors %}
+                        <div class="text-danger">
+                            {{ landform.location.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="form-group mb-3">
+                    {{ landform.price.label_tag }}
+                    {{ landform.price }}
+                    {% if landform.price.errors %}
+                        <div class="text-danger">
+                            {{ landform.price.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-info">Submit</button>
+          </form>
+      </div>
+    </div>
+  </div>
+  <!--/ Vehicles overview -->
 
-                <form method="POST" action="{% url 'realestates:attach_land_to_client' client.id %}">
-                    {% csrf_token %}
-                    <div class="form-group mb-3">
-                        {{ landform.plot_number.label_tag }}
-                        {{ landform.plot_number }}
-                        {% if landform.plot_number.errors %}
-                            <div class="text-danger">
-                                {{ landform.plot_number.errors }}
-                            </div>
-                        {% endif %}
-                    </div>
-                    <div class="form-group mb-3">
-                        {{ landform.location.label_tag }}
-                        {{ landform.location }}
-                        {% if landform.location.errors %}
-                            <div class="text-danger">
-                                {{ landform.location.errors }}
-                            </div>
-                        {% endif %}
-                    </div>
-                    <div class="form-group mb-3">
-                        {{ landform.price.label_tag }}
-                        {{ landform.price }}
-                        {% if landform.price.errors %}
-                            <div class="text-danger">
-                                {{ landform.price.errors }}
-                            </div>
-                        {% endif %}
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
+  <!-- Shipment statistics-->
+  <div class="col-xxl-6 col-lg-7">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center justify-content-between">
+            <div class="card-title mb-0">
+              <h6 class="m-0 me-2">Lands Attached to <span class="text-primary">{{ client.name }}</span></h6>
             </div>
         </div>
-        <div class="col-sm-12 col-xl-6">
-            <div class="bg-secondary rounded h-100 p-4">
-                <h6 class="mb-4">Lands Attached to <span class="text-info">{{ client.name }}</span></h6>
-                <ul class="list-group">
-                    {% for client_land in client_lands %}
-                        <li class="list-group-item">
-                            {{ client_land.land.plot_number }} - {{ client_land.land.location }} - {{ client_land.land.price|add_commas }}
-                        </li>
-                    {% endfor %}
-                </ul>
-                <a href="{% url 'realestates:record_payment' client.id %}" class="btn btn-info mt-3">Record Payment</a>
-            </div>
+        <div class="card-body">
+            <ul class="list-group">
+                {% for client_land in client_lands %}
+                    <li class="list-group-item">
+                        {{ client_land.land.plot_number }} - {{ client_land.land.location }} - {{ client_land.land.price|add_commas }}
+                    </li>
+                {% endfor %}
+            </ul>
+            <a href="{% url 'realestates:record_payment' client.id %}" class="btn btn-info mt-3">Record Client Payment</a>
         </div>
     </div>
+  </div>
+  <!--/ Shipment statistics -->
 </div>
 {% endblock %}
 

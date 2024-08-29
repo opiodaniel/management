@@ -1,0 +1,27 @@
+{% extends "base_eternal.html" %}
+{% load static %}
+
+{% block title %}Confirm Delete{% endblock title%}
+
+{% block style %}
+{% endblock style %}
+
+{% block content %}
+<div class="overflow-auto row">
+    <div class="col-lg-6 mb-4 col-md-4 order-0">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2>Confirm Delete</h2>
+                    <p>Are you sure you want to delete  Distributor: <span class="text-info">{{ employee.user.get_full_name }}
+                        -<span class="text-danger">username:</span> {{ employee.user.username }}</span>?</p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                        <input type="button" class="btn btn-warning" onclick="window.history.go(-1)" value="Cancel">
+                    </form>
+                </div>
+            </div>
+    </div>
+</div>
+{% endblock %}
+

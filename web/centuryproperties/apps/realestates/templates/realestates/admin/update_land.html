@@ -1,0 +1,83 @@
+{% extends "base_admin_dashboard.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}
+  Edit Land
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="row g-6">
+  <!-- Vehicles overview -->
+  <div class="col-xxl-6">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <div class="card-title mb-0">
+          <h6 class="m-0 me-2">Edit Land</h6>
+        </div>
+      </div>
+      <div class="card-body">
+          {% if messages %}
+            <div>
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+          {% endif %}
+          <form method="POST" action="{% url 'realestates:update_land' land.id %}">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                    {{ landform.plot_number.label_tag }}
+                    {{ landform.plot_number }}
+                    {% if landform.plot_number.errors %}
+                        <div class="text-danger">
+                            {{ landform.plot_number.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="form-group mb-3">
+                    {{ landform.location.label_tag }}
+                    {{ landform.location }}
+                    {% if landform.location.errors %}
+                        <div class="text-danger">
+                            {{ landform.location.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="form-group mb-3">
+                    {{ landform.price.label_tag }}
+                    {{ landform.price|add_commas }}
+                    {% if landform.price.errors %}
+                        <div class="text-danger">
+                            {{ landform.price.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-info">Submit</button>
+                <input type="button" class="btn btn-danger" onclick="window.history.go(-1)" value="Cancel">
+          </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block add_js %}
+<script>
+    function formatAmount(input) {
+        // Remove existing commas and non-numeric characters from the input
+        let value = input.value.replace(/[^\d]/g, '');
+
+        // Add commas to the value
+        value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+        // Update the input value
+        input.value = value;
+    }
+</script>
+{% endblock %}

@@ -57,6 +57,10 @@ class AvicDataProcessing(BaseDataProcessing, BasePotentialAlgo, AvicAlgo):
             df['payment_approved'] = df['payment_approved'].fillna(False)
             df['payment_date'] = pd.to_datetime(df['payment_date'], errors='coerce').fillna(pd.Timestamp('2023-01-01'))
 
+            # Convert 'date_client_entered' to datetime and handle invalid dates
+            df['date_client_entered'] = pd.to_datetime(df['date_client_entered'], errors='coerce').fillna(
+                pd.Timestamp('2023-01-01'))
+
             # Dictionary to track phone numbers and their associated clients
             phone_number_tracker = {}
 
@@ -91,6 +95,7 @@ class AvicDataProcessing(BaseDataProcessing, BasePotentialAlgo, AvicAlgo):
                 else:
                     phone_number_tracker[phone_number] = [row['client_name']]
 
+                date_client_entered = pd.to_datetime(row['date_client_entered']).date()
                 # Ensure client exists and is associated with the employee
                 client, created = Client.objects.get_or_create(
                     phoneNumber1=phone_number,
@@ -98,6 +103,7 @@ class AvicDataProcessing(BaseDataProcessing, BasePotentialAlgo, AvicAlgo):
                         'name': row['client_name'],
                         'phoneNumber2': row['client_contact2'],
                         'location': row['client_location'],
+                        'date': date_client_entered,
                         'employee': employee
                     }
                 )
@@ -105,6 +111,7 @@ class AvicDataProcessing(BaseDataProcessing, BasePotentialAlgo, AvicAlgo):
                     client.name = row['client_name']
                     client.phoneNumber2 = row['client_contact2']
                     client.location = row['client_location']
+                    client.date = date_client_entered
                     client.employee = employee
                     client.save()
 

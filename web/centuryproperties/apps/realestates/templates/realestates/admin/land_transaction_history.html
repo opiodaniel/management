@@ -5,31 +5,41 @@
 {% block title %}Transaction History{% endblock %}
 
 {% block content %}
-<div class="container-fluid pt-4 px-4">
-    <div class="bg-secondary text-center rounded p-4">
-        <div class="d-flex align-items-center justify-content-between mb-4">
-            <h4 class="mb-0">Transaction History for {{ client_land.land.plot_number }} - {{ client_land.land.location }}</h4>
+<div class="col-12">
+    <div class="card">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <div class="card-title mb-0">
+          <h5 class="m-0 me-2">Transaction History for {{ client_land.land.plot_number }} - {{ client_land.land.location }}</h5>
         </div>
-        <table class="table text-start align-middle table-bordered table-hover mb-0">
-            <thead>
-                <tr class="text-info">
-                    <th scope="col">Date</th>
-                    <th scope="col">Paid</th>
-                </tr>
-            </thead>
-            <tbody class="text-white">
-                {% for transaction in transactions %}
-                    <tr>
-                        <td>{{ transaction.timestamp|date:"Y-m-d" }}</td>
-                        <td>{{ transaction.amount_paid|add_commas }}</td>
-                    </tr>
-                {% endfor %}
-            <tr class="text-danger">
-                <td><strong>Total:</strong></td>
-                <td><strong>{{ total_amount_paid|add_commas }}</strong></td>
-            </tr>
-            </tbody>
-        </table>
+      </div>
+      <div class="card-datatable table-responsive">
+            <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                <div class="table-responsive">
+                   <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                        <table id="scroll-table" class="table table-bordered table-hover mb-0">
+                            <thead>
+                                <tr class="text-primary">
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Paid</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-danger">
+                                {% for transaction in transactions %}
+                                    <tr>
+                                        <td>{{ transaction.timestamp|date:"Y-m-d" }}</td>
+                                        <td>{{ transaction.amount_paid|add_commas }}</td>
+                                    </tr>
+                                {% endfor %}
+                                <tr class="text-danger">
+                                    <td><strong>Total:</strong></td>
+                                    <td><strong>{{ total_amount_paid|add_commas }}</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+      </div>
     </div>
 </div>
 {% endblock %}

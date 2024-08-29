@@ -7,39 +7,8 @@
 {% endblock %}
 
  {% block add_css %}
-       <!--<link type="text/css" rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}"/>-->
-         <script src="{% static 'js/jquery-3.3.1.js' %}"></script>
-         <script src="{% static 'js/bootstrap.min.js' %}"></script>
-         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-         <style>
-            table {
-                        width: 100%;
-                        border-collapse: collapse;
-                    }
-
-                    th, td {
-                        padding: 8px;
-                        border: 1px solid black;
-                    }
-
-                    /* Truncate long text and display ellipsis */
-                    .truncate {
-                        white-space: nowrap;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                    }
-
-                    /* Responsive styles */
-                    @media screen and (max-width: 600px) {
-                        th, td {
-                            padding: 4px;
-                        }
-
-                        .truncate {
-                                max-width: 90px; /* Adjust max-width as needed */
-                            }
-                    }
-        </style>
+ <script src="{% static 'js/jquery-3.3.1.js' %}"></script>
+ <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
 {% block SubNavbar %}
@@ -59,176 +28,240 @@
 {% endblock SubNavbar %}
 
 {% block content %}
-<!-- Monthly Sales  Start -->
- <div class="container-fluid pt-4 px-4">
-    <div class="row g-4">
-        <div class="col-sm-6 col-xl-3">
-            <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
-                <i class="fa fa-chart-line fa-3x text-success"></i>
-                <div class="ms-3">
-                    <p class="mb-2">Monthly Sale</p>
-                    <h6 class="mb-0">Shs:{{total_amount_month}}</h6>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
-                <i class="fa fa-chart-bar fa-3x text-info"></i>
-                <div class="ms-3">
-                    <p class="mb-2">Total Sale</p>
-                    <h6 class="mb-0">Shs:{{total_sales_previous_months_sum}}</h6>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
-                <i class="fa fa-users text-warning" aria-hidden="true" style='font-size:50px;'></i>
-                <div class="ms-3">
-                    <p class="mb-2">Distributors</p>
-                    <h6 class="mb-0">{{total_number_employees}}</h6>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
-                <i class="fa fa-user-friends" aria-hidden="true" style='font-size:50px;color:blue'></i>
-                <div class="ms-3">
-                    <p class="mb-2">Clients</p>
-                    <h6 class="mb-0">{{total_num_clients_}}</h6>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Monthly Sales Start End -->
 
-<!-- All Monthly Sales Start -->
- <div class="container-fluid pt-4 px-4">
-    <div class="bg-secondary text-center rounded p-4">
-        <div class="d-flex align-items-center justify-content-between mb-4">
-            <h6 class="mb-0">All Monthly Sale</h6>
+<div class="row g-6">
+      <!-- Card Border Shadow -->
+      <div class="col-lg-3 col-sm-6">
+        <div class="card card-border-shadow-success h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-2">
+              <div class="avatar me-4">
+                <span class="avatar-initial rounded bg-label-success"><i class="fa fa-chart-line fa-3x text-success"></i></span>
+              </div>
+              <h4 class="mb-0">{{total_amount_month}}</h4>
+            </div>
+            <p class="mb-2">Monthly Sale</p>
+            <p class="mb-0">
+              <!--
+              <span class="text-heading fw-medium me-2">+18.2%</span>
+              <span class="text-muted">than last week</span>
+              -->
+            </p>
+          </div>
         </div>
-        <div id="table_content" class="table-responsive" style="max-height: 500px; overflow-y: auto;">
-            <table class="table text-start align-middle table-bordered table-hover mb-0">
-                <thead>
-                    <tr class="text-info">
-                        <th scope="col">Date</th>
-                        <th scope="col">Amount</th>
-                        <th scope="col">More info</th>
-                    </tr>
-                </thead>
-                <tbody style="cursor:pointer" class="text-white">
-                    {% for data in monthly_data %}
-                    <tr onclick="showSubTable(this)">
-                        <td>{{ data.date }}</td>
-                        <td>{{ data.amount }}</td>
-                        <td><i class="fas fa-info-circle"></i></td>
-                    </tr>
-                    <!-- Hidden sub-table -->
-                    <tr class="sub-table-row" style="display:none;">
-                        <td colspan="2">
-                            <h5>Transactions made in {{data.date}} </h5>
-                            <div style= "max-height: 200px; overflow-y: auto;">
-                            <table id="customer" style="max-height: 200px; overflow-y: auto;">
+      </div>
+      <div class="col-lg-3 col-sm-6">
+        <div class="card card-border-shadow-info h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-2">
+              <div class="avatar me-4">
+                <span class="avatar-initial rounded bg-label-info"><i class="fa fa-chart-bar fa-3x text-info"></i></span>
+              </div>
+              <h4 class="mb-0">{{total_sales_previous_months_sum}}</h4>
+            </div>
+            <p class="mb-2">Total Sale</p>
+            <p class="mb-0">
+              <!--
+              <span class="text-heading fw-medium me-2">-8.7%</span>
+              <span class="text-muted">than last week</span>
+              -->
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-sm-6">
+        <div class="card card-border-shadow-danger h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-2">
+              <div class="avatar me-4">
+                <span class="avatar-initial rounded bg-label-danger"><i class="fa fa-users text-warning" aria-hidden="true" style='font-size:50px;'></i></span>
+              </div>
+              <h4 class="mb-0">{{total_number_employees}}</h4>
+            </div>
+            <p class="mb-2">All Distributors</p>
+            <p class="mb-0">
+              <!--
+              <span class="text-heading fw-medium me-2">+4.3%</span>
+              <span class="text-muted">than last week</span>
+              -->
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-sm-6">
+        <div class="card card-border-shadow-primary h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-2">
+              <div class="avatar me-4">
+                <span class="avatar-initial rounded bg-label-info"><i class="fa fa-user-friends" aria-hidden="true" style='font-size:50px;color:blue'></i></span>
+              </div>
+              <h4 class="mb-0">{{total_num_clients_}}</h4>
+            </div>
+            <p class="mb-2">All Clients</p>
+            <p class="mb-0">
+              <!--
+              <span class="text-heading fw-medium me-2">-2.5%</span>
+              <span class="text-muted">than last week</span>
+              -->
+            </p>
+          </div>
+        </div>
+      </div>
+      <!--/ Card Border Shadow -->
 
-                                  <tr>
-                                     <th>{{data.date}}</th>
-                                     <th>Amount</th>
-                                      <!--
-                                     <th>Client</th>
-                                     <th>contact</th> -->
-                                  </tr>
-                                  {% for md in  data.month_detail  %}
-                                  <tr>
-                                    <td>{{ md.timestamp }}</td>
-                                    <td>{{md.amount_paid|add_commas}}</td>
-                                    <!--
-                                    <td>{{ md.client_land.client.name }}</td>
-                                    <td>{{ md.client_land.client.phoneNumber1 }}</td> -->
-                                  </tr>
-                                 {% endfor %}
-                            </table>
+      <!-- All Monthly Sales Start -->
+      <div class="col-12">
+            <div class="card">
+              <div class="card-header d-flex align-items-center justify-content-between">
+                <div class="card-title mb-0">
+                  <h5 class="m-0 me-2">All Monthly Sale</h5>
+                </div>
+              </div>
+
+              <div class="card-datatable table-responsive">
+                    <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                        <div class="table-responsive">
+                           <div id="table_content" class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                                <table class="table text-start align-middle table-bordered table-hover mb-0">
+                                    <thead>
+                                        <tr class="text-dark">
+                                            <th scope="col">Date</th>
+                                            <th scope="col">Amount</th>
+                                            <th scope="col">More info</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="cursor:pointer" class="text-dark">
+                                        {% for data in monthly_data %}
+                                        <tr onclick="showSubTable(this)">
+                                            <td>{{ data.date }}</td>
+                                            <td>{{ data.amount }}</td>
+                                            <td><i class="fas fa-info-circle"></i></td>
+                                        </tr>
+                                        <!-- Hidden sub-table -->
+                                        <tr class="sub-table-row" style="display:none;">
+                                            <td colspan="3">
+                                                <h5>Transactions made in {{ data.date }}</h5>
+                                                <div style="max-height: 200px; overflow-y: auto;">
+                                                    <table id="customer" class="table table-bordered">
+                                                        <thead class="thead-light">
+                                                            <tr>
+                                                                <th>Date</th>
+                                                                <th>Amount</th>
+                                                                <!--
+                                                                <th>Client</th>
+                                                                <th>Contact</th> -->
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {% for md in data.month_detail %}
+                                                            <tr>
+                                                                <td>{{ md.timestamp }}</td>
+                                                                <td>{{ md.amount_paid|add_commas }}</td>
+                                                                <!--
+                                                                <td>{{ md.client_land.client.name }}</td>
+                                                                <td>{{ md.client_land.client.phoneNumber1 }}</td> -->
+                                                            </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                        <!-- Add more rows as needed -->
+                                    </tbody>
+                                </table>
                             </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    <!-- Add more rows as needed -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-<!-- Monthly Sales  End -->
-
-<!-- Graph of Approved/pending Detail  -->
- <div class="container-fluid pt-4 px-4">
-    <div class="row g-4">
-
-        <div class="col-sm-12 col-xl-9">
-            <div class="bg-secondary text-center rounded h-100  p-4">
-                 <input type="number" id="thresholdInput1" value="{{default_threshold_input}}" style="text-align:center; width: 50px; height: 30px"  />
-                 <button id="updateThresholdButton1" type="button" class="btn btn-info btn-sm mb-1">Update Threshold</button>
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h6 class="mb-0">Approved clients</h6>
-                </div>
-                <canvas id="clientsChart" width="400" height="100"></canvas>
+                        </div>
+                    </div>
+              </div>
             </div>
-        </div>
-        <div class="col-sm-12 col-xl-3">
-            <div class="bg-secondary text-center rounded h-80 p-4">
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h6 class="mb-0">Clients Overview</h6>
-                </div>
-                <canvas id="clientsPieChart"></canvas>
+      </div>
+      <!-- Monthly Sales Start End -->
+
+      <!--bar Graph of Employees with Approved client  -->
+      <div class="col-xxl-9">
+        <div class="card h-100">
+          <div class="card-header d-flex align-items-center justify-content-between">
+            <div class="card-title mb-0">
+                <input type="number" id="thresholdInput1" value="{{default_threshold_input}}" style="text-align:center; width: 50px; height: 30px" />
+                <button id="updateThresholdButton1" type="button" class="btn btn-info btn-sm mb-1">Update Threshold</button>
+                <h5 class="m-0 me-2">Approved clients</h5>
             </div>
+          </div>
+          <div class="card-body">
+              <canvas id="clientsChart" width="400" height="100"></canvas>
+          </div>
         </div>
+      </div>
+      <!--/ End -->
 
-    </div>
-</div>
-
-
-<!-- client table data -->
-<div class="container-fluid pt-4 px-4">
-    <div class="bg-secondary text-center rounded p-4">
-        <h6 class="mb-3">Performance</h6>
-        <div class="d-flex align-items-center justify-content-between mb-4">
+      <!--Graph of Approved/pending Detail-->
+      <div class="col-xxl-3 col-lg-5">
+        <div class="card h-100">
+          <div class="card-header d-flex justify-content-between">
+            <div class="card-title mb-0">
+              <h5 class="mb-1 me-2">Clients Overview</h5>
+              <!--<p class="card-subtitle">12% increase in this month</p>-->
+            </div>
+          </div>
+          <div class="card-body">
+            <canvas id="clientsPieChart"></canvas>
+          </div>
         </div>
-        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-            <table id="scroll-table">
-                <thead>
-                    <tr class="text-info">
-                        <th scope="col">Name</th>
-                        <th scope="col">Clients</th>
-                        <th scope="col"><i class="fas fa-check-circle" style='font-size:25px'></i></th>
-                        <th scope="col"><i class='fas fa-question-circle' style='font-size:25px'></i></th>
-                        <th scope="col">Rate</th>
-                    </tr>
-                </thead>
-                <tbody class="text-white" id="employeeTableBody">
+      </div>
+      <!--/ Graph of Approved/pending Detail -->
 
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-<!-- client table data End  -->
-
-<!-- Back to Top -->
-<a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+      <!-- Performance -->
+      <div class="col-12">
+            <div class="card">
+              <div class="card-header d-flex align-items-center justify-content-between">
+                <div class="card-title mb-0">
+                  <h5 class="m-0 me-2">Performance</h5>
+                </div>
+              </div>
+              <div class="card-datatable table-responsive">
+                    <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                        <div class="table-responsive">
+                           <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                                <table id="scroll-table" class="table table-bordered table-hover mb-0">
+                                    <thead>
+                                        <tr class="text-primary">
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Clients</th>
+                                            <th scope="col"><i class="fas fa-check-circle" style='font-size:25px'></i></th>
+                                            <th scope="col"><i class='fas fa-question-circle' style='font-size:25px'></i></th>
+                                            <th scope="col">Rate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-dark" id="employeeTableBody">
+                                        <!-- Add your rows here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+              </div>
+            </div>
+      </div>
+      <!-- / Performance -->
+  </div>
 {% endblock %}
 
  <!-- Footer Start -->
 {% block footer %}
- <div class="container-fluid pt-4 px-4">
-    <div class="bg-secondary rounded-top p-4">
-        <div class="row">
-            <div class="col-12 col-sm-6 text-center text-sm-start">
-                &copy; <a href="#">@AcDantez</a>, All Right Reserved.
-            </div>
-            <div class="col-12 col-sm-6 text-center text-sm-end">
-                <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
-                Designed By <a href="#">@AcDantez</a>
-                <br>Distributed By: <a href="#">@AcDantez</a>
+<div class="content-wrapper">
+    <div class="container-p-y container-xxl flex-grow-1">
+        <div class="bg-light rounded-top p-4">
+            <div class="row">
+                <div class="col-12 col-sm-6 text-center text-sm-start">
+                    &copy; <a href="#">@AcDantez</a>, All Right Reserved.
+                </div>
+                <div class="col-12 col-sm-6 text-center text-sm-end">
+                    <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
+                    Designed By <a href="#">@AcDantez</a>
+                    <br>Distributed By: <a href="#">@AcDantez</a>
+                </div>
             </div>
         </div>
     </div>
@@ -276,7 +309,6 @@
                          xValue.push(employee_name);
                          yValue.push(data[employee_name]["clients"].length);
                      }
-
                         // Total number clients brought by each Employee Graph //
 
                         var ctx4 = $("#bar-chart").get(0).getContext("2d");
@@ -450,7 +482,7 @@
 
             // Create the data for the pie chart
             var data = {
-                labels: ['Clients with Land and Payment', 'Clients without Land'],
+                labels: ['approved', 'pending'],
                 datasets: [{
                     data: [{{ clients_with_land_and_payment }}, {{ clients_without_land }}],
                     backgroundColor: ['#4CAF50', '#FF9800'],
@@ -558,8 +590,8 @@
         {
             var seek_permission =  prompt("Are you sure you want to clear all data? if so type y" , 'No')
             if(seek_permission != 'y'){return;}
-            truncate_model_b("Employees")
-            truncate_model_b("client")
+            //truncate_model_b("Employees")
+            //truncate_model_b("client")
             truncate_model_b("payment")
             truncate_model_b("Commission")
             truncate_model_b("EmployeePaymentRecord")

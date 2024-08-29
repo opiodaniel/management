@@ -8,6 +8,7 @@ from django.db.models import Sum
 from django.dispatch import receiver
 from django.db.models.signals import pre_save, post_save
 from django.db import connection
+from django.core.exceptions import ValidationError
 
 
 class TruncateTableMixin:
@@ -27,7 +28,7 @@ class Company(TruncateTableMixin, models.Model):
 class Employees(TruncateTableMixin, models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='employee')
     is_administrator = models.BooleanField(default=False)
-
+    exclude_from_reassignment = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True, null=True)
     updated = models.DateTimeField(auto_now=True)
     is_confirmed = models.BooleanField(default=True)
@@ -81,7 +82,7 @@ class Employees(TruncateTableMixin, models.Model):
         return Payment.objects.filter(client_land__client__employee=self, approved=True).count()
 
     def total_appending_clients(self):
-        return Client.objects.filter(employee=self,  client_lands__isnull=True).count()
+        return Client.objects.filter(employee=self, client_lands__isnull=True).count()
 
     @classmethod
     def total_approved_clients_for_all_employee(cls):
@@ -95,6 +96,18 @@ class Employees(TruncateTableMixin, models.Model):
         return self.user.get_full_name()
 
 
+@receiver(post_save, sender=User)
+def create_employee(sender, instance, created, **kwargs):
+    if created:
+        Employees.objects.create(user=instance)
+
+
+@receiver(post_save, sender=User)
+def save_employee(sender, instance, created, **kwargs):
+    if created:
+        instance.employee.save()
+
+
 class Client(TruncateTableMixin, models.Model):
     name = models.CharField(max_length=100)
     phoneNumber1 = models.CharField(max_length=15, blank=True, default='', validators=[MinLengthValidator(7)])
@@ -102,9 +115,20 @@ class Client(TruncateTableMixin, models.Model):
     location = models.CharField(max_length=30, default='', blank=True, null=True)
     date = models.DateTimeField(auto_now_add=True, null=True)
     employee = models.ForeignKey(Employees, on_delete=models.SET_NULL, null=True, related_name="clients")
+    expired_date = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['phoneNumber1'], name='unique_phoneNumber1'),
+        ]
 
     def __str__(self):
         return self.name
+
+    def is_editable(self):
+        if self.date is None:
+            return False
+        return timezone.now() <= self.date + timedelta(hours=5)
 
 
 class Land(TruncateTableMixin, models.Model):
@@ -113,8 +137,21 @@ class Land(TruncateTableMixin, models.Model):
     price = models.IntegerField(default=0)
     available = models.BooleanField(default=True)
 
+    class Meta:
+        constraints = [
+            models.CheckConstraint(check=models.Q(price__gt=0), name='price_gt_0'),
+        ]
+
     def __str__(self):
         return self.plot_number
+
+    def clean(self):
+        if self.price <= 0:
+            raise ValidationError("Land price must be greater than zero.")
+
+    def save(self, *args, **kwargs):
+        self.clean()  # Ensure clean method is called before saving
+        super().save(*args, **kwargs)
 
 
 class ClientLand(TruncateTableMixin, models.Model):
@@ -178,14 +215,15 @@ class Payment(TruncateTableMixin, models.Model):
 class Commission(models.Model):
     employee = models.ForeignKey(Employees, on_delete=models.CASCADE, related_name='commissions', null=True)
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='commissions', null=True)
+    client_land = models.ForeignKey(ClientLand, on_delete=models.CASCADE, related_name='commission_payments', null=True)
     total_commission = models.IntegerField(default=0)
     date_paid = models.DateField(null=True)
 
     class Meta:
-        unique_together = ('employee', 'client')
+        unique_together = ('employee', 'client', 'client_land')
 
     def __str__(self):
-        return f"Commission for {self.employee.user.username} from {self.client.name}: {self.total_commission}"
+        return f"Commission for {self.employee.user.username} from {self.client.name} (Land: {self.client_land.land.plot_number}): {self.total_commission}"
 
 
 old_payment_amounts = {}
@@ -206,6 +244,7 @@ def update_commission(sender, instance, created, **kwargs):
         commission, _ = Commission.objects.get_or_create(
             employee=instance.client_land.client.employee,
             client=instance.client_land.client,
+            client_land=instance.client_land,
             defaults={'date_paid': instance.timestamp, 'total_commission': 0}
         )
 
@@ -237,6 +276,7 @@ def update_commission(sender, instance, created, **kwargs):
 class EmployeePaymentRecord(TruncateTableMixin, models.Model):
     employee = models.ForeignKey(Employees, on_delete=models.CASCADE, related_name='payment_records', null=True)
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='payment_records', null=True)
+    client_land = models.ForeignKey(ClientLand, on_delete=models.CASCADE, related_name='payment_records', null=True)
     total_commission = models.IntegerField(default=0)
     amount_paid = models.IntegerField(default=0)
     balance = models.IntegerField(default=0)
@@ -249,3 +289,4 @@ class EmployeePaymentRecord(TruncateTableMixin, models.Model):
         # Ensure balance is updated correctly
         self.balance = self.total_commission - self.amount_paid
         super().save(*args, **kwargs)
+

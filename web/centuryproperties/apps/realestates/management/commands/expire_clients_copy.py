@@ -4,6 +4,7 @@ from datetime import timedelta, datetime, time
 from django.utils import timezone
 from ...models import Client, Employees
 
+
 class Command(BaseCommand):
     help = 'Expire clients and assign them to the administrator'
 
@@ -16,7 +17,7 @@ class Command(BaseCommand):
             return
         # Load the Excel file with clients who expired last Sunday
         # /home/centuryproperties/management/web/centuryproperties/apps/realestates/management/
-        excel_file_path = '/home/opio/projects/management/web/centuryproperties/apps/realestates/management/commands/free_clients.xlsx'  # Update this with the actual path
+        excel_file_path = '/home/opio/projects/management/web/centuryproperties/apps/realestates/management/commands/12-latest-download.xlsx'  # Update this with the actual path
         workbook = openpyxl.load_workbook(excel_file_path)
         sheet = workbook.active
 

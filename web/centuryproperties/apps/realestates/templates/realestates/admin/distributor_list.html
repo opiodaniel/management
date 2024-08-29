@@ -1,0 +1,150 @@
+{% extends "base_admin_dashboard.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}
+   Client List
+{% endblock %}
+
+{% block add_css %}
+{% endblock %}
+
+
+{% block content %}
+<div class="card">
+  <h5 class="card-header pb-0 text-md-start text-center">Distributors</h5>
+  <div class="card-datatable text-nowrap">
+    <div id="DataTables_Table_1_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+      <div class="row">
+        <div class="col-sm-12 col-md-6">
+          <div class="dataTables_length" id="DataTables_Table_1_length">
+            <span>
+                <!-- Display messages -->
+                {% if messages %}
+                <div class="container mt-3">
+                    {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </span>
+          </div>
+        </div>
+        <div class="col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end mt-n6 mt-md-0">
+          <form id="DataTables_Table_1_filter" class="dataTables_filter d-flex" method="get">
+            <label class="me-2">Search:
+            <input type="search" name="search" value="{{ query }}" class="form-control me-2" placeholder="Search by name" aria-controls="DataTables_Table_1">
+            <button type="submit" class="btn btn-info btn-sm mb-1">Search</button></label>
+          </form>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="dt-complex-header table table-bordered dataTable no-footer" id="DataTables_Table_1" aria-describedby="DataTables_Table_1_info">
+          <thead>
+            <tr>
+              <th rowspan="2" class="sorting sorting_asc" tabindex="0" aria-controls="DataTables_Table_1" colspan="1" aria-label="Name: activate to sort column descending" aria-sort="ascending">Name</th>
+              <th colspan="2" rowspan="1">Contact</th>
+              <th colspan="3" rowspan="1">Information</th>
+              <th rowspan="2" class="sorting_disabled" colspan="1" aria-label="Actions">Actions</th>
+            </tr>
+            <tr>
+              <th class="sorting" tabindex="0" aria-controls="DataTables_Table_1" rowspan="1" colspan="1" aria-label="E-mail: activate to sort column ascending">E-mail</th>
+              <th class="sorting" tabindex="0" aria-controls="DataTables_Table_1" rowspan="1" colspan="1" aria-label="City: activate to sort column ascending">Contact</th>
+              <th class="sorting" tabindex="0" aria-controls="DataTables_Table_1" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending">Total Clients</th>
+              <th class="sorting" tabindex="0" aria-controls="DataTables_Table_1" rowspan="1" colspan="1" aria-label="Salary: activate to sort column ascending">Approved Clients</th>
+              <th class="border-1 sorting" tabindex="0" aria-controls="DataTables_Table_1" rowspan="1" colspan="1" aria-label="Status: activate to sort column ascending">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for employee in employees %}
+            <tr class="{% cycle 'odd' 'even' %}">
+              <td class="sorting_1">{{ employee.user.get_full_name }}</td>
+              <td>{{ employee.user.email }}</td>
+              <td>{{ employee.phone }}</td>
+              <td>{{ employee.total_clients }}</td>
+              <td>{{ employee.total_approved_clients }}</td>
+              <td><span class="badge  bg-label-info">Distributor Status</span></td>
+              <td>
+                <div class="d-inline-block">
+                  <a href="javascript:;" class="btn btn-icon dropdown-toggle hide-arrow me-1" data-bs-toggle="dropdown">
+                    <i class="fa fa-trash text-warning" aria-hidden="true"></i>
+                  </a>
+                  <div class="dropdown-menu dropdown-menu-end m-0">
+                    <a  class="dropdown-item text-dark">Click Delete IF You Are Sure </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{% url 'realestates:delete_employee' employee.id %}" class="dropdown-item text-danger delete-record">Confirm Delete</a>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="row">
+        <div class="col-sm-12 col-md-6">
+          <div class="dataTables_info" id="DataTables_Table_1_info" role="status" aria-live="polite">Showing {{ employees.start_index }} to {{ employees.end_index }} of {{ employees.paginator.count }} entries</div>
+        </div>
+        <div class="col-sm-12 col-md-6">
+          <div class="dataTables_paginate paging_simple_numbers" id="DataTables_Table_1_paginate">
+            <ul class="pagination">
+              {% if employees.has_previous %}
+                <li class="paginate_button page-item previous" id="DataTables_Table_1_previous">
+                  <a href="?page={{ employees.previous_page_number }}&search={{ query }}" aria-controls="DataTables_Table_1" role="link" class="page-link">
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                  </a>
+                </li>
+              {% else %}
+                <li class="paginate_button page-item previous disabled" id="DataTables_Table_1_previous">
+                  <a aria-controls="DataTables_Table_1" aria-disabled="true" role="link" class="page-link">
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                  </a>
+                </li>
+              {% endif %}
+              {% for page_num in employees.paginator.page_range %}
+                {% if employees.number == page_num %}
+                  <li class="paginate_button page-item active"><a href="#" class="page-link">{{ page_num }}</a></li>
+                {% else %}
+                  <li class="paginate_button page-item"><a href="?page={{ page_num }}&search={{ query }}" class="page-link">{{ page_num }}</a></li>
+                {% endif %}
+              {% endfor %}
+              {% if employees.has_next %}
+                <li class="paginate_button page-item next" id="DataTables_Table_1_next">
+                  <a href="?page={{ employees.next_page_number }}&search={{ query }}" aria-controls="DataTables_Table_1" role="link" class="page-link">
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                  </a>
+                </li>
+              {% else %}
+                <li class="paginate_button page-item next disabled" id="DataTables_Table_1_next">
+                  <a aria-controls="DataTables_Table_1" aria-disabled="true" role="link" class="page-link">
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block add_js %}
+<script>
+        $(document).ready(function() {
+            $('#searchInput').on('keyup', function() {
+                var searchText = $(this).val().toLowerCase();
+                $(this).closest('.bg-secondary').find('.search-table tbody tr').filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(searchText) > -1);
+                });
+            });
+        });
+</script>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

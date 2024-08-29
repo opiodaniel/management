@@ -4,8 +4,9 @@ from django.contrib import messages
 from django.contrib.auth.models import User,auth
 
 from .models import Client, Employees, Payment,  Company, Commission, Land, ClientLand
-from .forms import (ClientForm, ClientEditForm, EmployeeLoginForm, RegistrationForm,
-                    ProfileEditForm, UserEditForm, PaymentForm, LandForm, ClientLandForm)
+from .forms import (ClientForm, AdminClientForm, ClientEditForm, EmployeeLoginForm, RegistrationForm,
+                    ProfileEditForm, UserEditForm, PaymentForm,  ReassignClientForm,
+                    LandForm, ClientLandForm, EditEmployeePaymentForm)
 
 from django.contrib.auth import authenticate, login
 
@@ -61,7 +62,10 @@ from django.utils.timezone import now
 import openpyxl
 from openpyxl.utils import get_column_letter
 from django.views.decorators.http import require_POST
-
+from django.utils.timezone import make_naive
+from openpyxl.styles import Font, PatternFill
+from openpyxl.utils import get_column_letter
+import math
 
 # ======== LOGIN PAGE ========
 def login_page(request):
@@ -84,7 +88,7 @@ def login_page(request):
                 # print(user)
                 # print(user.id)
                 # messages.info(request, f"You are now logged in as {username}.")
-                return redirect(reverse('realestates:admin_dashboard', args=[user.employee.id]))
+                return redirect(reverse('realestates:admin_dashboard', args=[user.id]))
             else:
                 # messages.info(request, f"You are now logged in as {username}.")
                 return redirect(reverse('realestates:employee_dashboard'))
@@ -152,6 +156,9 @@ def admin_dashboard(request, admin_id):
     if not employee.is_administrator:
         return redirect(reverse('realestates:employee_dashboard'))
 
+    # if not request.user.is_superuser:
+    #     return HttpResponseForbidden("<h4 style=color:red>The system is under maintenance please try again later.</h4>")
+
     default_threshold_input = 10  # employees with more than 5 clients who have made some payment will be displayed
 
     company_logo_url = ""
@@ -214,7 +221,7 @@ def admin_dashboard(request, admin_id):
         total_amount_previous_days = 0
     total_sale_for_today_previous_days = total_amount_made_today + total_amount_previous_days
 
-    employees = Employees.objects.filter(is_administrator=False)
+    employees = Employees.objects.filter(is_administrator=False, is_show=True)
 
     payments = Payment.objects.filter(approved=False).order_by('approved', '-client_land__purchase_date')
     total_num_clients_ = Client.objects.all().count()
@@ -274,7 +281,7 @@ def free_clients(request):
     except Company.DoesNotExist:
         company = None
 
-    print(admin)
+    # print(admin)
 
     # Retrieve expired clients
     query = request.GET.get('q')
@@ -312,33 +319,43 @@ def free_clients(request):
 
 @login_required
 def download_free_clients(request):
-    admin = Employees.objects.filter(is_administrator=True).first()
+    try:
+        employee = request.user.employee
+    except Employees.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to view this page.")
+
+    if not employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
+
+    admin = Employees.objects.filter(is_administrator=True).last()
     if not admin:
         return HttpResponse("Administrator not found.", status=404)
 
-    # Filter clients who expired recently (you can adjust the time range as needed)
-    one_week_ago = timezone.now() - timedelta(days=7)
-    expired_clients = Client.objects.filter(
-        employee=admin,
-        client_lands__isnull=True,
-        expired_date__gte=one_week_ago
-    )
+    # Fetch expired clients assigned to the admin and not archived
+    expired_clients = Client.objects.filter(employee=admin, expired_date__isnull=False, is_archived=False)
 
-    # Create an in-memory workbook and worksheet
+    if not expired_clients.exists():
+        return HttpResponse("No expired clients found.", status=404)
+
+    # Create an in-memory workbook
     workbook = openpyxl.Workbook()
     worksheet = workbook.active
-    worksheet.title = 'Free Clients'
+    worksheet.title = "Expired Clients"
 
     # Write the header row
-    headers = ['Name', 'Contact']
+    headers = ['Name', 'Contact', 'Date Expired', 'Employee Name']
     for col_num, column_title in enumerate(headers, 1):
         cell = worksheet.cell(row=1, column=col_num)
         cell.value = column_title
+        cell.font = Font(bold=True)
+        cell.fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
 
     # Write data rows
     for row_num, client in enumerate(expired_clients, 2):
         worksheet.cell(row=row_num, column=1, value=client.name)
         worksheet.cell(row=row_num, column=2, value=client.phoneNumber1)
+        worksheet.cell(row=row_num, column=3, value=client.expired_date.strftime('%Y-%m-%d'))
+        worksheet.cell(row=row_num, column=4, value=client.employee.user.username)
 
     # Adjust column widths
     for col_num, column_title in enumerate(headers, 1):
@@ -347,8 +364,11 @@ def download_free_clients(request):
 
     # Save the workbook to an in-memory file
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = 'attachment; filename=free_clients.xlsx'
+    response['Content-Disposition'] = 'attachment; filename=expired_clients.xlsx'
     workbook.save(response)
+
+    # Archive the clients after downloading
+    expired_clients.update(is_archived=True)
 
     return response
 
@@ -356,6 +376,14 @@ def download_free_clients(request):
 # ========== ADMIN TO ASSIGN FREE CLIENTS TO EMPLOYEES ==========
 @login_required
 def assign_client(request, client_id):
+    try:
+        employee = request.user.employee
+    except Employees.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to view this page.")
+
+    if not employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
+
     if request.method == 'POST':
         client = get_object_or_404(Client, id=client_id)
         employee_id = request.POST.get('employee_id')
@@ -374,12 +402,13 @@ def claim_free_client(request):
         print(phone_number)
 
         try:
-            admin = Employees.objects.filter(is_administrator=True).first()
+            admin = Employees.objects.filter(is_administrator=True).last()
             client = Client.objects.get(phoneNumber1=phone_number)
 
             if client.employee == admin and not client.client_lands.exists():
                 client.employee = request.user.employee
                 client.date = timezone.now()
+                client.is_archived = False
                 client.save()
                 response = {
                     'success': True,
@@ -453,8 +482,12 @@ def pay_employee(request):
 # ========= EMPLOYEE CLIENTS WHO MADE SOME PAYMENT FOR THE LAND  =========
 @login_required
 def employee_clients_made_payment(request, employee_id):
+    try:
+        employee = request.user.employee
+    except Employees.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to view this page.")
 
-    if not request.user.employee.is_administrator:
+    if not employee.is_administrator:
         return redirect(reverse('realestates:employee_dashboard'))
 
     admin_id = request.user.id
@@ -477,21 +510,42 @@ def employee_clients_made_payment(request, employee_id):
 
     employee = get_object_or_404(Employees, id=employee_id)
     client_lands = ClientLand.objects.filter(client__employee=employee).select_related('client', 'land')
-    client_commissions = Commission.objects.filter(employee=employee).select_related('client')
 
     client_data = []
     for client_land in client_lands:
-        commission = client_commissions.filter(client=client_land.client).first()
-        total_commission = commission.total_commission if commission else 0
-        amount_paid = EmployeePaymentRecord.objects.filter(employee=employee, client=client_land.client).aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
-        balance = total_commission - amount_paid
+        commissions = Commission.objects.filter(
+            employee=employee,
+            client=client_land.client,
+            client_land=client_land
+        )
 
-        client_data.append({
-            'client_land': client_land,
-            'commission': total_commission,
-            'amount_paid': amount_paid,
-            'balance': balance,
-        })
+        for commission in commissions:
+            total_commission = commission.total_commission
+
+            # Calculate the total amount paid by the client for this specific land
+            amount_paid_records = EmployeePaymentRecord.objects.filter(
+                employee=employee,
+                client=client_land.client,
+                client_land=client_land
+            )
+
+            amount_paid = sum(record.amount_paid for record in amount_paid_records)
+            balance = total_commission - amount_paid
+
+            # Get total amount paid by the client for the specific land
+            total_amount_paid_by_client = Payment.objects.filter(
+                client_land=client_land,
+                approved=True
+            ).aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+
+            client_data.append({
+                'client_land': client_land,
+                'commission': total_commission,
+                'amount_paid': amount_paid,
+                'balance': balance,
+                'total_amount_paid_by_client': total_amount_paid_by_client,
+                'payment_records': amount_paid_records  # Add this line to include payment records
+            })
 
     context = {
         'admin_id': admin_id,
@@ -504,11 +558,59 @@ def employee_clients_made_payment(request, employee_id):
     return render(request, 'realestates/admin/employee_clients_made_payment.html', context)
 
 
+# EDIT EMPLOYEE PAYMENT
+@login_required
+def edit_employee_payment(request, employee_id, client_id, client_land_id, record_id):
+
+    try:
+        employee = request.user.employee
+    except Employees.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to view this page.")
+
+    if not employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
+
+    if request.method == 'POST':
+        amount_paid = request.POST.get('amount_paid', '0').replace(',', '')
+        try:
+            amount_paid = int(amount_paid)
+        except ValueError:
+            messages.error(request, "Invalid amount entered.")
+            return redirect('realestates:employee_clients_made_payment', employee_id=employee_id)
+
+        employee = get_object_or_404(Employees, id=employee_id)
+        client = get_object_or_404(Client, id=client_id)
+        client_land = get_object_or_404(ClientLand, id=client_land_id)
+
+        try:
+            commission = Commission.objects.get(employee=employee, client=client, client_land=client_land)
+            total_commission = commission.total_commission
+        except Commission.DoesNotExist:
+            total_commission = 0
+
+        amount_already_paid = \
+        EmployeePaymentRecord.objects.filter(employee=employee, client=client, client_land=client_land).aggregate(
+            Sum('amount_paid'))['amount_paid__sum'] or 0
+        remaining_commission = total_commission - amount_already_paid
+
+        if amount_paid > remaining_commission:
+            messages.error(request, f"Amount to be paid exceeds the remaining commission of {'{:,}'.format(remaining_commission)}.")
+        else:
+
+            payment_record = get_object_or_404(EmployeePaymentRecord, id=record_id)
+            payment_record.amount_paid = amount_paid
+            payment_record.save()
+            messages.success(request, "Payment record updated successfully.")
+        return redirect('realestates:employee_clients_made_payment', employee_id=employee_id)
+
+    messages.error(request, "Invalid request.")
+    return redirect('realestates:employee_clients_made_payment', employee_id=employee_id)
+
+
 # ========= CONFIRM EMPLOYEE PAYMENT =========
 @require_POST
 @login_required
-def approve_employee_payment(request, employee_id, client_id):
-
+def approve_employee_payment(request, employee_id, client_id, client_land_id):
     if not request.user.employee.is_administrator:
         return redirect(reverse('realestates:employee_dashboard'))
 
@@ -517,14 +619,15 @@ def approve_employee_payment(request, employee_id, client_id):
         amount_paid = int(amount_paid_str)
         employee = get_object_or_404(Employees, id=employee_id)
         client = get_object_or_404(Client, id=client_id)
+        client_land = get_object_or_404(ClientLand, id=client_land_id)
 
         try:
-            commission = Commission.objects.get(employee=employee, client=client)
+            commission = Commission.objects.get(employee=employee, client=client, client_land=client_land)
             total_commission = commission.total_commission
         except Commission.DoesNotExist:
             total_commission = 0
 
-        amount_already_paid = EmployeePaymentRecord.objects.filter(employee=employee, client=client).aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+        amount_already_paid = EmployeePaymentRecord.objects.filter(employee=employee, client=client, client_land=client_land).aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
         remaining_commission = total_commission - amount_already_paid
 
         if amount_paid > remaining_commission:
@@ -534,6 +637,7 @@ def approve_employee_payment(request, employee_id, client_id):
             EmployeePaymentRecord.objects.create(
                 employee=employee,
                 client=client,
+                client_land=client_land,
                 total_commission=total_commission,
                 amount_paid=amount_paid,
                 balance=remaining_commission - amount_paid
@@ -583,7 +687,7 @@ def client_list(request):
     if query:
         all_clients = all_clients.filter(phoneNumber1__icontains=query)  # Adjust field ('name') based on search criteria
     # Apply pagination
-    paginator = Paginator(all_clients, 50)  # Display 50 clients per page
+    paginator = Paginator(all_clients, 15)  # Display 50 clients per page
     page_number = request.GET.get('page')
     try:
         clients = paginator.page(page_number)
@@ -606,15 +710,92 @@ def client_list(request):
     return render(request, 'realestates/admin/client_list.html', context)
 
 
+def get_client_details(request):
+    client_id = request.GET.get('client_id')
+    client = get_object_or_404(Client, id=client_id)
+    employee_name = client.employee.user.get_full_name() if client.employee else 'No employee assigned'
+    edit_url = reverse('realestates:edit_client', args=[client_id])
+
+    return JsonResponse({'employee_name': employee_name, 'edit_url': edit_url})
+
+
+def distributor_list(request):
+    query = request.GET.get('search', '')  # Get search query from the request
+
+    if query:
+        # Split the query into words, assuming the user might type a full name or part of it
+        query_parts = query.split()
+
+        # If there are two parts in the query, treat it as a potential full name search
+        if len(query_parts) == 2:
+            first_name_query, last_name_query = query_parts
+            employee_list = Employees.objects.filter(
+                is_administrator=False,
+                is_show=True
+            ).filter(
+                Q(user__first_name__icontains=query) |
+                Q(user__last_name__icontains=query) |
+                (Q(user__first_name__icontains=first_name_query) & Q(user__last_name__icontains=last_name_query))
+            )
+        else:
+            # If only one part, search across both first_name and last_name for a match
+            employee_list = Employees.objects.filter(
+                is_administrator=False,
+                is_show=True
+            ).filter(
+                Q(user__first_name__icontains=query) |
+                Q(user__last_name__icontains=query)
+            )
+    else:
+        employee_list = Employees.objects.filter(
+            is_administrator=False,
+            is_show=True
+        )
+
+    paginator = Paginator(employee_list, 10)  # Show 10 employees per page
+
+    page_number = request.GET.get('page')
+    employees = paginator.get_page(page_number)
+
+    return render(request, 'realestates/admin/distributor_list.html', {'employees': employees, 'query': query})
+
+
+def delete_employee(request, pk):
+    # Get the employee object, or return a 404 error if not found
+    employee = get_object_or_404(Employees, pk=pk)
+
+    if request.method == "POST":
+        # Get the associated user object
+        user = employee.user
+
+        # Delete the employee object
+        employee.delete()
+
+        # Delete the associated user object
+        user.delete()
+
+        # Add a success message
+        messages.success(request, 'Distributor and their user details have been successfully deleted.')
+
+        # Redirect to the employee list page or any other appropriate page
+        return redirect('realestates:distributor_list')  # Replace 'employee_list' with your actual view name
+
+    # For GET requests, you could render a confirmation page (optional)
+    return render(request, 'realestates/admin/confirm_delete_employee.html', {'employee': employee})
+
+
 # ============= EDIT USER PROFILE =================
 def edit_user_profile_new(request):
     # company_obj = WebSiteCompany(request, web_company_id=7).site_company()
     profile = Employees.objects.filter(user=request.user)
+    # print('-----------',profile)
     if not profile:
         profile = Employees.objects.create(user=request.user)
     if request.method == 'POST':
         user_form = UserEditForm(instance=request.user, data=request.POST)
+        # print(user_form.errors)
         profile_form = ProfileEditForm(instance=request.user.employee, data=request.POST, files=request.FILES)
+        # print(profile_form.errors)
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
@@ -656,6 +837,7 @@ def change_password(request):
 
 
 # ============ ATTACH LAND TO CLIENT ==================
+@login_required
 def attach_land_to_client(request, client_id):
 
     try:
@@ -667,8 +849,6 @@ def attach_land_to_client(request, client_id):
         return redirect(reverse('realestates:employee_dashboard'))
 
     admin_id = request.user.id
-
-    print(admin_id)
 
     profile_pic_url = ""
     try:
@@ -761,20 +941,21 @@ def record_payment(request, client_id):
                 payment = form.save(commit=False)
                 payment.client_land = selected_client_land
                 payment.approved_by = request.user.employee if request.user.employee.is_administrator else None
+                payment.employee = payment.client_land.client.employee
                 payment.save()
                 return redirect('realestates:record_payment', client_id=client.id)
         else:
-            initial_data = {'employee': request.user.employee if request.user.employee.is_administrator else None}
+            initial_data = {'approved_by': request.user.employee if request.user.employee.is_administrator else None}
             form = PaymentForm(initial=initial_data)
     else:
         selected_client_land_id = request.GET.get('client_land')
-        print(selected_client_land_id, selected_client_land)
+        # print(selected_client_land_id, selected_client_land)
         if selected_client_land_id:
             selected_client_land = get_object_or_404(ClientLand, id=selected_client_land_id)
-        initial_data = {'employee': request.user.employee if request.user.employee.is_administrator else None}
+        initial_data = {'approved_by': request.user.employee if request.user.employee.is_administrator else None}
         form = PaymentForm(initial=initial_data)
 
-    print(selected_client_land_id, selected_client_land)
+    # print(selected_client_land_id, selected_client_land)
     if selected_client_land:
         transactions = Payment.objects.filter(client_land=selected_client_land)
         total_amount_paid = transactions.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
@@ -796,6 +977,7 @@ def record_payment(request, client_id):
 
 
 # ============ EDIT PAYMENT MADE BY CLIENT =================
+@login_required
 def edit_payment(request, payment_id):
 
     try:
@@ -847,6 +1029,7 @@ def edit_payment(request, payment_id):
 
 
 # ============== ADD NEW LAND INTO THE SYSTEM ================
+@login_required
 def add_land(request):
     if request.method == 'POST':
         form = LandForm(request.POST)
@@ -858,7 +1041,55 @@ def add_land(request):
     return JsonResponse({'status': 'invalid method'}, status=405)
 
 
+# # ============== ADD NEW LAND INTO THE SYSTEM ================
+@login_required
+def land_list(request):
+    query = request.GET.get('q')
+
+    # Get lands attached to clients with no payment made
+    if query:
+        client_lands = ClientLand.objects.filter(total_amount_paid=0, land__plot_number__icontains=query)
+    else:
+        client_lands = ClientLand.objects.filter(total_amount_paid=0)
+
+    # Get the related lands
+    lands = Land.objects.filter(id__in=client_lands.values('land_id'))
+
+    paginator = Paginator(lands, 12)  # Show 12 lands per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'realestates/admin/land_list.html', {'page_obj': page_obj, 'query': query})
+
+
+# ============= UPDATE LAND ==============
+@login_required
+def update_land(request, land_id):
+    land = get_object_or_404(Land, id=land_id)
+    if request.method == 'POST':
+        form = LandForm(request.POST, instance=land)
+        if form.is_valid():
+            form.save()
+            return redirect('realestates:land_list')  # Redirect to a list of lands or another appropriate page
+    else:
+        form = LandForm(instance=land)
+    return render(request, 'realestates/admin/update_land.html', {'landform': form, 'land': land})
+
+
+# ============= DELETE LAND ==============
+@login_required
+def delete_land(request, land_id):
+    land = get_object_or_404(Land, id=land_id)
+    if request.method == 'POST':
+        land.delete()
+        return redirect('realestates:land_list')  # Redirect to a list of lands or another appropriate page
+    else:
+        form = LandForm(instance=land)
+    return render(request, 'realestates/admin/confirm_delete.html', {'form': form, 'land': land})
+
+
 # ============= CLIENTS WITH LAND(MADE COMPLETE PAYMENT FOR THE LAND) ==============
+@login_required
 def clients_with_lands(request):
 
     try:
@@ -910,6 +1141,7 @@ def clients_with_lands(request):
 
 
 # ============== TRANSACTION HISTORY FOR THE CLIENTS WHO ALREADY BOUGHT LAND ===============
+@login_required
 def land_transaction_history(request, land_id):
 
     try:
@@ -952,6 +1184,13 @@ def land_transaction_history(request, land_id):
     }
     return render(request, 'realestates/admin/land_transaction_history.html',
                   context)
+
+
+# ================ Admin Settings. uploading excel data, cleaning database, and downloading excel data ==============
+@login_required
+def admin_access(request):
+    context ={}
+    return render(request, 'realestates/admin/admin_access.html', context)
 
 
 # ================ EMPLOYEE DASHBOARD ==============
@@ -1001,7 +1240,8 @@ def employee_dashboard(request):
     total_paid = employee.payment_records.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
     balance = total_commission - total_paid
 
-    form = ClientForm()
+    # Get the top 5 employees with the most clients
+    top_employees = Employees.objects.annotate(clients_count=Count('clients')).filter(is_show=True).exclude(is_administrator=True).order_by('-clients_count')[:5]
 
     context = {
         'employee': employee,
@@ -1016,7 +1256,7 @@ def employee_dashboard(request):
         'total_commission': total_commission,
         'total_paid': total_paid,
         'balance': balance,
-        'form': form,
+        'top_employees': top_employees
     }
 
     # Render the employee dashboard template
@@ -1045,28 +1285,32 @@ def add_client(request):
             client.employee = employee
             client.date = timezone.now()
             client.save()
-            return JsonResponse({'success': True})
+            return JsonResponse({'success': True, 'message': 'Client has been created successfully.'})
         else:
             errors = form.errors.as_json()
             return JsonResponse({'success': False, 'error': errors})
 
     return JsonResponse({'success': False, 'error': 'Invalid request method.'})
-# @login_required
-# def add_client(request):
-#     if request.method == 'POST':
-#         form = ClientForm(request.POST)
-#         if form.is_valid():
-#             client = form.save(commit=False)
-#             employee = Employees.objects.get(user=request.user)
-#             client.employee = employee
-#             client.date = timezone.now()
-#             client.save()
-#             return JsonResponse({'success': True})
-#         else:
-#             errors = form.errors.as_json()
-#             return JsonResponse({'success': False, 'error': errors})
-#
-#     return JsonResponse({'success': False, 'error': 'Invalid request method.'})
+
+
+@login_required
+def client_entry(request):
+    try:
+        employee = request.user.employee
+    except Employees.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to view this page.")
+
+    clients = Client.objects.filter(employee=employee).exclude(client_lands__isnull=False).order_by('-date')
+    commission_earned_per_client = Commission.objects.filter(employee=employee)
+    client_form = ClientForm
+
+    context = {
+        'form': client_form,
+        'clients': clients,
+        'commission_earned_per_client': commission_earned_per_client,
+    }
+
+    return render(request, 'realestates/employee/client_entry.html', context)
 
 
 # ========== EDIT CLIENT ==========
@@ -1079,7 +1323,14 @@ def edit_client(request, pk):
         client_form = ClientEditForm(data=request.POST, instance=client_info)
         if client_form.is_valid():
             client_form.save()
-            return redirect(reverse('realestates:employee_dashboard'))
+            # Check if the user is an admin
+            if request.user.employee.is_administrator:
+                # Redirect to client_payment page for admins
+                return redirect(reverse('realestates:client_payment'))
+            else:
+                # Redirect to employee_dashboard page for non-admins
+                return redirect(reverse('realestates:employee_dashboard'))
+
     else:
         # Populate forms with existing data
         client_form = ClientEditForm(instance=client_info)
@@ -1090,7 +1341,7 @@ def edit_client(request, pk):
 # ========== DISPLAYS EMPLOYEES WITH THEIR CLIENTS =============
 @login_required
 def employees_client(request):
-    employees = Employees.objects.filter(is_administrator=False)
+    employees = Employees.objects.filter(is_administrator=False, is_show=True)
 
     # Prefetch related data for optimized querying
     employees = employees.prefetch_related(
@@ -1134,53 +1385,80 @@ def employees_client(request):
 # ========= EMPLOYEE CLIENTS WHO MADE SOME PAYMENT FOR THE LAND  =========
 @login_required
 def employee_pay_breakdown(request):
-
     try:
         employee = request.user.employee
     except Employees.DoesNotExist:
         return HttpResponseForbidden("You are not authorized to view this page.")
 
-    employee_id = request.user.employee.id
+    employee_id = employee.id
 
-    profile_pic_url = ""
-    try:
-        employee = Employees.objects.get(id=request.user.id)
-        if employee.profile_pic:
-            profile_pic_url = employee.profile_pic.url
-    except Employees.DoesNotExist:
-        employee = None
+    profile_pic_url = employee.profile_pic.url if employee.profile_pic else ""
 
-    company_logo_url = ""
     try:
         company = Company.objects.get(id=1)
-        if company.company_logo:
-            company_logo_url = company.company_logo.url
+        company_logo_url = company.company_logo.url if company.company_logo else ""
     except Company.DoesNotExist:
-        company = None
+        company_logo_url = ""
 
     employee = get_object_or_404(Employees, id=employee_id)
     client_lands = ClientLand.objects.filter(client__employee=employee).select_related('client', 'land')
     client_commissions = Commission.objects.filter(employee=employee).select_related('client')
 
+    commission_earned_per_client = Commission.objects.filter(employee=employee)
+    total_commission_from_all_client = Commission.objects.filter(employee=employee).aggregate(Sum('total_commission'))[
+                           'total_commission__sum'] or 0
+    total_amount_paid_of_all_clients = employee.payment_records.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+    total_balance = total_commission_from_all_client - total_amount_paid_of_all_clients
+
     client_data = []
     for client_land in client_lands:
-        commission = client_commissions.filter(client=client_land.client).first()
-        total_commission = commission.total_commission if commission else 0
-        amount_paid = EmployeePaymentRecord.objects.filter(employee=employee, client=client_land.client).aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
-        balance = total_commission - amount_paid
+        commissions = Commission.objects.filter(
+            employee=employee,
+            client=client_land.client,
+            client_land=client_land
+        )
 
-        client_data.append({
-            'client_land': client_land,
-            'commission': total_commission,
-            'amount_paid': amount_paid,
-            'balance': balance,
-        })
+        for commission in commissions:
+            total_commission = commission.total_commission
+
+            # Calculate the total amount paid by the client for this specific land
+            amount_paid_records = EmployeePaymentRecord.objects.filter(
+                employee=employee,
+                client=client_land.client,
+                client_land=client_land
+            )
+
+            amount_paid = sum(record.amount_paid for record in amount_paid_records)
+            balance = total_commission - amount_paid
+
+            # Get total amount paid by the client for the specific land
+            total_amount_paid_by_client = Payment.objects.filter(
+                client_land=client_land,
+                approved=True
+            ).aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+
+            client_data.append({
+                'client_land': client_land,
+                'commission': total_commission,
+                'amount_paid': amount_paid,
+                'balance': balance,
+                'total_amount_paid_by_client': total_amount_paid_by_client,
+                'commission_instance': commission,  # Add this line to differentiate instances
+            })
+
+    # Get all payment records for the employee
+    payment_history = EmployeePaymentRecord.objects.filter(employee=employee).order_by('-payment_date')
 
     context = {
         'company_logo_url': company_logo_url,
         'profile_pic_url': profile_pic_url,
         'employee': employee,
         'client_data': client_data,
+
+        'total_amount_paid_of_all_clients': total_amount_paid_of_all_clients,
+        'total_commission_from_all_client': total_commission_from_all_client,
+        'total_balance': total_balance,
+        'payment_history': payment_history,  # Include payment history in context
     }
 
     return render(request, 'realestates/employee/employee_pay_breakdown.html', context)
@@ -1202,6 +1480,12 @@ def email_message(semail, username,  type):
 # ============ REGISTER MORE EMPLOYEES/DISTRIBUTOR ==================
 @login_required
 def register(request):
+
+    try:
+        employee = request.user.employee
+    except Employees.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to view this page.")
+
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         # print(form.errors)
@@ -1211,7 +1495,7 @@ def register(request):
             username = cd['username']
             email_message(semail, username, 'register')
             form.save()
-            return redirect(reverse('realestates:admin_dashboard', args=[request.user.id]))
+            return redirect(reverse('realestates:register'))
 
     form = RegistrationForm()
     admin_id = request.user.id
@@ -1289,7 +1573,7 @@ def export_unapproved_payments(request):
 
 
 # ======== DOWNLOAD EXCEL CONTAINING EMPLOYEES WITH THE CLIENTS THEY BROUGHT INCLUDING THERE PAYMENT ========
-
+@login_required
 def get_employee_with_clients_and_payments(request):
     employees = Employees.objects.all()
 
@@ -1306,6 +1590,7 @@ def get_employee_with_clients_and_payments(request):
                 'client_contact1': None,
                 'client_contact2': None,
                 'client_location': None,
+                'date_client_entered': None,
                 'land_location': None,
                 'amount_paid': 0,
                 'land_price': 0,
@@ -1318,6 +1603,7 @@ def get_employee_with_clients_and_payments(request):
         else:
             for client in clients:
                 client_lands = client.client_lands.all()
+                date_client_entered = make_naive(client.date) if client.date else None
                 if not client_lands.exists():
                     data.append({
                         'employee_name': employee.user.get_full_name(),
@@ -1328,9 +1614,10 @@ def get_employee_with_clients_and_payments(request):
                         'client_contact1': client.phoneNumber1,
                         'client_contact2': client.phoneNumber2,
                         'client_location': client.location,
+                        'date_client_entered': date_client_entered,
                         'land_location': client.location,
-                        'amount_paid': 0,
                         'land_price': 0,
+                        'amount_paid': 0,
                         'remaining_amount': 0,
                         'installment_number': 0,
                         'total_Installments': 0,
@@ -1350,9 +1637,10 @@ def get_employee_with_clients_and_payments(request):
                                 'client_contact1': client.phoneNumber1,
                                 'client_contact2': client.phoneNumber2,
                                 'client_location': client.location,
-                                'land_location': client.location,
-                                'amount_paid': 0,
+                                'date_client_entered': date_client_entered,
+                                'land_location': client_land.land.location,
                                 'land_price': client_land.land.price,
+                                'amount_paid': 0,
                                 'remaining_amount': client_land.remaining_amount,
                                 'installment_number': 0,
                                 'total_Installments': client_land.total_installments,
@@ -1370,10 +1658,11 @@ def get_employee_with_clients_and_payments(request):
                                     'client_contact1': client.phoneNumber1,
                                     'client_contact2': client.phoneNumber2,
                                     'client_location': client.location,
-                                    'land_location': client.location,
+                                    'date_client_entered': date_client_entered,
+                                    'land_location': client_land.land.location,
+                                    'land_price': client_land.land.price,
                                     'amount_paid': payment.amount_paid,
-                                    'land_price': payment.total_amount,
-                                    'remaining_amount': payment.remaining_amount,
+                                    'remaining_amount': client_land.remaining_amount,
                                     'installment_number': payment.installment_number,
                                     'total_Installments': payment.total_installments,
                                     'payment_date': payment.timestamp,
@@ -1763,3 +2052,147 @@ def get_data_link(request):
     dic = {'status': 'ok', "dic": dic}
     # print('core view 9055 get_data_link dic_= ', dic)
     return JsonResponse(dic)
+
+
+@login_required
+def client_payment(request):
+    if request.method == 'POST':
+        reassign_form = ReassignClientForm(request.POST)
+        admin_client_form = AdminClientForm(request.POST)
+
+        if reassign_form.is_valid():
+            # Process the valid reassign form data
+            client = reassign_form.cleaned_data['client']
+            new_employee = reassign_form.cleaned_data['new_employee']
+            client.employee = new_employee
+            client.save()
+
+            return redirect('realestates:client_payment')  # Replace with your success page
+
+    else:
+        admin_client_form = AdminClientForm(request.POST)
+        reassign_form = ReassignClientForm()
+
+    context = {
+        'reassign_form': reassign_form,
+        'admin_client_form': admin_client_form,
+    }
+    return render(request, 'realestates/admin/client_payment.html', context)
+
+
+@login_required
+def admin_add_client(request):
+    if request.method == 'POST':
+        form = AdminClientForm(request.POST)
+        if form.is_valid():
+            phone_number1 = form.cleaned_data['phoneNumber1']
+            phone_number2 = form.cleaned_data.get('phoneNumber2')
+
+            # Check for existing client with the same phone numbers
+            if Client.objects.filter(phoneNumber1=phone_number1).exists() or Client.objects.filter(
+                    phoneNumber2=phone_number1).exists() or \
+                    (phone_number2 and (
+                            Client.objects.filter(phoneNumber1=phone_number2).exists() or Client.objects.filter(
+                        phoneNumber2=phone_number2).exists())):
+                return JsonResponse({'success': False, 'error': 'Client with the same phone number already exists.'})
+
+            client = form.save(commit=False)
+            # employee = Employees.objects.get(user=request.user)
+            # client.employee = employee
+            client.date = timezone.now()
+            client.save()
+            return JsonResponse({'success': True, 'message': 'Client has been created successfully.'})
+        else:
+            errors = form.errors.as_json()
+            return JsonResponse({'success': False, 'error': errors})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method.'})
+
+
+# ==== Exclude from re-assignment ====
+# TRINITY Orena
+# Reagan Jex
+# Wacibra jack
+# Dramant	Kasule
+
+
+
+# @login_required
+# def download_free_clients(request):
+#
+#     try:
+#         employee = request.user.employee
+#     except Employees.DoesNotExist:
+#         return HttpResponseForbidden("You are not authorized to view this page.")
+#
+#     if not employee.is_administrator:
+#         return redirect(reverse('realestates:employee_dashboard'))
+#
+#     admin = Employees.objects.filter(is_administrator=True).last()
+#     if not admin:
+#         return HttpResponse("Administrator not found.", status=404)
+#
+#     # Fetch expired clients assigned to the admin
+#     expired_clients = Client.objects.filter(employee=admin).exclude(expired_date__isnull=True)
+#
+#     if not expired_clients.exists():
+#         return HttpResponse("No expired clients found.", status=404)
+#
+#     # Create an in-memory workbook
+#     workbook = openpyxl.Workbook()
+#
+#     # Group by expiration date range (e.g., by month)
+#     date_ranges = []
+#     current_date = timezone.now()
+#     for i in range(0, 5):  # Grouping into 5 monthly ranges for demonstration
+#         end_date = current_date - timedelta(days=i * 30)
+#         start_date = end_date - timedelta(days=30)
+#         date_ranges.append((start_date, end_date))
+#
+#     added_sheets = False
+#     clients_per_page = 5000  # Increase number of clients per sheet
+#
+#     for start_date, end_date in date_ranges:
+#         clients_in_range = expired_clients.filter(expired_date__range=(start_date, end_date))
+#         if clients_in_range.exists():
+#             total_pages = math.ceil(clients_in_range.count() / clients_per_page)
+#             for page in range(total_pages):
+#                 # Shorten the worksheet title to ensure it fits within the 31-character limit
+#                 worksheet_title = f"-Page{page + 1}"
+#                 worksheet = workbook.create_sheet(title=worksheet_title)
+#                 added_sheets = True
+#
+#                 # Write the header row
+#                 headers = ['Name', 'Contact', 'Date Expired', 'Employee Name']
+#                 for col_num, column_title in enumerate(headers, 1):
+#                     cell = worksheet.cell(row=1, column=col_num)
+#                     cell.value = column_title
+#                     cell.font = Font(bold=True)
+#                     cell.fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
+#
+#                 # Write data rows
+#                 start_index = page * clients_per_page
+#                 end_index = start_index + clients_per_page
+#                 for row_num, client in enumerate(clients_in_range[start_index:end_index], 2):
+#                     worksheet.cell(row=row_num, column=1, value=client.name)
+#                     worksheet.cell(row=row_num, column=2, value=client.phoneNumber1)
+#                     worksheet.cell(row=row_num, column=3, value=client.expired_date.strftime('%Y-%m-%d'))
+#                     worksheet.cell(row=row_num, column=4, value=client.employee.user.username)
+#
+#                 # Adjust column widths
+#                 for col_num, column_title in enumerate(headers, 1):
+#                     column_letter = get_column_letter(col_num)
+#                     worksheet.column_dimensions[column_letter].width = 20
+#
+#     # Remove the default sheet created by openpyxl only if other sheets were added
+#     if 'Sheet' in workbook.sheetnames and added_sheets:
+#         del workbook['Sheet']
+#
+#     # Save the workbook to an in-memory file
+#     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+#     response['Content-Disposition'] = 'attachment; filename=free_clients.xlsx'
+#     workbook.save(response)
+#
+#     return response
+
+

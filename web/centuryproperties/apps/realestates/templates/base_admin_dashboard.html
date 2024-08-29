@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_eternal.html" %}
 {% load static %}
 {% load custom_filters %}
 
@@ -11,51 +11,9 @@
          <script src="{% static 'js/jquery-3.3.1.js' %}"></script>
          <script src="{% static 'js/bootstrap.min.js' %}"></script>
          <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-         <style>
-            table {
-                        width: 100%;
-                        border-collapse: collapse;
-                    }
-
-                    th, td {
-                        padding: 8px;
-                        border: 1px solid black;
-                    }
-
-                    /* Truncate long text and display ellipsis */
-                    .truncate {
-                        white-space: nowrap;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                    }
-
-                    /* Responsive styles */
-                    @media screen and (max-width: 600px) {
-                        th, td {
-                            padding: 4px;
-                        }
-
-                        .truncate {
-                                max-width: 90px; /* Adjust max-width as needed */
-                            }
-                    }
-        </style>
-         <style>
-            footer {
-                position: fixed;
-                bottom: 0;
-                width: 80%; /* Adjust the width as needed */
-                margin-left: 15%; /* Center the footer horizontally */
-                background-color: #f8f9fa; /* Add your desired background color */
-                border-top: 1px solid #dee2e6; /* Add your desired border */
-                padding: 20px; /* Add padding for better spacing */
-            }
-         </style>
-
         <!-- Add this in your base template or record_payment template -->
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
        {% endblock %}
 
         <!-- Sidebar Start -->
@@ -123,11 +81,7 @@
         {% endblock %}
         <!-- Navbar End -->
 
-        {% block content %}
-        {% endblock %}
 
 
-        <!-- Footer Start -->
-        {% block footer %}
-        {% endblock %}
-        <!-- Footer End -->
+
+

@@ -1,35 +1,97 @@
+{% extends "base_eternal.html" %}
 {% load static %}
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" />
-    
-     <title>Edit User Profile</title>
-</head>
-<body>
 
-<div class="container bg-dark text-white">
-    <form method="post" enctype="multipart/form-data" style="background-color:lightblu;">
-        {% csrf_token %}
-        <table>
-        {{ user_form.as_table }}
-        {{ profile_form.as_table }}
-        </table>
-        <b><input type="submit" value="Update" style="color:blue;cursor:pointer" />
-        <input type="button" value="Cancel" style="color:red;cursor:pointer"
-                  onclick="window.history.go(-1);"/></b>
-    </form>
-</div>
+{% block add_css %}
+{% endblock %}
 
-</body>
-</html>
+{% block content %}
+    <!-- Content -->
+    <div class="container container-p-y">
+        <div class="overflow-auto row">
+            <div class="col-lg-8 col-xl-12 mb-1 order-0">
+                <div class="card mb-4">
+                    <h5 class="card-header">Edit Profile</h5>
+                     <div  style="display:flex;gap:10px;">
+                         {% if message %}
+                            <p style="color:red">{{ message }}</p>
+                         {% endif %}
+                     </div>
+                    <hr class="my-0"/>
+                    <div class="card-body">
+                        <form id="formAccountSettings" method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="overflow-auto row">
+                                <div class="row">
+                                     <div class="col-md-6 col-xl-6 mb-3">
+                                        <label for="email" class="form-label">Email</label>
+                                        {{ user_form.email }}
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 col-xl-3 mb-3">
+                                        <label for="firstName" class="form-label">First Name</label>
+                                        {{ user_form.first_name }}
+                                    </div>
+                                    <div class="col-md-6 col-xl-3 mb-3">
+                                        <label for="lastName" class="form-label">Last Name</label>
+                                         {{ user_form.last_name }}
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 col-xl-3 mb-3">
+                                        <label for="profile_pic" class="form-label">Profile Pic</label>
+                                            {{ profile_form.profile_pic }}
+                                    </div>
+                                    <div class="col-md-6 col-xl-3 mb-3">
+                                        <label for="date_of_birth" class="form-label">Date Of Birth</label>
+                                        {{ profile_form.date_of_birth }}
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 col-xl-3 mb-3">
+                                        <label for="address" class="form-label">Address</label>
+                                            {{ profile_form.address }}
+                                    </div>
+                                    <div class="col-md-6 col-xl-3 mb-3">
+                                        <label for="zip" class="form-label">Zip</label>
+                                        {{ profile_form.zip }}
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 col-xl-3 mb-3">
+                                        <label for="country" class="form-label">Country</label>
+                                            {{ profile_form.country }}
+                                    </div>
+                                    <div class="col-md-6 col-xl-3 mb-3">
+                                        <label for="phone" class="form-label">Phone</label>
+                                        {{ profile_form.phone }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 col-xl-3 mb-3">
+                                        <label for="city" class="form-label">City</label>
+                                            {{ profile_form.city }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <button  type="submit" class="btn btn-danger me-2">Save</button>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- /Account -->
+                </div>
+            </div>
+            <!-- Total Revenue -->
+            <!--/ Total Revenue -->
+        </div>
+    </div>
+{% endblock %}
 
 
-
+{% block add_js %}
+{% endblock %}
