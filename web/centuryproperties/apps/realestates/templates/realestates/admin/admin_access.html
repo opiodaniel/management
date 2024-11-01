@@ -58,6 +58,27 @@
     </div>
   </div>
 
+
+  <!-- Download Data  -->
+  <div class="col-12">
+    <div class="card">
+      <h5 class="card-header text-info">Download Data</h5>
+      <div class="card-body">
+        <div class="dropzone needsclick dz-clickable" id="dropzone-multi">
+          <div class="needsclick">
+             <form action="{% url 'realestates:download_clients_pdf' %}" method="get">
+                <label for="start_date">Start Date:</label>
+                <input class="form-control" type="date" id="start_date" name="start_date" required>
+                <label for="end_date">End Date:</label>
+                <input class="form-control" type="date" id="end_date" name="end_date">
+                <button type="submit" class="btn btn-light btn-sm" >Download PDF</button>
+             </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 {% endblock %}
 

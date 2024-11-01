@@ -1,0 +1,26 @@
+<div class="content-wrapper">
+  <!-- Content -->
+  <div class="container-xxl flex-grow-1 container-p-y">
+    <!-- Search Bar -->
+    <div class="input-group">
+       <input type="text" id="search_client" class="form-control custom-border"
+          placeholder="Search client by contact..."  name="q">
+        <button onclick="search_client(event)" data-page="clients" class="btn btn-outline-dark" type="submit">Search</button>
+    </div>
+
+    <div class="clients-grid">
+        {% for client in clients %}
+        <div class="client-card border rounded p-2 mb-2 bg-white">
+            <div class="client-info">
+                <div class="client-date text-muted">{{ client.date }}</div>
+                <div class="client-name text-dark">{{ client.name }}</div>
+                <div class="client-contact text-secondary">{{ client.phoneNumber1 }}</div>
+            </div>
+            <div class="client-action">
+                <a href="#" class="btn btn-sm btn-primary"> {% if client.employee.is_administrator %} Free Client {% elif not client.employee %} Free Client {% else %}Entered by: {{client.employee}} {% endif %}</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+  </div>
+</div>

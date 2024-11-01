@@ -1,0 +1,1060 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Real Estates Ltd</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <meta name="robots" content="index,follow,all">
+    <meta name="msapplication-TileColor" content="#eceff1">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="google-site-verification" content="1NKy94ZSBrapf9w9BU4mJdhW__UB__qbGWa1V2aWoUs" />
+    <link rel="stylesheet" href="/static/cms.base.css" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/main.a399bc1a5519.css">
+    <link rel="apple-touch-icon" sizes="120x120" href="/static/images/apple-touch-icon.e3f5be308427.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.b0adf6b91841.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.bd459d491a1e.png">
+    <link rel="manifest" href="/static/images/site.57775445aa3a.webmanifest">
+    <link rel="mask-icon" href="/static/images/safari-pinned-tab.00983a824cb5.svg" color="#f72c30">
+    <link rel="shortcut icon" href="/static/images/favicon.bc906d84c4a9.ico">
+    <link href="/static/general.css" rel="stylesheet">
+
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <link href="/static/simulation_style.css" rel="stylesheet">
+    <link href="/static/globsim.css" rel="stylesheet">
+    <style>
+      .h1_hide {
+          font-size: 0;
+          width: 1px;
+          height: 1px;
+          display: inline-block;
+          overflow: hidden;
+          position: absolute!important;
+          border: 0!important;
+          padding: 0!important;
+          margin: 0!important;
+          clip: rect(1px,1px,1px,1px);
+        }
+  </style>
+
+    <style>
+        body {font-family: Arial;}
+
+        /* Style the tab */
+        .tab {
+          overflow: hidden;
+          border: 1px solid #ccc;
+          background-color: #f1f1f1;
+        }
+
+        /* Style the buttons inside the tab */
+        .tab button {
+          background-color: inherit;
+          float: left;
+          border: none;
+          outline: none;
+          cursor: pointer;
+          padding: 5px 10px;
+          transition: 0.3s;
+          font-size: 17px;
+        }
+
+        /* Change background color of buttons on hover */
+        .tab button:hover {
+          background-color: #ddd;
+        }
+
+        /* Create an active/current tablink class */
+        .tab button.active {
+          background-color: #ccc;
+        }
+
+        /* Style the tab content */
+        .tabcontent {
+          display: none;
+          padding: 6px 12px;
+          border: 1px solid #ccc;
+          border-top: none;
+        }
+    </style>
+    <style>
+        .value {
+         width:110px;
+         padding-right:3px;
+         text-align: right;
+        }
+
+        .account {
+          padding-left:5px; padding-right:5px;
+          text-align: left;
+        }
+
+        data {
+          font-family: Arial, Helvetica, sans-serif;
+          border-collapse: collapse;
+        }
+
+        .data td {
+          padding-top: 1px;
+          padding-bottom: 1px;
+          text-align: left;
+          border: 1px solid #ddd;
+        }
+
+        .data tr {
+          padding-top: 1px;
+          padding-bottom: 1px;
+          border: 1px solid #ddd;
+        }
+
+        .data th {
+          text-align: center;
+          padding-top: 1px;
+          padding-bottom: 1px;
+          background-color: blue;
+          color: white;
+          border: 1px solid #ddd;
+        }
+        .data tr:nth-child(even){background-color: lightblue}
+    </style>
+    <style>
+        .chosen {color: blue}
+    </style>
+    <style>
+    .button {
+      background-color: #ddd;
+      border: none;
+      color: black;
+      padding: 5px 10px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 16px;
+    }
+
+    .button:hover {
+      background-color: #f1f1f1;
+    }
+    </style>
+    <!-- designing the name of the company  -->
+    <style>
+      .pink-blue-gradient-text {
+          background-image: radial-gradient(circle, #144ee3, #f35792);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        .blue-pink-gradient-text {
+          background-image: radial-gradient(circle, #f35792, #144ee3);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        a {
+          text-decoration: none;
+        }
+    </style>
+
+   <!-- https://getbootstrap.com/docs/5.1/components/navbar/  -->
+   <!--https://www.w3schools.com/bootstrap4/tryit.asp?filename=trybs_nav_pills_toggleable&stacked=h-->
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/2.3.0/luxon.min.js" integrity="sha512-2j5fkjQ4q5ceXgfxi+kqrU2Oz234MrpyywZsQz1F5OGnfat7mOhjRr0oz5cpQ+YwwWB+hhDBSyxNGuL/tKWMFw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@0.2.1"></script>
+  <script src="/static/js/chartjs/chartjs-chart-financial.js" crossorigin="anonymous"></script>
+
+  <script src="/static/js/academycity/corporatevaluation/basic_pop_windows_v85.js" crossorigin="anonymous"></script>
+  <script>var ef = '';</script>
+
+    <script type="text/javascript" src="/static/sec_interactive/js/jquery-1.4.3.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/sec_interactive/css/interactive.css" />
+    <link rel="stylesheet" type="text/css" href="/static/sec_interactive/css/report.css" />
+    <link rel="stylesheet" type="text/css" href="/static/sec_interactive/css/print.css" media="print" />
+    <link rel="stylesheet" type="text/css" href="/static/sec_interactive/css/xbrlViewerStyle.css" />
+    <style type="text/css">li.octave {border-top: 1px solid black;}</style>
+    <!--
+    [if lt IE 8]>
+    <style type="text/css">
+    li.accordion a {display:inline-block;}
+    li.accordion a {display:block;}
+    </style>
+    <![endif]
+    -->
+
+</head>
+
+<body id="body_base0">
+
+<div id="modal-exclude">
+    <!--    beginning of top nav -->
+    <div class="navbar-brand mx-4 mb-3 mt-2 d-flex align-items-center">
+        <a href="/pay">
+            <img class="rounded-circle" src="{% static 'estate/img/com_logo.jpeg' %}" alt="" style="width: 80px; margin-left:-10px; margin-right: 10px;">
+        </a>
+        <div>
+            <h5 class="text-info mb-0" style="text-align:left">
+                <span class="blue-pink-gradient-text">Century Properties</span><br>
+                <span style="margin-left:60px;" class="pink-blue-gradient-text">&amp;</span><br>
+                <span class="pink-blue-gradient-text">Real Estates Ltd</span>
+            </h5>
+        </div>
+    </div>
+    <!--    end of top nav  -->
+
+    <div class="body-content">
+        <div class="homepage">
+            <!--tabes click-->
+            <div>
+                <div style="color:white;background-color:darkblue">
+                    <span>Financial Statements, Corporate Valuation & Options Trading </span><span id="main_page_time"></span>
+                </div>
+                <!-- Location for tabs.  The management tabs has to be entered manually  -->
+                <div id="tab_titles" class="tab">
+                </div>
+                <div id="tab_contents"  style="padding-left:30px">
+
+                        <div id="inputs" class="tabcontent"  style="background-color:lightcyan">
+                            <!-- pick a company and year of valuation -->
+                            <div>
+                                <table>
+                                    <tr>
+                                        <td>Branch:</td>
+                                        <td>
+                                            <select id="industries" name="industries" onChange="industries_fun(event)" style="width: 200px;">
+                                                <option value='-1'>------------------------------</option>
+                                                <option value='1'>Century Property Kampala</option>
+                                                <option value='2'>Century Property Bombo</option>
+                                                <option value='3'>Century Property Entebbe</option>
+                                                <option value='4'>Century Property Kawempe</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Year:</td>
+                                        <td>
+                                            <select id="valuation_year" name="valuation_year" onchange="valuation_year_fun(event)" style="width: 80px;">
+                                                <option value='-1'>---------</option>
+                                                <option value='2022'>2022</option>
+                                                <option value='2023'>2023</option>
+                                                <option value='2024'>2024</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <br/>
+                            <div id="rp_by_countries_" style="display:block">
+                                <table class="data" id="rp_countries_" onchange="calc_rp_(event)" oninput="calc_rp_(event)">
+                                    <thead>
+                                        <tr>
+                                            <th>Clients</th>
+                                            <th>PlotNumber</th>
+                                            <th>LandPrice</th>
+                                            <th>Paid</th>
+                                            <th>Date</th>
+                                            <th style="padding:0px">
+                                                <button class="btn" onclick="add_country_risk_premium()" style="color:white">
+                                                    <i class="fa fa-plus"></i></button>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="rp_countries_tbody_">
+                                        {% for client_land in client_lands %}
+                                        <tr id="rp_country_row" onchange="rp_input_(event, r='null', type='country')">
+                                            <td>{{ client_land.client.name }}</td>
+                                            <td>{{ client_land.land.plot_number }}</td>
+                                            <td>{{ client_land.land.price }}</td>
+                                            <td>{{ client_land.total_amount_paid }}</td>
+                                            <td>{{ client_land.purchase_date }}</td>
+                                            <td style="padding:0px">
+                                                <button style="width:100%;" class="btn" onclick="delete_rp_for_country_or_region(event, type='country')">
+                                                    <i class="fa fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div id="fsa"    class="tabcontent data"  style="padding-left:20px;width:100%">
+                          <!-- Nav pills -->
+                          <ul class="nav nav-pills" role="tablist">
+                            <li class="nav-item"><a id="fsa_balance_sheet" class="nav-link active" data-toggle="pill" href="#balance_sheet">Balance Sheet</a></li>
+                            <li class="nav-item"><a id="fsa_income_statement" class="nav-link" data-toggle="pill" href="#income_statement">Income Statement</a></li>
+                            <li class="nav-item"><a id="fsa_vertical" class="nav-link" data-toggle="pill" href="#vertical">Vertical</a></li>
+                            <li class="nav-item"><a id="fsa_horizontal" class="nav-link" data-toggle="pill" href="#horizontal">Horizontal</a></li>
+                            <li class="nav-item"><a id="fsa_ratio" class="nav-link" data-toggle="pill" href="#ratio_analysis">Ratio</a></li>
+                          </ul>
+                          <!-- Tab panes -->
+                          <div class="tab-content">
+                            <div id="balance_sheet" class="tab-pane">balance_sheet</div>
+
+                            <div id="income_statement" class="tab-pane">income_statement</div>
+
+                            <div id="vertical" class="tab-pane">vertical</div>
+
+                            <div id="horizontal" class="tab-pane fade">horizontal</div>
+
+                            <div id="ratio_analysis" class="tab-pane fade data active">Ratio</div>
+                          </div>
+                        </div>
+
+
+
+
+                    <div id="sec" class="tabcontent">
+                        <div id="valuationsetup_xbrl_data"></div>
+                        <div id="navigation_table"></div>
+                    </div>
+
+                    <div id="calculations" class="tabcontent" style="padding-left:20px;width:100%">
+                      <!-- Nav pills -->
+                      <ul class="nav nav-pills" role="tablist">
+                        <li class="nav-item"><a id="calc_cost_of_debt" class="nav-link" data-toggle="pill" href="#tab_cost_of_debt">Cost of Debt</a></li>
+                        <li class="nav-item"><a id="calc_cost_of_equity" class="nav-link" data-toggle="pill" href="#tab_cost_of_equity">Cost of Equity</a></li>
+                        <li class="nav-item"><a id="calc_estimated_roic" class="nav-link" data-toggle="pill" href="#tab_estimated_roic">Estimated ROIC</a></li>
+                        <li class="nav-item"><a id="calc_effective_tax_rate" class="nav-link" data-toggle="pill" href="#tab_effective_tax_rate">Effective tax rate</a></li>
+                        <li class="nav-item"><a id="calc_risk_premium" class="nav-link" data-toggle="pill" href="#tab_risk_premium" onclick="set_risk_premium_()">Risk Premium</a></li>
+                      </ul>
+                      <!-- Tab panes -->
+                      <div class="tab-content">
+                        <div id="tab_cost_of_debt" class="container tab-pane">
+                                <table class="data" style="width:30%">
+                                    <thead><tr><th>Parameter</th><th>Value</th><th></th></tr></thead>
+                                    <tr><td class="account">Risk Free</td><td id="cofd_rf" style="text-align:right;"></td><td>%</td></tr>
+                                    <tr><td class="account">EBIT</td><td id="cofd_ebit" style="text-align:right;"></td><td></td></tr>
+                                    <tr><td class="account">Interest Expense</td>
+                                        <td id="cofd_interest_expense" style="text-align:right;"></td></tr>
+                                    <tr><td class="account">Interest Coverage</td>
+                                        <td id="cofd_interest_coverage" style="text-align:right;"></td><td></td></tr>
+                                    <tr><td class="account">Estimated Bond Rating</td>
+                                        <td id="cofd_estimated_bond_rating" style="text-align:right;"></td><td></td></tr>
+                                    <tr><td class="account">Estimated Company Default Spread</td>
+                                        <td id="cofd_estimated_company_default_spread" style="text-align:right;"></td><td>%</td></tr>
+                                    <tr><td class="account">Estimated County Default Spread</td>
+                                        <td id="cofd_estimated_county_default_spread" style="text-align:right;"></td><td>%</td></tr>
+                                    <tr><td class="account">Estimated Cost of Debt</td>
+                                        <td id="cofd_estimated_cost_of_debt" style="text-align:right;"></td><td>%</td></tr>
+                                </table>
+                        </div>
+
+                        <div id="tab_cost_of_equity" class="container tab-pane">
+                                  <table class="data" style="width:25%">
+                                      <thead><tr><th>Parameter</th><th>Value</th><th></th></tr></thead>
+                                      <tr><td class="account">Risk Free</td>
+                                          <td id="cofe_rf" style="text-align:right;">0</td><td>%</td></tr>
+                                      <tr><td class="account">Unlevred Beta</td>
+                                          <td id="cofe_ub" style="text-align:right;">0</td><td></td></tr>
+                                      <tr><td class="account">Beta</td>
+                                          <td id="cofe_b" style="text-align:right;">0</td><td></td></tr>
+                                      <tr><td class="account">Mature marker risk premium</td>
+                                          <td id="cofe_rp" style="text-align:right;">0</td><td>%</td>
+                                      </tr>
+                                      <tr><td class="account">Adj. Default Spread</td>
+                                          <td id="cofe_ads" style="text-align:right;">0</td><td>%</td></tr>
+                                      <tr><td class="account">Volatility ratio</td>
+                                          <td id="cofe_vr" style="text-align:right;">1.5000</td></tr>
+                                      <tr><td class="account">Total Country Risk</td>
+                                          <td id="cofe_tcr" style="text-align:right;">0</td><td>%</td></tr>
+                                      <tr><td class="account">Cost of Equity</td>
+                                          <td id="cofe_" style="text-align:right;">0</td><td>%</td></tr>
+                                  </table>
+                        </div>
+
+                        <div id="tab_estimated_roic" class="container tab-pane">
+                                <span style="color:blue; font-size: 20px;"># of Periods for estimation:</span>
+                                <input id="roic_effective_tax_rate_periods" type="text" value="5" oninput="on_change_num_of_estimation_periods(event)" style="width:55px"/>
+                                <table class="data" id="estimated_roic" class="w3-table-all w3-hoverable" style="width:100%">
+                                 </table>
+                        </div>
+
+                        <div id="tab_effective_tax_rate" class="container tab-pane">
+                                <span style="color:blue; font-size: 20px;"># of Periods for estimation:</span>
+                                <input id="roic_effective_tax_rate_periods_" type="text" value="5" oninput="on_change_num_of_estimation_periods(event)" style="width:55px"/>
+                              <table class="data" id="effective_tax_rate" class="w3-table-all w3-hoverable" style="width:100%">
+                              </table>
+                        </div>
+
+                        <div id="tab_risk_premium" class="container tab-pane" style="width:100%;">
+
+                            <div id="chart_components" style="width:100%;">
+                            </div>
+                            <div id="chart_average" style="width:100%;">
+                            </div>
+                            <div id="chart_b" style="width:100%;">
+                            </div>
+                            <div id="chart_geometric" style="width:100%;">
+                            </div>
+                            <div id="risk_premium_data">
+                                Calculating Risk Premium.  Please wait.
+                            </div>
+                        </div>
+
+                      </div>
+                    <br/><br/><br/><br/>
+
+                    </div>
+                    <div id="valuation" class="tabcontent" style="padding-left:20px;width:100%">
+                        <span style="padding:10px; color:blue">
+                            <font size="5">Parameters effecting the valuation:</font>
+                        </span>
+                        <table style="background-color:lightblue">
+                            <tr>
+                                <td>WACC (%): </td><td style="padding-left:5px"><input id="wacc_" type="text" value="6" oninput="input_dcf(event)" style="width:55px;line-height:10px;text-align:right;"/></td>
+                                <td>EBIT (<span id="valuation_year_">1</span>):</td><td><input id="cf1_ebit" type="text" value="1000" oninput="input_dcf(event)" style="width:80px;line-height:10px;text-align:right;"/></td>
+                                <td>Short Term Growth(%):</td><td><input id="stgrowth_" type="text" value="5" oninput="input_dcf(event)" style="width:55px;line-height:10px;text-align:right;"/></td>
+                                <td>Long Term Growth(%):</td><td><input id="ltgrowth_" type="text" value="2" oninput="input_dcf(event)" style="width:55px;line-height:10px;text-align:right;"/></td>
+                            </tr>
+                            <tr>
+                                <td>Effective tax rate(%): </td><td style="padding-left:5px"><input id="effective_tax_rate_" type="text" value="0" oninput="input_dcf(event)" style="width:55px;line-height:10px;text-align:right;"/></td>
+                                <td>Marginal tax rate(%):</td><td style="padding-left:5px"><input id="marginal_tax_rate_" type="text" value="0" oninput="input_dcf(event)" style="width:55px;line-height:10px;text-align:right;"/></td>
+                                <td>ROIC (short term %):</td><td style="padding-left:5px"><input id="roic_st_" type="text" value="0" oninput="input_dcf(event)" style="width:55px;line-height:10px;text-align:right;"/></td>
+                                <td>ROIC (long term %) :</td><td style="padding-left:5px"><input id="roic_lt_" type="text" value="0" oninput="input_dcf(event)" style="width:55px;line-height:10px;text-align:right;"/></td>
+                            </tr>
+                            <tr>
+                                <td># of S.T. period</td><td style="padding-left:5px"><input id="duration_of_st_period_" type="text" value="5" oninput="input_dcf(event)" style="width:55px;line-height:10px;text-align:right;"/></td>
+                                <td></td><td></td>
+                                <td>Re-investment rate (ST %):</td>
+                                <td><input id="re_investment_rate_short_term_" type="text" value="0" oninput="input_dcf(event)" style="width:55px;line-height:10px;text-align:right;"/></td>
+                                <td>Re-investment rate (LT %):</td><td style="padding-left:5px"><input id="re_investment_rate_long_term_" type="text" value="0" oninput="input_dcf(event)" style="width:55px;line-height:10px;text-align:right;"/></td>
+                            </tr>
+                        </table>
+                        <br/>
+
+                        <div>
+                            <table id="dcf_framework" class="data">
+                            </table>
+                        </div>
+                        <br/><br/>
+                        <br/><br/><br/><br/>
+                    </div>
+
+                    <div id="sp_forecast_actual" class="tabcontent">
+                        <div id="result"></div>
+                        <input type="text" id="search_input" onkeyup="search_function()" n="2" placeholder="Search for Tickers.." title="Type in a name">
+                        <button onclick='start_streamer(event)'>Price Streams</button>
+                        <div id="sp_forecast_actual_data" class="data"></div>
+                    </div>
+
+                    <div id="valuationtodo" class="container tabcontent" >
+                        <button onclick="add_task(event)">Add Task</button>
+                    <table id="tasks" class="data" onchange="input_valuation_todo(event)">
+                        <thead>
+                            <tr>
+                                <th>Priority</th><th>subject</th><th>description</th><th>is_active</th>
+                            </tr>
+                        </thead>
+
+                    </table>
+                        <br/><br/><br/><br/><br/>
+                    </div>
+
+                    <div id="valuationmethodology" class="tabcontent container"></div>
+
+                    <div id="valuationadmin" class="tabcontent">
+                    <!--    Accounting -->
+                        <table>
+                            <tr>
+                                <td>
+                                    <table>
+                                        <tr><td>
+                                            <label for="myCheck">Update Data For Companies:</label>
+                                            <input type="checkbox" id="update_data_for_companies" onclick="update_data_for_companies()">
+                                        </td></tr>
+                                        <tr><td>
+                                            <label for="myCheck">Update Quarterly Data:</label>
+                                            <input type="checkbox" id="update_data_for_companiesq" onclick="update_data_for_companiesq(event)">
+                                        </td></tr>
+                                    </table><br/>
+                                </td>
+                                <td>
+                                    <h4>Fill cube data</h4>
+                                    <table>
+                                        <tr>
+                                            <td onclick="analysis_setup_attribute(event)">
+                                                <button fun="update_chart_of_accounts" style="width: 50px;">CofA</button>
+                                                <button fun="update_companies" style="width: 50px;">Com</button>
+                                                <button fun="update_time" style="width: 50px;">Time</button>
+                                                <button fun="update_fact_table" style="width: 50px;">Fact</button>
+                                                <button fun="get_data_for_ticker" style="width: 50px;">Pivot</button>
+                                            </td><td>
+                                                <input id="bi_attribute_name" type="text" value="ticker" size="4" placeholder="attribute name"/>
+                                                <input id="bi_attribute_value" type="text" value="AAPL" size="4" placeholder="attribute value"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td>
+                                    <div id="result_message">result_message</div>
+                                </td>
+                            </tr>
+                        </table>
+                        <hr/>
+                        <h4>AcademyCityXBRL</h4>
+                        <table>
+                            <tbody obj="AcademyCityXBRL" attributes_id="tdameritrade_attributes" message_id="result_message_academycityxbrl">
+                            <tr id="buttons" onclick="activate_obj_function(event)">
+                                <td>
+                                    <button fun="run_all_pages" style="width: 120px;">run_all_pages</button><br/>
+                                    This is an example of how to use the object GetAllUrlsProcessed.<br/>
+                                    To download several pages at the same time and process them.
+                                </td>
+                            </tr>
+                            <tr id="tdameritrade_attributes">
+                                <td>
+                                    <input type="text" value="ticker" size="4" placeholder="name"/>
+                                    <input type="text" value="AAPL" size="4" placeholder="value"/>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div id="result_message_academycityxbrl"></div><br/>
+
+                        <hr/>
+                        <table>
+                            <tr>
+                                <td>
+                                    <button onclick="tdameritrade_setup_w_attribute(event)" fun="get_option_statistics_for_ticker" style="width: 122px;">
+                                                optionForTicker</button>
+                                </td>
+                            </tr>
+                                    <tr>
+                                        <td>
+                                            <button onclick="tdameritrade_setup_w_attribute(event)" fun="get_quote" style="width: 122px;">get_quote</button>
+                                        </td>
+                                    </tr>
+                        </table>
+
+                        <hr/>
+                        <h5>S&P Functions</h5>
+                        <table>
+                            <tr>
+                                <td>
+                                    <button onclick="admin_setup(event)" fun="get_earning_forecast_sp500_view" style="width: 250px;">
+                                        get_earning_forecast_sp500_view
+                                    </button>
+                                </td>
+                            </tr>
+                        </table>
+                        <br/><br/><br/><br/>
+                    </div>
+                    <div id="valuationsetup" class="tabcontent"></div>
+                </div>
+
+                <br/><br/><br/>
+            </div>
+            <span id="tabs_"
+                tabs_s="valuation:Valuation;local,calculations:Schedules;local,calculations:Schedules;local,fsa:FSA;local,inputs:Inputs;local"
+                tabs_m="valuationsetup:Setup;pull_screen,valuationadmin:Admin;pull_screen,valuationmethodology:Methodology;pull_screen,valuationtodo:To Do;pull_screen,sec:SEC;local"
+                tabs_options = "sp_forecast_actual:S&P500;local" user_id = "607">
+            </span>
+            <span id="is_staff" is_staff="True" is_instructor="True"  is_options="False" is_fsa="False"></span>
+            <div id="log_info"></div>
+        </div>
+    </div>
+    <!--    beginning of footer -->
+
+<!--    end of footer  -->
+</div>
+<!-- end of body content-->
+
+
+
+<p id="demo"></p>
+
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
+         integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+ <script src="/static/js/reconnecting-websocket.js"></script>
+<script src="/static/vendor/jquery/jquery.min.js"></script>
+<script src="/static/js/npm/cookie/js.cookie.min.js"></script>
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+
+<script>
+function rp_input(event, r='null', type='country') {
+    // Capture the data from the row
+    const row = event.target.closest('tr');
+    const clientName = row.querySelector('td:nth-child(1)').innerText;
+    const plotNumber = row.querySelector('td:nth-child(2)').innerText;
+    const landPrice = row.querySelector('td:nth-child(3)').innerText;
+    const amountPaid = row.querySelector('td:nth-child(4)').querySelector('input').value;
+
+    // Make an Ajax call to update the data in the backend
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    fetch('{% url 'realestates:update_client_land' %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify({
+            clientName: clientName,
+            plotNumber: plotNumber,
+            landPrice: landPrice,
+            amountPaid: amountPaid,
+        }),
+    }).then(response => response.json())
+    .then(data => {
+        // handle response
+    }).catch(error => {
+        console.error('Error:', error);
+    });
+}
+</script>
+
+<!-- rp_input_(event) -->
+<script>
+function rp_input_(event, r="null", type="country")
+{
+ if (r!="null"){var e=r} else{var e = event.target.parentNode.parentNode;}
+ c = e.children[0].children[0].value;
+ id = e.children[0].children[0].getAttribute("rec_id");
+ re = e.children[1].children[0].value;
+ ra = e.children[2].children[0].value;
+ sp = e.children[3].children[0].value;
+ rp = e.children[4].children[0].value;
+ tx = e.children[5].children[0].value;
+  $.post('/en/corporatevaluation/update_country_risk/',
+  {
+    ty: type,
+    y: vObj["valuation_year"],
+    t: vObj["ticker"],
+    id: id,
+    c: c,
+    re:re ,
+    ra:ra ,
+    sp:sp ,
+    rp:rp ,
+    tx:tx ,
+  },
+  function(data){
+    try{
+    // alert(data['status']);
+        e.children[0].children[0].setAttribute("rec_id", data['id'])
+        //alert(e.outerHTML)
+    }
+    catch(err){alert(22)};
+  });
+}
+</script>
+
+<!-- add_country_risk_premium() -->
+<script>
+function add_country_risk_premium()
+{
+    t = document.getElementById("rp_countries_tbody_")
+    r = document.getElementById("rp_country_row")
+    var c = r.cloneNode(true);
+
+    var e = c.children[0].children[0]; e.value = -1;
+    e.setAttribute("rec_id", "-1");
+    t.appendChild(c);
+  try{s="add_country_risk_premium";} catch(er){alert("add_country_risk_premium - error in function "+s)}
+    return c;
+}
+</script>
+
+<!-- delete_rp_for_country_or_region(event) -->
+<script>
+function delete_rp_for_country_or_region(event, type="country")
+{
+
+ t = event.target; r = t.parentNode.parentNode.parentNode;
+
+ r.children[0].children[0].value = -1;
+ //alert(r.outerHTML)
+
+ rp_input_(event=event, r=r, type=type)
+
+ //alert("r\n" + r.outerHTML)
+ //alert("r.parentNode\n" + r.parentNode.outerHTML)
+ //alert(r.parentNode.children.length)
+
+ if(r.parentNode.children.length > 1)
+ {
+   r.parentNode.removeChild(r);
+ }
+
+  try{s="delete_rp_for_country_or_region";} catch(er){alert("delete_rp_for_country_or_region - error in function "+s)}
+}
+</script>
+
+<!-- PARAMETERS IN vObj -->
+<script>
+var vObj = new Object();
+</script>
+<script>
+var csrftoken = Cookies.get('csrftoken');
+function csrfSafeMethod(method) {
+// these HTTP methods do not require CSRF protection
+return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+beforeSend: function(xhr, settings) {
+  if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+  }
+}
+});
+
+$(document).ready(function(){
+
+post_ajax_create_action = function (verb_="", app_="", model_, obj_slug_=null, pkey_=null) {
+  $.post(link_create_action,
+    {
+      verb: verb_,
+      app: app_,
+      model: model_,
+      obj_slug: obj_slug_,
+      pkey: pkey_
+    },
+    function(data){
+        alert(data["status"])
+    }
+  );
+}
+
+
+// ================================================
+//  SimTab object
+function SimTab(parent, name, title, valuation_id, url_get_screens, screen_update)
+{
+ this.parent = parent; this.name = name; this.title = title; this.VALUATION_ID = valuation_id;
+ this.screen_update = screen_update; this.NAV = null; this.CONTENT = null;
+ // --
+ this.callback_functions = []; this.need_update_screen = 1; this.CONTENTObjects = {}; this.is_show_first = true;
+ //--
+
+  e = document.createElement("button");e.setAttribute("class", "tablinks ");e.setAttribute("id", "tab-"+name);
+  e.setAttribute("obj_name", name); e.innerHTML = title;
+
+  this.parent.tabTitles.insertBefore(e, this.parent.tabTitles.childNodes[0])
+
+  e.addEventListener("click", function(){
+    event.preventDefault();
+    obj_name = this.getAttribute('obj_name');
+    obj = parent.TabObjects[obj_name]
+    is_show_first = obj.is_show_first
+
+      //post_ajax_create_action('globsim__change_to_tab__' + obj.title)
+      var i, tabcontent, tablinks; tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {tabcontent[i].style.display = "none";}
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {tablinks[i].className = tablinks[i].className.replace(" active", "");}
+      document.getElementById(obj_name).style.display = "block"; this.className += " active";
+  }.bind(e, event, parent ));
+
+  this.tabTitle = e; this.tabDoc = ed;
+}
+
+
+// =========== Tabs management for admin ==========================
+// -- SimManagementTab object --
+function SimManagementTab(parent, name, title, valuation_id, url_get_screens, screen_update)
+{
+ //alert(JSON.stringify(parent))
+ this.parent = parent; this.name = name; this.title = title; this.VALUATION_ID = valuation_id;
+ this.screen_update = screen_update; this.NAV = null; this.CONTENT = null;
+ // --
+ this.callback_functions = [];
+ //--
+  if (this.screen_update == 'pull_screen')
+  {
+    ed = document.createElement("div"); ed.setAttribute("class", "tabcontent");
+    ed.setAttribute("id", this.name); this.parent.tabContents.appendChild(ed);
+  } else{try{ed = document.getElementById(this.name);} catch (er) {alert('Error1: ' + er)}}
+
+  // --
+  e = document.createElement("button");e.setAttribute("class", "tablinks ");e.setAttribute("id", "tab-"+name);
+  e.setAttribute("obj_name", name); e.innerHTML = title;
+
+  //alert(e.outerHTML);
+  this.parent.tabTitles.insertBefore(e, this.parent.tabTitles.childNodes[0])
+
+
+  e.addEventListener("click", function(){
+    //alert(event.target.outerHTML)
+    event.preventDefault(); obj_name = this.getAttribute('obj_name'); obj = parent.TabObjects[obj_name];
+
+    // --
+    //obj.title_click(obj); obj.parent.titleWasClicked();
+    // --
+      //post_ajax_create_action('globsim__change_to_tab__' + obj.title)
+      var i, tabcontent, tablinks; tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {tabcontent[i].style.display = "none";}
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {tablinks[i].className = tablinks[i].className.replace(" active", "");}
+      document.getElementById(obj_name).style.display = "block"; this.className += " active";
+  }.bind(e, event, parent ));
+
+ this.tabTitle = e; this.tabDoc = ed;
+
+ //try{
+ // name_ = this.name.toLowerCase(); content_ = name_ + "_content"; nav_ = name_ + "_nav"
+ // this.NAV = document.getElementById(nav_)
+ // this.CONTENT = document.getElementById(content_)
+// } catch(err) {}
+
+
+}
+
+
+
+
+// =========== Tabs management ==========================
+// -- SimManager --
+function SimManager(valuation_id)
+{
+    this.is_staff = document.getElementById("is_staff").getAttribute("is_staff");
+    this.is_instructor = document.getElementById("is_staff").getAttribute("is_instructor");
+    this.is_options = document.getElementById("is_staff").getAttribute("is_options");
+    this.is_fsa = document.getElementById("is_staff").getAttribute("is_fsa");
+    this.valuation_id = valuation_id;
+    this.url_get_screens = '/en/corporatevaluation/get_screens/';
+    this.name = "Corporate Valuation";
+    this.tabTitles = document.getElementById("tab_titles");
+    this.tabContents = document.getElementById("tab_contents");
+    this.TabObjects = {};
+    this.setTabs();
+    try{
+      var event = new Event("click", {bubbles: true});
+      this.TabObjects["inputs"].tabTitle.dispatchEvent(event);
+    } catch (err) {alert(err)}
+
+    startTime();
+}
+
+SimManager.prototype.titleWasClicked = function() {
+        for (t in this.TabObjects)
+        {
+          alert(t)
+          this.TabObjects[t].tabTitleWasClicked()
+        }
+}
+
+SimManager.prototype.setTabs = function() {
+    var tabs_ = document.getElementById("tabs_");
+
+    var tabs_s = tabs_.getAttribute("tabs_s");
+    var tans_all = tabs_s.split(",");
+
+    var tabs = {};
+    for (var property in tans_all) {
+      ss = tans_all[property]; ss_ = ss.split(":"); ss__ = ss_[1].split(";")
+      tabs[ss_[0]] = [ss__[0], ss__[1]]
+    }
+
+    //alert(JSON.stringify(tabs))
+
+    var tabs_options = tabs_.getAttribute("tabs_options");
+    var tabs_options_all = tabs_options.split(",");
+
+    var tabs_options = {};
+    for (var property in tabs_options_all) {
+      ss = tabs_options_all[property]; ss_ = ss.split(":"); ss__ = ss_[1].split(";")
+      tabs_options[ss_[0]] = [ss__[0], ss__[1]]
+    }
+    //alert(JSON.stringify(tabs_options))
+
+    var tabs_m = tabs_.getAttribute("tabs_m");
+    var tans_all_m = tabs_m.split(",");
+
+    var tabs_management = {};
+    for (const property in tans_all_m) {
+      var ss = tans_all_m[property]; var ss_ = ss.split(":");var ss__ = ss_[1].split(";");
+      tabs_management[ss_[0]] = [ss__[0], ss__[1]];
+    }
+
+    //alert(JSON.stringify(tabs_management))
+
+
+    if (this.is_staff == 'True' || this.is_instructor == 'True'){
+      for(var name in tabs_management)
+      {s = "this.TabObjects[name] = new SimManagementTab(this, name, '"+tabs_management[name][0]+"', this.valuation_id, this.url_get_screens, '"+tabs_management[name][1]+"')" ;eval(s) }
+    }
+
+    if (this.is_staff == 'True' || this.is_options == 'True' || this.is_fsa == 'True'){
+      for(var name in tabs_options)
+      {s = "this.TabObjects[name] = new SimTab(this, name, tabs_options[name][0], this.valuation_id, this.url_get_screens, tabs_options[name][1])" ;eval(s)}
+    }
+
+    for(var name in tabs)
+    {s = "this.TabObjects[name] = new SimTab(this, name, tabs[name][0], this.valuation_id, this.url_get_screens, tabs[name][1])" ; eval(s)}
+
+}
+
+
+// == Math ==
+function sigmoid(t) {
+    return 1/(1+Math.pow(Math.E, -t));
+}
+
+// == Timer ==
+function startTime() {const today=new Date();let h=today.getHours();let m=today.getMinutes();
+  let s=today.getSeconds();m=checkTime(m);s=checkTime(s);
+  for(var i in vObj["ids_for_timer"]){
+        try{document.getElementById(vObj["ids_for_timer"][i]).innerHTML= h+":"+m+":"+s} catch(er){}
+        };setTimeout(startTime, 1000);
+}
+function checkTime(i) {if (i < 10) {i = "0" + i}; return i;}
+
+// ------------------------------------------------
+sm = new SimManager(valuation_id=0)
+// ------------------------------------------------
+
+
+});
+
+</script>
+<script data-cms src="/static/bundle.toolbar.min.js" type="text/javascript"></script>
+
+
+</body>
+</html>
+
+
+
+
+<div id="rp_by_countries_" style="display:block">
+                                <table class="data" id="rp_countries_" onchange="calc_rp_(event)" oninput="calc_rp_(event)">
+                                    <thead>
+                                    <tr>
+                                        <th>Clients</th>
+                                        <th>PlotNumber</th>
+                                        <th>LandPrice</th>
+                                        <th>Paid</th>
+                                        <th>Date</th>
+                                        <th style="padding:0px">
+                                            <button class="btn" onclick="add_country_risk_premium()" style="color:white">
+                                            <i class="fa fa-plus"></i></button>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="rp_countries_tbody_">
+                                    <tr id="rp_country_row" onchange="rp_input_(event, r='null', type='country')">
+                                        <td>
+                                            <select id="countries" name="countries" onChange="countries_fun(event)" style="width:100%;" rec_id="-1">
+                                                <option value='0'>--------------------</option>
+                                                <option data='55.00_Aa2_0.44_0.66' value=1648>Abu Dhabi</option>
+                                                <option data='20.00_kk_None_0' value=1399>Afghanistan</option>
+                                                <option data='20.00_kk_None_0' value=1402>Aland Islands</option>
+                                                <option data='15.00_B1_3.98_5.97' value=1403>Albania</option>
+                                                <option data='26.00_kk_6.63_9.94' value=1463>Algeria</option>
+                                                <option data='34.00_kk_None_0' value=1409>American Samoa</option>
+                                                <option data='10.00_BBB_None_0' value=1404>Andorra</option>
+                                                <option data='30.00_Caa1_6.63_9.94' value=1400>Angola</option>
+                                                <option data='0.00_kk_None_0' value=1401>Anguilla</option>
+                                                <option data='None_kk_None_0' value=1410>Antarctica</option>
+                                                <option data='25.00_kk_None_0' value=1412>Antigua and Barbuda</option>
+                                            </select>
+                                        </td>
+                                        <td style="padding:0px"><input id="rp_revenues" style="width:100%;line-height: 10px;text-align: right;" type="text" value="1"/></td>
+                                        <td style="padding:0px"><input id="rp_rate" style="width:100%;line-height: 10px;text-align: right;" type="text" value=""/></td>
+                                        <td style="padding:0px"><input id="rp_spread" style="width:100%;line-height: 15px;text-align: right;" type="text" value=""/></td>
+                                        <td style="padding:0px"><input id="rp_risk_premium" style="width:100%;line-height: 10px;text-align: right;" type="text" value=""/></td>
+                                        <td style="padding:0px">
+                                            <button style="width:100%;" class="btn" onclick="delete_rp_for_country_or_region(event, type='country')">
+                                                <i class="fa fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+
+                                        <td>
+                                            <select id="clients" name="clients" onChange="clients_fun(event)" style="width:100%;">
+                                                <option value='-1'>--------------------</option>
+                                                <option value=1>Abu Dhabi</option>
+                                                <option  value=2>Afghanistan</option>
+                                                <option value=3>Aland Islands</option>
+                                                <option  value=4>Albania</option>
+                                            </select>
+                                        </td>
+
+
+
+                                        <tbody id="rp_countries_tbody_">
+                                            {% for client_land in client_lands %}
+                                            <tr id="rp_country_row" onchange="rp_input(event, r='null', type='country')">
+                                                <td>
+                                                    <input type="text" name="client_name" value="{{ client_land.client.name }}" readonly>
+                                                </td>
+                                                <td style="padding:0px">
+                                                    <input id="rp_plot_number" name="plot_number" type="text" value="{{ client_land.land.plot_number }}" />
+                                                </td>
+                                                <td style="padding:0px">
+                                                    <input id="rp_land_price" name="land_price" type="text" value="{{ client_land.land.price }}" />
+                                                </td>
+                                                <td style="padding:0px">
+                                                    <input id="rp_paid_amount" name="paid_amount" type="text" value="{{ client_land.total_amount_paid }}" />
+                                                </td>
+                                                <td style="padding:0px">
+                                                    <input id="rp_purchase_date" name="purchase_date" type="date" value="{{ client_land.payments.timestamp }}" />
+                                                </td>
+                                                <td style="padding:0px">
+                                                    <button style="width:100%;" class="btn" type="button" onclick="delete_rp_for_country_or_region(event, type='country')">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+
+
+
+
+                                <form id="clientLandForm" method="POST">
+                                    {% csrf_token %}
+                                    <table class="data" id="rp_countries_" onchange="calc_rp_(event)" oninput="calc_rp_(event)">
+                                        <thead>
+                                            <tr>
+                                                <th>Clients</th>
+                                                <th>Plot Number</th>
+                                                <th>Land Price</th>
+                                                <th>Paid</th>
+                                                <th>Date</th>
+                                                <th style="padding:0px">
+                                                    <button class="btn" type="button" onclick="add_client_record()" style="color:white">
+                                                        <i class="fa fa-plus"></i>
+                                                    </button>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="clientLandBody">
+                                            <tr id="clientRecordRow">
+                                                <td>
+                                                    <select name="client_name" id="clientSelect" onchange="loadClientLands(this)" required>
+                                                        <option value="">--- Select Client ---</option>
+                                                        {% for client in clients %}
+                                                            <option value="{{ client.id }}">{{ client.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                                <td><input type="text" name="plot_number" required></td>
+                                                <td><input type="number" name="land_price" required></td>
+                                                <td><input type="number" name="paid_amount" required></td>
+                                                <td><input type="date" name="purchase_date" required></td>
+                                                <td>
+                                                    <button type="button" class="btn btn-danger" onclick="remove_row(this)">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <button type="submit">Save</button>
+                                </form>

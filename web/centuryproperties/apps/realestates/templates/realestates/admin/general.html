@@ -1,0 +1,2564 @@
+{% extends "base_admin_dashboard.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block add_css %}
+
+    <link href="{% static 'estate/css/general.css' %}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <link href="{% static 'estate/css/simulation_style.css' %}" rel="stylesheet">
+    <link href="{% static 'estate/css/globsim.css' %}" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'estate/css/main.css' %}">
+
+    <style>
+        body {font-family: Arial;}
+
+        /* Style the tab */
+        .tab {
+          overflow: hidden;
+          border: 1px solid #ccc;
+          background-color: #f1f1f1;
+        }
+
+        /* Style the buttons inside the tab */
+        .tab button {
+          background-color: inherit;
+          float: left;
+          border: none;
+          outline: none;
+          cursor: pointer;
+          padding: 5px 10px;
+          transition: 0.3s;
+          font-size: 17px;
+        }
+
+        /* Change background color of buttons on hover */
+        .tab button:hover {
+          background-color: #ddd;
+        }
+
+        /* Create an active/current tablink class */
+        .tab button.active {
+          background-color: #ccc;
+        }
+
+        /* Style the tab content */
+        .tabcontent {
+          display: none;
+          padding: 6px 12px;
+          border: 1px solid #ccc;
+          border-top: none;
+        }
+    </style>
+    <style>
+        .value {
+         width:110px;
+         padding-right:3px;
+         text-align: right;
+        }
+
+        .account {
+          padding-left:5px; padding-right:5px;
+          text-align: left;
+        }
+
+        data {
+          font-family: Arial, Helvetica, sans-serif;
+          border-collapse: collapse;
+        }
+
+        .data td {
+          padding-top: 1px;
+          padding-bottom: 1px;
+          text-align: left;
+          border: 1px solid #ddd;
+        }
+
+        .data tr {
+          padding-top: 1px;
+          padding-bottom: 1px;
+          border: 1px solid #ddd;
+        }
+
+        .data th {
+          text-align: center;
+          padding-top: 1px;
+          padding-bottom: 1px;
+          background-color: blue;
+          color: white;
+          border: 1px solid #ddd;
+        }
+        .data tr:nth-child(even){background-color: lightblue}
+    </style>
+    <style>
+        .chosen {color: blue}
+    </style>
+    <style>
+    .button {
+      background-color: #ddd;
+      border: none;
+      color: black;
+      padding: 5px 10px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 16px;
+    }
+
+    .button:hover {
+      background-color: #f1f1f1;
+    }
+    </style>
+    <!-- designing the name of the company  -->
+    <style>
+      .pink-blue-gradient-text {
+          background-image: radial-gradient(circle, #144ee3, #f35792);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        .blue-pink-gradient-text {
+          background-image: radial-gradient(circle, #f35792, #144ee3);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        a {
+          text-decoration: none;
+        }
+    </style>
+   <!--https://getbootstrap.com/docs/5.1/components/navbar/  -->
+   <!--https://www.w3schools.com/bootstrap4/tryit.asp?filename=trybs_nav_pills_toggleable&stacked=h-->
+
+   <link rel="stylesheet" href="{% static 'estate/css/bootstrap.min_copy.css' %}">
+
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+   <!-- Icon Font Stylesheet -->
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+   <!-- clientPaymentTable -->
+    <style>>
+    /* Ensure table inputs are smaller on mobile */
+        @media (max-width: 768px) {
+            #clientPaymentTable {
+                font-size: 12px; /* Adjust font size for mobile */
+            }
+            #clientPaymentTable input {
+                padding: 4px; /* Reduce padding for smaller screens */
+            }
+            #clientPaymentTable .btn {
+                padding: 4px 6px; /* Smaller buttons on mobile */
+            }
+        }
+
+        /* Optional: Adjust columns to wrap content on very small screens */
+        @media (max-width: 576px) {
+            #clientPaymentTable th, #clientPaymentTable td {
+                white-space: nowrap; /* Prevent breaking content mid-word */
+            }
+        }
+    </style>
+
+    <!-- employeeClientsTable -->
+    <style>>
+    /* Ensure table inputs are smaller on mobile */
+        @media (max-width: 768px) {
+            #employeeClientsTable {
+                font-size: 12px; /* Adjust font size for mobile */
+            }
+            #employeeClientsTable input {
+                padding: 4px; /* Reduce padding for smaller screens */
+            }
+            #employeeClientsTable .btn {
+                padding: 4px 6px; /* Smaller buttons on mobile */
+            }
+        }
+
+        /* Optional: Adjust columns to wrap content on very small screens */
+        @media (max-width: 576px) {
+            #employeeClientsTable th, #employeeClientsTable td {
+                white-space: nowrap; /* Prevent breaking content mid-word */
+            }
+        }
+    </style>
+
+    <style>
+        /* Responsive form container */
+        .responsive-form {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto; /* Allow horizontal scrolling if necessary */
+        }
+
+        /* Ensure the form controls are responsive */
+        .responsive-form select {
+            width: 100%;
+            max-width: 100%; /* Make select fields responsive */
+        }
+
+        .elm-group {
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping of inputs and buttons */
+            gap: 10px;
+        }
+
+        .elm-group select,
+        .elm-group button {
+            flex: 1;
+            min-width: 150px; /* Ensure elements don't get too narrow */
+        }
+
+        /* Media queries for small screens */
+        @media (max-width: 768px) {
+            .elm-group select,
+            .elm-group button {
+                width: 100%; /* Make inputs and buttons take full width on small screens */
+            }
+
+            /* Optional: Reduce button size on small screens */
+            .btn {
+                padding: 5px 10px;
+                font-size: 14px;
+            }
+
+            .responsive-form td {
+                display: block;
+                width: 100%; /* Make table cells stack vertically */
+            }
+        }
+    </style>
+
+    <style>
+    .custom-border {
+        border: 2px solid #007BFF; /* Change the color and width as desired */
+        border-radius: 5px; /* Add some border-radius for rounded corners */
+        padding: 10px; /* Optional: Add some padding for better appearance */
+    }
+
+    .custom-border:focus {
+        border-color: #0056b3; /* Change the border color when focused */
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Optional: Add shadow on focus */
+    }
+
+
+    .pagination {
+        margin-top: 20px; /* Add margin to the top of pagination controls */
+    }
+  </style>
+   <!-- client and distributor list display style  -->
+    <style>
+        .clients-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 16px;
+        margin-top: 20px;
+       }
+
+        .client-card {
+            background-color: #343a40;
+            padding: 20px;
+            border-radius: 8px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 150px;
+        }
+
+        .client-info {
+            margin-bottom: 10px;
+        }
+
+        .client-date, .client-name, .client-contact {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .client-action {
+            text-align: center;
+        }
+
+        .client-action .btn {
+            width: 100%;
+        }
+
+        .pagination {
+            margin-top: 20px;
+        }
+
+        .pagination .step-links a, .pagination .current {
+            color: white;
+            margin: 0 5px;
+        }
+
+        .pagination .step-links a {
+            text-decoration: none;
+            color: #17a2b8;
+        }
+
+        .pagination .step-links a:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+   <!--Increasing the size of the input  -->
+    <style>
+        /* Style the table normally on larger screens */
+        table {
+            width: 100%;
+            table-layout: auto;
+        }
+
+        /* On mobile devices, convert table rows to block elements */
+        @media (max-width: 600px) {
+            table, tbody, tr, td, th {
+                display: block; /* Stack the rows vertically */
+                width: 100%;
+            }
+
+            tr {
+                margin-bottom: 15px; /* Add space between rows */
+            }
+
+            td {
+                display: flex;
+                justify-content: space-between;
+                padding: 10px 0;
+                border-bottom: 1px solid #ddd;
+            }
+
+            td::before {
+                content: attr(data-label); /* Create labels for each cell */
+                font-weight: bold;
+                text-transform: uppercase;
+                margin-right: 10px;
+            }
+
+            input[type="text"], input[type="date"], input[type="number"] {
+                width: 100%; /* Full width for inputs in stacked rows */
+                padding: 10px;
+            }
+        }
+
+    </style>
+
+   <!-- css for the popup message  -->
+    <style>
+       .notification-popup {
+        display: none; /* Hidden by default */
+        position: fixed;
+        top: 20px; /* Distance from the top of the page */
+        left: 50%;
+        transform: translateX(-50%); /* Center horizontally */
+        padding: 15px 20px;
+        border-radius: 5px;
+        color: white;
+        font-size: 16px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        transition: opacity 0.3s ease;
+    }
+
+    .notification-popup.success {
+        background-color: #28a745; /* Green for success */
+    }
+
+    .notification-popup.error {
+        background-color: #dc3545; /* Red for error */
+    }
+
+    .notification-popup .close-btn {
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+
+    </style>
+
+{% endblock %}
+
+
+{% block Navbar %}
+<!-- Navbar -->
+<nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
+    <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+        <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)"> <i class="fa fa-bars" aria-hidden="true"></i> </a>
+    </div>
+</nav>
+<!-- / Navbar -->
+{% endblock Navbar %}
+
+
+{% block content %}
+<div id="modal-exclude">
+    <!--    beginning of top nav -->
+    <!--
+    <div class="navbar-brand mx-4 mb-3 mt-2 d-flex align-items-center">
+        <a href="/pay">
+            <img class="rounded-circle" src="{% static 'estate/img/com_logo.jpeg' %}" alt="" style="width: 80px; margin-left:-10px; margin-right: 10px;">
+        </a>
+        <div>
+            <h5 class="text-info mb-0" style="text-align:left;font-weight:bold">
+                <span class="blue-pink-gradient-text">Century Properties</span><br>
+                <span style="margin-left:60px;" class="pink-blue-gradient-text">&amp;</span><br>
+                <span class="pink-blue-gradient-text">Real Estates Ltd</span>
+            </h5>
+        </div>
+    </div>
+    -->
+    <!--    end of top nav  -->
+
+   <!-- Popup Message    -->
+    <div id="notificationPopup" class="notification-popup">
+        <span id="notificationMessage"></span>
+        <button type="button" onclick="closeNotification()" class="close-btn">&times;</button>
+    </div>
+
+
+    <div class="body-content">
+        <div class="homepage">
+            <!--tabes click-->
+            <div>
+                <div style="color:white;background-color:darkblue;font-size:16px">
+                    <span>Century Properties & Real Estates Ltd - Record System </span><span style="color:gold" id="main_page_time"></span>
+                </div>
+                <!-- Location for tabs.  The management tabs has to be entered manually  -->
+                <div id="tab_titles" class="tab">
+                </div>
+                <div id="tab_contents"  style="padding-left:30px">
+
+                        <div id="inputs" class="tabcontent"  style="background-color:lightcyan">
+
+                            <div class="row g-3">
+                              <!-- Card Border Shadow -->
+                              <div class="col-lg-2 col-sm-3">
+                                <div class="card card-border-shadow-success h-100">
+                                  <div class="card-body">
+                                    <div class="d-flex align-items-center mb-2">
+                                      <div class="avatar me-4">
+                                        <span class="avatar-initial rounded bg-label-success"><i class="fa fa-chart-line fa-2x text-success"></i></span>
+                                      </div>
+                                      <h4 class="mb-0">{{total_amount_month}}</h4>
+                                    </div>
+                                    <p class="mb-2">Monthly Sale</p>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-lg-2 col-sm-3">
+                                <div class="card card-border-shadow-info h-100">
+                                  <div class="card-body">
+                                    <div class="d-flex align-items-center mb-2">
+                                      <div class="avatar me-4">
+                                        <span class="avatar-initial rounded bg-label-info"><i class="fa fa-chart-bar fa-2x text-info"></i></span>
+                                      </div>
+                                      <h4 class="mb-0">{{total_sales_previous_months_sum}}</h4>
+                                    </div>
+                                    <p class="mb-2">Total Sale</p>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-lg-2 col-sm-3">
+                                <div class="card card-border-shadow-danger h-100">
+                                  <div class="card-body">
+                                    <div class="d-flex align-items-center mb-2">
+                                      <div class="avatar me-4">
+                                        <span class="avatar-initial rounded bg-label-danger"><i class="fa fa-users text-warning" aria-hidden="true" style='font-size:30px;'></i></span>
+                                      </div>
+                                      <h4 class="mb-0">{{total_number_employees}}</h4>
+                                    </div>
+                                    <p class="mb-2">Distributors</p>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-lg-2 col-sm-3">
+                                <div class="card card-border-shadow-primary h-100">
+                                  <div class="card-body">
+                                    <div class="d-flex align-items-center mb-2">
+                                      <div class="avatar me-4">
+                                        <span class="avatar-initial rounded bg-label-info"><i class="fa fa-user-friends" aria-hidden="true" style='font-size:30px;color:blue'></i></span>
+                                      </div>
+                                      <h4 class="mb-0">{{total_num_clients_}}</h4>
+                                    </div>
+                                    <p class="mb-2">Clients</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <br>
+                            <div class="responsive-form">
+                                <table>
+                                    <tr>
+
+                                        <td>
+                                            <span class="text-dark" style="font-weight:bold">Client:</span><br>
+                                            <select class="select2 form-control form-control-sm" name="client_name" id="clientSelect" onchange="loadClientLands(this)" required>
+                                                <option value="">------------- Select Client ------------</option>
+                                            </select>
+                                            <!-- Edit Client Info Button -->
+                                            <button id="edit-client-info-btn" class="btn btn-info btn-sm" type="button" style=" display:none;line-height: 15px;">
+                                                Edit Client Info
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="text-dark" style="font-weight:bold">Client Land:</span>
+                                            <select class="select2 form-control form-control-sm" style="padding: 4px;line-height: 1.5;height: auto;" name="client_land" onchange="loadSelectedLand(event)" required>
+                                                <option value="">-----Select Client Land-----</option>
+                                            </select>
+                                            <button type="button" class="btn btn-primary btn-sm" onclick="openCreateLandModal(event)" style="line-height: 15px;">
+                                                Add Land
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div style="display: flex; gap: 10px;">
+                                <span id="land-price" style="display:none"></span>
+                                <span id="total-paid" style="display:none"></span>
+                                <span id="balance" style="display:none"></span>
+                            </div>
+
+                            <div id="rp_by_countries_" style="display:block">
+                                <form id="clientPaymentForm" method="POST">
+                                    {% csrf_token %}
+                                    <!-- Add Bootstrap's table-responsive class for mobile responsiveness -->
+                                    <div class="table-responsive">
+                                        <table class="data" id="clientPaymentTable">
+                                            <thead class="thead-dark">
+                                                <tr>
+                                                    <th>Client Land</th>
+                                                    <th>Amount Paid</th>
+                                                    <th>Approved</th>
+                                                    <th>Approved By</th>
+                                                    <th>Distributor</th>
+                                                    <th>Timestamp</th>
+                                                    <th>Edit</th>
+                                                    <th style="padding:0px">
+                                                        <button class="btn" type="button" onclick="add_payment_record(loggedInUser, employeesList)" style="color:white">
+                                                            <i class="fa fa-plus"></i>
+                                                        </button>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="clientPaymentBody">
+                                                <!-- Example Rows -->
+                                                <tr>
+                                                    <td>example - u101</td>
+                                                    <td><input type="text" class="form-control form-control-sm" name="amount_paid" value="10,000" readonly></td>
+                                                    <td><input type="checkbox" name="approved" checked disabled></td>
+                                                    <td><input type="text" class="form-control form-control-sm" name="approved_by" value="admin" readonly></td>
+                                                    <td><input type="text" class="form-control form-control-sm" name="employee" value="David Jeremiah" readonly></td>
+                                                    <td><input type="text" class="form-control form-control-sm" name="timestamp" value="Sep. 25, 2024" readonly></td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-warning btn-sm">
+                                                            <i class="fa fa-edit"></i>
+                                                        </button>
+                                                    </td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-danger btn-sm">
+                                                            <i class="fa fa-window-close" aria-hidden="true"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                       <!-- registration for both clients and distributors --->
+                        <div id="fsa"    class="tabcontent data"  style="padding-left:20px;width:100%">
+                          <!-- Nav pills -->
+                          <ul class="nav nav-pills" role="tablist">
+                            <li class="nav-item"><a id="fsa_vertical" class="nav-link" data-page="distributor_form" data-toggle="pill" href="#distributor_form">Distributor</a></li>
+                            <li class="nav-item"><a id="fsa_income_statement" class="nav-link" data-page="client_form" data-toggle="pill" href="#client_form">Client</a></li>
+                            <li class="nav-item"><a id="fsa_balance_sheet" class="nav-link active" data-toggle="pill" href="#test">Demo</a></li>
+                          </ul>
+                          <!-- Tab panes -->
+                          <div class="tab-contents">
+                             <div id="distributor_form" class="tab-pane">
+                                 <!-- distributor_form -->
+                                 {% include 'realestates/include/distributor_form.html'  %}
+                             </div>
+                            <div id="client_form" class="tab-pane">
+                                 <!-- client_form -->
+                                {% include 'realestates/include/client_form.html'  %}
+                            </div>
+                            <div id="test" class="tab-pane">test page</div>
+
+                          </div>
+                        </div>
+
+                    <div id="sec" class="tabcontent">
+                        <div id="valuationsetup_xbrl_data"></div>
+                        <div id="navigation_table"></div>
+                    </div>
+
+                   <!-- income  -->
+                    <div id="calculations" class="tabcontent" style="padding-left:20px;width:100%">
+                      <!-- Nav pills -->
+                      <ul class="nav nav-pills" role="tablist">
+                        <li class="nav-item"><a id="calc_estimated_roic" class="nav-link" data-toggle="pill" href="#yearly_sale">Yearly Sale</a></li>
+                        <li class="nav-item"><a id="calc_cost_of_debt" class="nav-link show_content" data-page="monthly_sale" data-toggle="pill" href="#monthly_sale">Monthly Sale</a></li>
+                      </ul>
+                      <!-- Tab panes -->
+                      <div class="tab-contents">
+
+                        <div id="yearly_sale" class="container tab-pane">
+                                <span style="color:blue; font-size: 20px;"># of Periods for estimation:</span>
+                                <input id="roic_effective_tax_rate_periods" type="text" value="1" oninput="on_change_num_of_estimation_periods(event)" style="width:55px"/>
+                                <table class="data w3-table-all w3-hoverable" id="estimated_roic"  style="width:100%">
+                                </table>
+                        </div>
+
+                        <div id="monthly_sale" class="container tab-pane">
+                            <!-- monthly sale -->
+                        </div>
+
+                      </div>
+                    <br/><br/><br/><br/>
+                    </div>
+                    <!-- client and distributor list -->
+                    <div id="valuation" class="tabcontent" style="padding-left:20px;width:100%">
+                        <!-- Nav pills -->
+                          <ul class="nav nav-pills" role="tablist">
+                              <li class="nav-item"><a  class="nav-link" data-toggle="pill" href="#all">All</a></li>
+                            <li class="nav-item"><a  class="nav-link show_content" data-page="clients" data-toggle="pill" href="#clients">Clients</a></li>
+                            <li class="nav-item"><a class="nav-link show_content" data-page="distributors" data-toggle="pill" href="#distributors">Distributors</a></li>
+                          </ul>
+                          <!-- Tab panes -->
+                          <div class="tab-contents">
+                            <div id="all" class="tab-pane">
+                                <div class="responsive-form">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <span class="text-dark" style="font-weight:bold">Distributor:</span><br>
+                                                <select class="select2 form-control form-control-sm" name="employee_name" id="employeeSelect" onchange="loadEmployeesClients(this)" required>
+                                                    <option value="">------------- Select Distributor ------------</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div style="display: flex; gap: 10px;">
+                                <span id="client_count" style="display:none;color:red;font-weight:bold"></span>
+                            </div>
+                                <div class="table-responsive">
+                                    <table class="data" id="employeeClientsTable">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th>clientName</th>
+                                                <th>Contact1</th>
+                                                <th>Contact2</th>
+                                                <th>Location</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="employeeClientsBody">
+                                            <!-- Example Rows -->
+                                            <tr>
+                                                <td><input type="text" class="form-control form-control-sm" name="amount_paid" value="example" readonly></td>
+                                                <td><input type="text" class="form-control form-control-sm" name="approved_by" value="0781218116" readonly></td>
+                                                <td><input type="text" class="form-control form-control-sm" name="approved_by" value="" readonly=""></td>
+                                                <td><input type="text" class="form-control form-control-sm" name="approved_by" value="Kampala" readonly=""></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div id="clients" class="tab-pane">
+                                <!-- all_clients -->
+                            </div>
+                            <div id="distributors" class="tab-pane fade">
+                               <!-- all_distributors -->
+                            </div>
+                          </div>
+                    </div>
+
+                    <div id="payslip" class="tabcontent">
+                        <div id="" class="tab-pane">
+                                <div class="responsive-form">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <span class="text-dark" style="font-weight:bold">Distributor:</span><br>
+                                                <select class="select2 form-control form-control-sm" name="distributor_name" id="employeePayslipSelect" onchange="loadPayslipByClients(this)" required>
+                                                    <option value="">------------- Select Distributor ------------</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="data" id="employeePayslipTable">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th>Client Name</th>
+                                                <th>Commission</th>
+                                                <th>Add</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="employeePayslipBody">
+                                            <!-- Example Rows will be populated here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    <div id="sp_forecast_actual" class="tabcontent">
+                        <div id="result"></div>
+                        <input type="text" id="search_input" onkeyup="search_function()" n="2" placeholder="Search for Tickers.." title="Type in a name">
+                        <button onclick='start_streamer(event)'>Price Streams</button>
+                        <div id="sp_forecast_actual_data" class="data"></div>
+                    </div>
+
+                    <div id="valuationtodo" class="container tabcontent" >
+                        <button onclick="add_task(event)">Add Task</button>
+                    <table id="tasks" class="data" onchange="input_valuation_todo(event)">
+                        <thead>
+                            <tr>
+                                <th>Priority</th><th>subject</th><th>description</th><th>is_active</th>
+                            </tr>
+                        </thead>
+
+                    </table>
+                        <br/><br/><br/><br/><br/>
+                    </div>
+
+                    <div id="valuationmethodology" class="tabcontent container"></div>
+
+                    <div id="valuationadmin" class="tabcontent">
+                    <!--    Accounting -->
+                        <table>
+                            <tr>
+                                <td>
+                                    <table>
+                                        <tr><td>
+                                            <label for="myCheck">Update Data For Companies:</label>
+                                            <input type="checkbox" id="update_data_for_companies" onclick="update_data_for_companies()">
+                                        </td></tr>
+                                        <tr><td>
+                                            <label for="myCheck">Update Quarterly Data:</label>
+                                            <input type="checkbox" id="update_data_for_companiesq" onclick="update_data_for_companiesq(event)">
+                                        </td></tr>
+                                    </table><br/>
+                                </td>
+                                <td>
+                                    <h4>Fill cube data</h4>
+                                    <table>
+                                        <tr>
+                                            <td onclick="analysis_setup_attribute(event)">
+                                                <button fun="update_chart_of_accounts" style="width: 50px;">CofA</button>
+                                                <button fun="update_companies" style="width: 50px;">Com</button>
+                                                <button fun="update_time" style="width: 50px;">Time</button>
+                                                <button fun="update_fact_table" style="width: 50px;">Fact</button>
+                                                <button fun="get_data_for_ticker" style="width: 50px;">Pivot</button>
+                                            </td><td>
+                                                <input id="bi_attribute_name" type="text" value="ticker" size="4" placeholder="attribute name"/>
+                                                <input id="bi_attribute_value" type="text" value="AAPL" size="4" placeholder="attribute value"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td>
+                                    <div id="result_message">result_message</div>
+                                </td>
+                            </tr>
+                        </table>
+                        <hr/>
+                        <h4>AcademyCityXBRL</h4>
+                        <table>
+                            <tbody obj="AcademyCityXBRL" attributes_id="tdameritrade_attributes" message_id="result_message_academycityxbrl">
+                            <tr id="buttons" onclick="activate_obj_function(event)">
+                                <td>
+                                    <button fun="run_all_pages" style="width: 120px;">run_all_pages</button><br/>
+                                    This is an example of how to use the object GetAllUrlsProcessed.<br/>
+                                    To download several pages at the same time and process them.
+                                </td>
+                            </tr>
+                            <tr id="tdameritrade_attributes">
+                                <td>
+                                    <input type="text" value="ticker" size="4" placeholder="name"/>
+                                    <input type="text" value="AAPL" size="4" placeholder="value"/>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div id="result_message_academycityxbrl"></div><br/>
+
+                        <hr/>
+                        <table>
+                            <tr>
+                                <td>
+                                    <button onclick="tdameritrade_setup_w_attribute(event)" fun="get_option_statistics_for_ticker" style="width: 122px;">
+                                                optionForTicker</button>
+                                </td>
+                            </tr>
+                                    <tr>
+                                        <td>
+                                            <button onclick="tdameritrade_setup_w_attribute(event)" fun="get_quote" style="width: 122px;">get_quote</button>
+                                        </td>
+                                    </tr>
+                        </table>
+
+                        <hr/>
+                        <h5>S&P Functions</h5>
+                        <table>
+                            <tr>
+                                <td>
+                                    <button onclick="admin_setup(event)" fun="get_earning_forecast_sp500_view" style="width: 250px;">
+                                        get_earning_forecast_sp500_view
+                                    </button>
+                                </td>
+                            </tr>
+                        </table>
+                        <br/><br/><br/><br/>
+                    </div>
+                    <div id="valuationsetup" class="tabcontent"></div>
+                </div>
+
+                <br/><br/><br/>
+            </div>
+            <span id="tabs_"
+                tabs_s="payslip:<i class='fa fa-credit-card custom me-1'></i>PayRoll;local,valuation:<i class='fa fa-users me-1'></i>Clients&Distributors;local,fsa:<i class='fa fa-user-plus me-1'></i>Register;local,calculations:<i class='fas fa-money-check me-1'></i>Income;local,inputs:<i class='fa fa-cash-register me-1'></i>Inputs;local"
+                tabs_m="valuationsetup:Setup;pull_screen,valuationadmin:Admin;pull_screen,valuationmethodology:Methodology;pull_screen,valuationtodo:To Do;pull_screen,sec:SEC;local"
+                tabs_options = "sp_forecast_actual:S&P500;local" user_id = "607">
+            </span>
+            <span id="is_staff" is_staff="{{user.is_staff}}" is_instructor="{{user|has_group:'instructors'}}"  is_options="{{user|has_group:'options'}}" is_fsa="{{user|has_group:'fsa'}}"></span>
+            <div id="log_info"></div>
+        </div>
+    </div>
+    <!--    beginning of footer -->
+
+<!--    end of footer  -->
+</div>
+
+<!-- Modal for adding new land -->
+<div class="modal fade" id="addLandModal" tabindex="-1" aria-labelledby="addLandModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addLandModalLabel">Add New Land</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="addLandForm" method="POST" action="">
+        {% csrf_token %}
+        <div class="modal-body">
+          <!-- Error Message Container -->
+          <div id="errorMessage" class="alert alert-danger d-none" role="alert"></div>
+
+          <!-- Render your LandForm here -->
+          {{ land_form.as_p }}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save Land</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<p id="demo"></p>
+
+<!--Alert Message Div-->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationModalLabel">Confirm Deletion</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmationModalMessage">Are you sure you want to delete this payment record?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" id="confirmActionButton" class="btn btn-danger">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+
+
+{% block add_js %}
+
+<script>
+    $(document).ready(function() {
+        $('#searchInput').on('keyup', function() {
+            var searchText = $(this).val().toLowerCase();
+            $(this).closest('.bg-secondary').find('.search-table tbody tr').filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(searchText) > -1);
+            });
+        });
+    });
+</script>
+
+<!--- auto trigger the input event -->
+<script>
+// This will trigger the event when the page loads
+window.onload = function() {
+    var inputElement = document.getElementById('roic_effective_tax_rate_periods');
+
+    // Create a new 'input' event
+    var event = new Event('input', {
+        bubbles: true, // Allows the event to bubble up the DOM
+        cancelable: true // The event can be canceled
+    });
+
+    // Dispatch the input event to the element, triggering the oninput handler
+    inputElement.dispatchEvent(event);
+};
+</script>
+
+<!--- Yearly sale -->
+<script>
+function on_change_num_of_estimation_periods(event)
+{
+    // --- Roic -----
+    // --------------
+    var year = "<thead><th>Date</th>"
+    var oiat = ""
+
+    roic_effective_tax_rate_periods_ = document.getElementById('roic_effective_tax_rate_periods').value
+
+    valuation_year_ = '2024'
+
+    nn_ = valuation_year_ - roic_effective_tax_rate_periods_ + 1
+
+    $.post('{% url 'realestates:get_payment_records' %}',
+          {
+            year: nn_,
+          },
+          function(data){
+
+          //alert(JSON.stringify(data))
+
+          if(data.length == 0){
+            //alert('No Transaction made on this year '+ nn_)
+            oiat += "<tr style='text-align:center;color:red;font-weight:bold' ><td>"+nn_+"</td>"
+            oiat += "<td style='text-align:center;color:red;font-weight:bold'>" + 'No Transaction made on this year ' + "</td>";
+          }
+
+          year += "<th> Amount </th></thead>";
+
+          for( t in data)
+         {
+            date = data[t]["date"]
+            amount_paid = data[t]["amount_paid"]
+            oiat += "<tr><td>"+date+"</td>"
+             oiat += "<td style='text-align:right'>" + toCommas(amount_paid) + "</td>";
+         }
+
+        st = year + oiat
+
+        document.getElementById('estimated_roic').innerHTML = st
+
+    });
+
+}
+</script>
+
+<!--deleteDistributor function-->
+<script>
+function deleteDistributor(event, distributorId) {
+    event.preventDefault();
+
+    showConfirmationModal("Are you sure you want to delete this distributor?", function() {
+
+        fetch(`/delete-employee/${distributorId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'), // Fetch the CSRF token
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const messageContainer = document.getElementById("messageContainer");
+            messageContainer.innerHTML = '';  // Clear previous messages
+
+            // Display success or error message based on the response
+            if (data.success) {
+                messageContainer.innerHTML = `<div class="alert alert-success alert-dismissible fade show" role="alert">
+                    ${data.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+                // Remove the distributor card
+                document.getElementById(`distributor-${distributorId}`).remove();
+            } else {
+                messageContainer.innerHTML = `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    ${data.error}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An unexpected error occurred.');
+        });
+
+    });
+}
+
+// Function to get the CSRF token from cookies
+function getCookie(name) {
+    let cookieValue = null;
+    const cookies = document.cookie.split(';');
+    cookies.forEach(cookie => {
+        const cookieTrimmed = cookie.trim();
+        if (cookieTrimmed.startsWith(name + '=')) {
+            cookieValue = decodeURIComponent(cookieTrimmed.substring(name.length + 1));
+        }
+    });
+    return cookieValue;
+}
+</script>
+
+<!--employeeSelect, Displays Employee list-->
+<script>
+    $(document).ready(function() {
+        $('#employeeSelect').select2({
+            ajax: {
+                url: '/employee-list-api/',  // API URL for fetching paginated clients
+                dataType: 'json',
+                delay: 250,  // Add delay to reduce number of API requests
+                data: function (params) {
+                    return {
+                        q: params.term,  // Search term
+                        page: params.page || 1  // Pagination
+                    };
+                },
+                processResults: function (data) {
+                    // Map received data into Select2 format
+                    return {
+                        results: data.distributors.map(function(distributor) {
+                            return {
+                                id: distributor.id,
+                                text: `${distributor.name} (username: ${distributor.username}, ${distributor.email})`
+                            };
+                        }),
+                        pagination: {
+                            more: data.has_next  // Indicates if more pages are available
+                        }
+                    };
+                },
+                cache: true
+            },
+            placeholder: '------------- Select Distributor  ------------',
+            minimumInputLength: 1,  // Trigger search after typing 1 character
+        });
+    });
+</script>
+
+<!--loadEmployeesClients, Function that Load Employee's Clients-->
+<script>
+
+var defaultEmployeeId = null;
+var defaultEmployeeName = '';
+var selectedLandId = null;
+
+// Load client lands and payments based on the selected client
+function loadEmployeesClients(selectElement) {
+    var employeeId = selectElement.value;  // Get the selected client ID
+    //alert(employeeId)
+    const url = `/employee-clients/${employeeId}/`;
+
+    if (employeeId) {
+        fetch(url)  // Fetch payment data and client lands for the selected client
+            .then(response => response.json())
+            .then(data => {
+                var tableBody = document.getElementById("employeeClientsBody");
+                tableBody.innerHTML = '';  // Clear previous payment details
+
+                //alert(JSON.stringify(data))
+
+                employee_clients_list = data.clients
+
+                if(employee_clients_list.length == 0){
+                    var client_count_span = document.getElementById("client_count")
+                    client_count_span.setAttribute('style', 'display:block;color:blue;font-weight:bold')
+                    client_count_span.innerHTML = 'Total number of clients: '+data.client_count
+                    var newRow = document.createElement("tr");
+                    newRow.innerHTML = `<tr><span style="color:red;font-weight:bold"> Distributor has no client. </span></tr>`
+                    tableBody.appendChild(newRow);
+                    return;
+                }
+
+                // Populate existing payments for the selected client
+                data.clients.forEach(client => {
+                    var newRow = document.createElement("tr");
+                    newRow.innerHTML = `
+                        <td><input type="text" class="form-control form-control-sm" name="client_name" value="${client.name}" readonly></td>
+                        <td><input type="text" class="form-control form-control-sm" name="phone_number1" value="${client.phone_number1}" readonly></td>
+                        <td><input type="text" class="form-control form-control-sm" name="phone_number2" value="${client.phone_number2}" readonly></td>
+                        <td><input type="text" class="form-control form-control-sm" name="location" value="${client.location}" readonly></td>
+                    `;
+                    tableBody.appendChild(newRow);
+                });
+                 var client_count_span = document.getElementById("client_count")
+                 client_count_span.setAttribute('style', 'display:block;color:blue;font-weight:bold')
+                 client_count_span.innerHTML = 'Total number of clients: '+data.client_count
+            })
+            .catch(error => {
+                console.error('Error fetching payment details:', error);
+            });
+    }
+
+
+}
+
+</script>
+
+
+<!-- clientSelect, displays list of clients -->
+<script>
+    $(document).ready(function() {
+        $('#clientSelect').select2({
+            ajax: {
+                url: '/client-list-api/',  // API URL for fetching paginated clients
+                dataType: 'json',
+                delay: 250,  // Add delay to reduce number of API requests
+                data: function (params) {
+                    return {
+                        q: params.term,  // Search term
+                        page: params.page || 1  // Pagination
+                    };
+                },
+                processResults: function (data) {
+                    // Map received data into Select2 format
+                    return {
+                        results: data.clients.map(function(client) {
+                            return {
+                                id: client.id,
+                                text: `${client.name} (Phone: ${client.phone_number1}, ${client.phone_number2})`
+                            };
+                        }),
+                        pagination: {
+                            more: data.has_next  // Indicates if more pages are available
+                        }
+                    };
+                },
+                cache: true
+            },
+            placeholder: '------------- Select Client  ------------',
+            minimumInputLength: 1,  // Trigger search after typing 1 character
+        });
+    });
+</script>
+
+<!--Add payment Record-->
+<script>
+    // Pass the data from Django to your JavaScript
+    var loggedInUser = "{{ logged_in_user }}";
+    var employeesList = [
+        {% for employee in employees %}
+        {
+            id: "{{ employee.id }}",
+            name: "{{ employee.user.get_full_name }}"
+        },
+        {% endfor %}
+    ];
+    var defaultEmployeeId = "{{ default_employee.id }}" || null;
+
+    // Call the add_payment_record function when needed
+    function add_payment_record() {
+        add_payment_record(loggedInUser, employeesList, defaultEmployeeId);
+    }
+</script>
+
+
+<!-- loadClientLands, Function toLoad Client Land // edit_payment_row -->
+<script>
+
+var defaultEmployeeId = null;
+var defaultEmployeeName = '';
+var selectedLandId = null;
+
+// Load client lands and payments based on the selected client
+function loadClientLands(selectElement) {
+    var clientId = selectElement.value;  // Get the selected client ID
+    const url = `/client-payment-info/${clientId}/`;
+
+    var editUrl = "{% url 'realestates:edit_client' pk=0 %}".replace('0', clientId);
+    $('#edit-client-info-btn').attr('onclick', 'window.location.href="' + editUrl + '"').show();
+
+    if (clientId) {
+        fetch(url)  // Fetch payment data and client lands for the selected client
+            .then(response => response.json())
+            .then(data => {
+                var tableBody = document.getElementById("clientPaymentBody");
+                var landSelect = document.querySelector('select[name="client_land"]');
+                tableBody.innerHTML = '';  // Clear previous payment details
+                landSelect.innerHTML = '<option value="">----- Select Client Land -----</option>'; // Clear previous lands
+
+                // Populate client lands dropdown
+                data.client_lands.forEach(land => {
+                    var landOption = document.createElement('option');
+                    landOption.setAttribute('data-client-id', `${land.client_id}`);
+                    landOption.value = `${land.land_id}`;
+                    landOption.textContent = `${land.plot_number}`;
+                    landSelect.appendChild(landOption);
+
+                    //var clientId = land.client_id
+                    //var editUrl = "{% url 'realestates:edit_client' pk=0 %}".replace('0', clientId);
+                    //$('#edit-client-info-btn').attr('onclick', 'window.location.href="' + editUrl + '"').show();
+
+                });
+
+                // Populate existing payments for the selected client
+                data.payments.forEach(payment => {
+                    var newRow = document.createElement("tr");
+                    newRow.innerHTML = `
+                        <td>${payment.client_land}</td>
+                        <td><input type="text" class="form-control form-control-sm" name="amount_paid" value="${payment.amount_paid.toLocaleString()}" readonly></td>
+                        <td><input type="checkbox" name="approved" ${payment.approved ? 'checked' : ''} disabled></td>
+                        <td><input type="text" class="form-control form-control-sm" name="approved_by" value="${payment.approved_by}" readonly></td>
+                        <td><input type="text" class="form-control form-control-sm" name="employee" value="${payment.employee}" readonly></td>
+                        <td><input type="text" class="form-control form-control-sm" name="timestamp" value="${payment.timestamp}" readonly></td>
+                        <td>
+                            <button type="button" class="btn btn-warning btn-sm" onclick="edit_payment_row(this, ${payment.payment_id})">
+                                <i class="fa fa-edit"></i>
+                            </button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="remove_row(this)">
+                                <i class="fa fa-window-close" aria-hidden="true"></i>
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(newRow);
+                });
+
+                // Store employee details for adding new records
+                defaultEmployeeId = data.employee_id;
+                defaultEmployeeName = data.logged_in_user;
+
+                var span_land_price = document.getElementById('land-price')
+                span_land_price.setAttribute('style', 'display:none;')
+
+                var span_total_paid = document.getElementById('total-paid')
+                span_total_paid.setAttribute('style', 'display:none;')
+
+                var span_balance = document.getElementById('balance')
+                span_balance.setAttribute('style', 'display:none;')
+
+            })
+            .catch(error => {
+                console.error('Error fetching payment details:', error);
+            });
+    }
+}
+</script>
+
+
+<!--loadSelectedLand, Update the client land when a specific land is selected-->
+<script>
+// Update the client land when a specific land is selected
+function loadSelectedLand(event) {
+    var selectedLandId = event.target.value;  // Capture the selected land ID
+     // Get the selected option element
+    var selectedOption = event.target.options[event.target.selectedIndex];
+    // Retrieve the client_id from the custom attribute
+    var clientId = selectedOption.getAttribute('data-client-id');
+        url_link_ = `/client-payment-info/${clientId}?land_id=` + selectedLandId
+     // Make an AJAX request to get the payment details for the selected land
+        fetch(url_link_)
+            .then(response => response.json())
+            .then(data => {
+                var tableBody = document.getElementById("clientPaymentBody");
+                tableBody.innerHTML = '';  // Clear the existing rows
+
+
+                data.client_lands.forEach(land_info => {
+
+                   if (land_info.land_id==selectedLandId)
+                   {
+                    var span_land_price = document.getElementById('land-price')
+                    span_land_price.setAttribute('style', 'display:block;color:blue;font-size:20px')
+                    span_land_price.innerHTML = 'Land Price: '+ `${land_info.land_price.toLocaleString()}`
+
+                    var span_total_paid = document.getElementById('total-paid')
+                    span_total_paid.setAttribute('style', 'display:none;')
+
+                    var span_balance = document.getElementById('balance')
+                    span_balance.setAttribute('style', 'display:none;')
+                   }
+
+                });
+
+                //alert(JSON.stringify(data.payments))
+
+                //alert(JSON.stringify(data.client_lands))
+
+                // Populate the table with filtered payment data
+                data.payments.forEach(payment => { //alert(JSON.stringify(payment));
+                    var newRow = document.createElement("tr");
+                    newRow.innerHTML = `
+                        <td>${payment.client_land}</td>
+                        <td><input type="text" class="form-control form-control-sm" name="amount_paid" value="${payment.amount_paid.toLocaleString()}" readonly></td>
+                        <td><input type="checkbox" name="approved" ${payment.approved ? 'checked' : ''} disabled></td>
+                        <td><input type="text" class="form-control form-control-sm" name="approved_by" value="${payment.approved_by}" readonly></td>
+                        <td><input type="text" class="form-control form-control-sm" name="employee" value="${payment.employee}" readonly></td>
+                        <td><input type="text" class="form-control form-control-sm" name="timestamp" value="${payment.timestamp}" readonly></td>
+                        <td>
+                            <button type="button" class="btn btn-warning btn-sm" onclick="edit_payment_row(this, ${payment.payment_id})">
+                                <i class="fa fa-edit"></i>
+                            </button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="remove_row(this)">
+                                <i class="fa fa-window-close" aria-hidden="true"></i>
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(newRow);
+
+                    var span_land_price = document.getElementById('land-price')
+                    span_land_price.setAttribute('style', 'display:block;color:blue;font-size:20px')
+                    span_land_price.innerHTML = 'Land Price: '+ `${payment.land_price.toLocaleString()}`
+
+                    var span_total_paid = document.getElementById('total-paid')
+                    span_total_paid.setAttribute('style', 'display:block;color:green;font-size:20px')
+                    span_total_paid.innerHTML = 'Paid: '+ `${payment.total_amount_paid.toLocaleString()}`
+
+                    var span_balance = document.getElementById('balance')
+                    span_balance.setAttribute('style', 'display:block;color:red;font-size:20px')
+                    span_balance.innerHTML = 'Balance: '+ `${payment.balance.toLocaleString()}`
+                });
+            })
+            .catch(error => console.error('Error fetching payment data:', error));
+}
+</script>
+
+
+<!--edit_payment_row, Function to edit payment-->
+<script>
+function edit_payment_row(button, paymentId) {
+
+    // Get the select element and its selected value
+    var landSelect = document.querySelector('select[name="client_land"]');
+    var selectedLandValue = landSelect.value;  // Get the value of the selected land
+
+    // Check if a valid client land is selected
+    if (!selectedLandValue) {
+        showNotification('Please select a client land.', 'error');
+        return;  // Exit the function if no client land is selected
+    }
+
+    var row = button.closest('tr');
+
+    // Get the current values from the row
+    var amountPaid = row.querySelector('input[name="amount_paid"]').value;
+    var approved = row.querySelector('input[name="approved"]').checked;
+    var approvedBy = row.querySelector('input[name="approved_by"]').value;
+    var timestamp = row.querySelector('input[name="timestamp"]').value;
+
+    // Ensure the timestamp is in the correct format (YYYY-MM-DD)
+    var formattedDate = formatDate(timestamp);
+
+    var selectedEmployeeId = defaultEmployeeId;
+    var selectedLandText = landSelect.options[landSelect.selectedIndex].text;
+
+    // Replace the row content with editable elements
+    row.innerHTML = `
+        <td>${selectedLandText}</td>  <!-- Display client land as text -->
+        <td><input type="text" class="form-control form-control-sm" oninput="formatAmount(this)" name="amount_paid" value="${amountPaid}" required></td>
+        <td><input type="checkbox" name="approved" ${approved ? 'checked' : ''}></td>
+        <td><input type="text" class="form-control form-control-sm" name="approved_by" value="${approvedBy}" readonly></td>
+        <td>
+            <select id="employeeSelect_${paymentId}" name="employee" class="form-control form-control-sm" style="padding: 5px; line-height: 1.5; height: auto;" onchange="this.selectedIndex = this.dataset.selectedIndex">
+                <option value="">-- Select Employee --</option>
+                {% for employee in employees %}
+                    <option value="{{ employee.id }}" ${selectedEmployeeId == {{ employee.id }} ? 'selected' : ''}>
+                        {{ employee }}
+                    </option>
+                {% endfor %}
+            </select>
+            <input type="hidden" name="employee" value="${selectedEmployeeId}">
+        </td>
+        <td><input type="date" style="padding:2px" name="timestamp" value="${formattedDate}" required></td>
+        <td>
+            <button type="button" class="btn btn-success btn-sm" onclick="save_edited_client_payment_record(this, ${paymentId})">
+                <i class="fa fa-save"></i>
+            </button>
+        </td>
+        <td>
+            <button type="button" class="btn btn-danger btn-sm" onclick="delete_client_payment_record(this, ${paymentId})">
+                <i class="fa fa-trash"></i>
+            </button>
+        </td>
+    `;
+
+    // Scroll to the updated row for better user experience
+    row.scrollIntoView({ behavior: 'smooth' });
+
+    // Store initial selected index to make the select "read-only"
+    var employeeSelect = document.getElementById(`employeeSelect_${paymentId}`);
+    employeeSelect.dataset.selectedIndex = employeeSelect.selectedIndex;
+}
+
+</script>
+
+<!--delete_client_payment_record, Function to delete the payment row-->
+<script>
+    function delete_client_payment_record(button, paymentId) {
+    // Define the confirmation message and action
+    showConfirmationModal("Are you sure you want to delete this payment record?", function() {
+        var landSelect = document.querySelector('select[name="client_land"]');
+
+        // Make an AJAX request to delete the payment record
+        fetch(`/delete-client-payment-record/${paymentId}/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')  // Include CSRF token
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Remove the row from the DOM
+                const row = button.closest('tr');
+                row.remove();
+                loadSelectedLand({ target: landSelect });
+                showNotification('Payment record deleted successfully.', 'success');
+
+            } else {
+                showNotification('Error deleting payment: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("An error occurred while deleting the payment record.");
+        });
+    });
+}
+</script>
+
+
+<!--save_edited_client_payment_record, Function to save the edited payment row-->
+<script>
+// Function to save the edited payment row
+function save_edited_client_payment_record(button, paymentId) {
+    var row = button.closest('tr');
+
+    // Get the updated values from the input fields
+    var amountPaid = row.querySelector('input[name="amount_paid"]').value;
+    var approved = row.querySelector('input[name="approved"]').checked;
+    var approvedBy = row.querySelector('input[name="approved_by"]').value;
+    var employee = row.querySelector('select[name="employee"]').value;
+    var timestamp = row.querySelector('input[name="timestamp"]').value;
+
+    // Get the selected land ID from the select element
+    var landSelect = document.querySelector('select[name="client_land"]');
+    var selectedLandId = landSelect.value;
+
+    // Construct request body for the update
+    var requestBody = {
+        payment_id: paymentId,
+        amount_paid: amountPaid,
+        approved: approved,
+        approved_by: approvedBy,
+        employee: employee,
+        timestamp: timestamp
+    };
+
+    // Send update request to the server
+    fetch(`/update-payment/${paymentId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(requestBody)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            setTimeout(function(){
+                loadSelectedLand({ target: landSelect });
+                showNotification('Payment updated successfully', 'success');
+                //location.reload();  // Reload the page to update the client list
+            }, 1000); // Reload the page after 2 seconds
+        } else {
+            showNotification('Error updating payment: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error("Error updating payment:", error);
+    });
+}
+</script>
+
+<!--add_payment_record, Function to handle adding a new payment record, auto-filling the client land based on the selection -->
+<script>
+// Function to handle adding a new payment record, auto-filling the client land based on the selection
+function add_payment_record() {
+
+    // Get the select element and its selected value
+    var landSelect = document.querySelector('select[name="client_land"]');
+    var selectedLandValue = landSelect.value;  // Get the value of the selected land
+
+    // Check if a valid client land is selected
+    if (!selectedLandValue) {
+        //alert('Please select a client land first.');
+        showNotification('Please select a client land.', 'error');
+        return;  // Exit the function if no client land is selected
+    }
+
+    var tableBody = document.getElementById("clientPaymentBody");
+    var newRow = document.createElement("tr");
+    // Get the selected client land text to display in the row
+    var selectedLandText = document.querySelector('select[name="client_land"]').options[document.querySelector('select[name="client_land"]').selectedIndex].text;
+    //alert(selectedLandText)
+    // Preselected employee data (these should come from the server based on the selected client)
+    var selectedEmployeeId = defaultEmployeeId;  // The current employee ID owning the client
+    //alert(selectedEmployeeId)
+    var employeeOptions = `
+        <select name="employee" style="padding: 5px;line-height: 1.5;height: auto;" required>
+            <option value="">-- Select Employee --</option>
+            {% for employee in employees %}
+                <option value="{{ employee.id }}" ${selectedEmployeeId == {{ employee.id }} ? 'selected' : ''}>
+                    {{ employee }}
+                </option>
+            {% endfor %}
+        </select>
+    `;
+
+    // Append the new row with inputs for amount paid, approved checkbox, and employee select dropdown
+    newRow.innerHTML = `
+        <td>${selectedLandText}</td>
+        <td><input type="text" class="form-control form-control-sm" oninput="formatAmount(this)" name="amount_paid" required></td>
+        <td><input type="checkbox" name="approved" checked></td>
+        <td><input type="text" class="form-control form-control-sm" name="approved_by" value="${defaultEmployeeName}" readonly></td>
+        <td>${employeeOptions}</td> <!-- Auto-select the current employee -->
+        <td><input type="date" class="form-control form-control-sm" style="padding:2px" name="timestamp" required></td>
+        <td>
+            <button type="button" class="btn btn-warning btn-sm" onclick="save_client_payment_record(event)">
+                <i class="fa fa-save"></i>
+            </button>
+        </td>
+        <td>
+            <button type="button" class="btn btn-danger btn-sm" onclick="remove_row(this)">
+                <i class="fa fa-window-close" aria-hidden="true"></i>
+            </button>
+        </td>
+    `;
+
+    // Add the new row to the table body
+    tableBody.appendChild(newRow);
+}
+</script>
+
+<!-- Function to open the modal to create new land -->
+<!-- Function to open the modal and set the form action to include client_id -->
+<script>
+function openCreateLandModal(event) {
+    const clientId = document.getElementById("clientSelect").value;
+    if (clientId) {
+        document.getElementById("addLandForm").action = `/create_client_land/${clientId}/`;
+        $('#addLandModal').modal('show');
+    } else {
+        showNotification('Please select a client.', 'error');
+    }
+}
+
+document.getElementById("addLandForm").addEventListener("submit", function (event) {
+    event.preventDefault(); // Prevent default form submission
+
+    const form = event.target;
+    const formData = new FormData(form);
+    const url = form.action;
+
+    fetch(url, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': getCookie('csrftoken') },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        const errorMessageElement = document.getElementById("errorMessage");
+
+        if (data.success) {
+            errorMessageElement.classList.add("d-none");
+            showNotification(data.message, 'success');
+            $('#addLandModal').modal('hide');
+            setTimeout(() => location.reload(), 1000); // Reload after a delay
+        } else {
+            errorMessageElement.textContent = data.error;
+            errorMessageElement.classList.remove("d-none");
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification("An unexpected error occurred.", 'error');
+    });
+});
+</script>
+
+<!--loadSelectedLand-->
+<script>
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
+  $.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+      if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+        xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+      }
+    }
+  });
+
+
+function save_client_payment_record(event) {
+    const row = event.target.closest('tr');
+
+    // Get values from the row
+    const clientLand = row.querySelector('td:nth-child(1)').textContent;  // Client Land text
+    const amountPaid = row.querySelector('td:nth-child(2) input[name="amount_paid"]').value;
+    const approved = row.querySelector('td:nth-child(3) input[name="approved"]').checked;
+    const approvedBy = row.querySelector('td:nth-child(4) input[name="approved_by"]').value;
+    const employee = row.querySelector('td:nth-child(5) select[name="employee"]').value;  // Employee select value
+    const timestamp = row.querySelector('td:nth-child(6) input[name="timestamp"]').value;
+
+    // Define the URL for the backend (assuming the client_id is part of the form or context)
+    const clientId = document.querySelector('#clientSelect').value;  // Assuming the client select dropdown exists
+    const url_link = `/update_client_land/${clientId}/`;
+
+   // Get the selected land ID from the select element
+    var landSelect = document.querySelector('select[name="client_land"]');
+    var selectedLandId = landSelect.value;
+
+    // Prepare the data to send to the server
+    const payload = {
+        clientLand: clientLand,
+        amountPaid: amountPaid,
+        approved: approved,
+        approvedBy: approvedBy,
+        employee: employee,
+        timestamp: timestamp
+    };
+
+
+    // Send the data using fetch() for a POST request
+    fetch(url_link, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),  // Include CSRF token for security
+        },
+        body: JSON.stringify(payload)
+    }).then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            loadSelectedLand({ target: landSelect });
+            setTimeout(function(){
+                showNotification('Payment updated successfully', 'success');
+            }, 1000); // Reload the page after 2 seconds
+
+        } else {
+            showNotification('Error updating payment: ' + data.error, 'error');
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+        alert(error);
+    });
+}
+
+</script>
+
+<!-- PARAMETERS IN vObj -->
+<script>
+var vObj = new Object();
+vObj["ids_for_timer"] = ["main_page_time", "orders_timer"]
+//--
+set_framework()
+</script>
+
+<!--Tabs Management Function-->
+<script>
+
+function csrfSafeMethod(method) {
+// these HTTP methods do not require CSRF protection
+return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+beforeSend: function(xhr, settings) {
+  if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+    xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+  }
+}
+});
+
+$(document).ready(function(){
+
+post_ajax_create_action = function (verb_="", app_="", model_, obj_slug_=null, pkey_=null) {
+  $.post(link_create_action,
+    {
+      verb: verb_,
+      app: app_,
+      model: model_,
+      obj_slug: obj_slug_,
+      pkey: pkey_
+    },
+    function(data){
+        alert(data["status"])
+    }
+  );
+}
+
+
+// ================================================
+//  SimTab object
+function SimTab(parent, name, title, valuation_id, url_get_screens, screen_update)
+{
+ this.parent = parent; this.name = name; this.title = title; this.VALUATION_ID = valuation_id;
+ this.screen_update = screen_update; this.NAV = null; this.CONTENT = null;
+ // --
+ this.callback_functions = []; this.need_update_screen = 1; this.CONTENTObjects = {}; this.is_show_first = true;
+ //--
+
+  e = document.createElement("button");e.setAttribute("class", "tablinks ");e.setAttribute("id", "tab-"+name);
+  e.setAttribute("obj_name", name); e.innerHTML = title;
+
+  this.parent.tabTitles.insertBefore(e, this.parent.tabTitles.childNodes[0])
+
+  e.addEventListener("click", function(){
+    event.preventDefault();
+    obj_name = this.getAttribute('obj_name');
+    obj = parent.TabObjects[obj_name]
+    is_show_first = obj.is_show_first
+
+      //post_ajax_create_action('globsim__change_to_tab__' + obj.title)
+      var i, tabcontent, tablinks; tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {tabcontent[i].style.display = "none";}
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {tablinks[i].className = tablinks[i].className.replace(" active", "");}
+      document.getElementById(obj_name).style.display = "block"; this.className += " active";
+  }.bind(e, event, parent ));
+
+  this.tabTitle = e; this.tabDoc = ed;
+}
+
+
+// =========== Tabs management for admin ==========================
+// -- SimManagementTab object --
+function SimManagementTab(parent, name, title, valuation_id, url_get_screens, screen_update)
+{
+ //alert(JSON.stringify(parent))
+ this.parent = parent; this.name = name; this.title = title; this.VALUATION_ID = valuation_id;
+ this.screen_update = screen_update; this.NAV = null; this.CONTENT = null;
+ // --
+ this.callback_functions = [];
+ //--
+  if (this.screen_update == 'pull_screen')
+  {
+    ed = document.createElement("div"); ed.setAttribute("class", "tabcontent");
+    ed.setAttribute("id", this.name); this.parent.tabContents.appendChild(ed);
+  } else{try{ed = document.getElementById(this.name);} catch (er) {alert('Error1: ' + er)}}
+
+  // --
+  e = document.createElement("button");e.setAttribute("class", "tablinks ");e.setAttribute("id", "tab-"+name);
+  e.setAttribute("obj_name", name); e.innerHTML = title;
+
+  //alert(e.outerHTML);
+  this.parent.tabTitles.insertBefore(e, this.parent.tabTitles.childNodes[0])
+
+
+  e.addEventListener("click", function(){
+    //alert(event.target.outerHTML)
+    event.preventDefault(); obj_name = this.getAttribute('obj_name'); obj = parent.TabObjects[obj_name];
+
+    // --
+    //obj.title_click(obj); obj.parent.titleWasClicked();
+    // --
+      //post_ajax_create_action('globsim__change_to_tab__' + obj.title)
+      var i, tabcontent, tablinks; tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {tabcontent[i].style.display = "none";}
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {tablinks[i].className = tablinks[i].className.replace(" active", "");}
+      document.getElementById(obj_name).style.display = "block"; this.className += " active";
+  }.bind(e, event, parent ));
+
+ this.tabTitle = e; this.tabDoc = ed;
+
+ //try{
+ // name_ = this.name.toLowerCase(); content_ = name_ + "_content"; nav_ = name_ + "_nav"
+ // this.NAV = document.getElementById(nav_)
+ // this.CONTENT = document.getElementById(content_)
+// } catch(err) {}
+
+
+}
+
+
+
+
+// =========== Tabs management ==========================
+// -- SimManager --
+function SimManager(valuation_id)
+{
+    this.is_staff = document.getElementById("is_staff").getAttribute("is_staff");
+    this.is_instructor = document.getElementById("is_staff").getAttribute("is_instructor");
+    this.is_options = document.getElementById("is_staff").getAttribute("is_options");
+    this.is_fsa = document.getElementById("is_staff").getAttribute("is_fsa");
+    this.valuation_id = valuation_id;
+    this.url_get_screens = '/en/corporatevaluation/get_screens/';
+    this.name = "Corporate Valuation";
+    this.tabTitles = document.getElementById("tab_titles");
+    this.tabContents = document.getElementById("tab_contents");
+    this.TabObjects = {};
+    this.setTabs();
+    try{
+      var event = new Event("click", {bubbles: true});
+      this.TabObjects["inputs"].tabTitle.dispatchEvent(event);
+    } catch (err) {alert(err)}
+
+    startTime();
+}
+
+SimManager.prototype.titleWasClicked = function() {
+        for (t in this.TabObjects)
+        {
+          alert(t)
+          this.TabObjects[t].tabTitleWasClicked()
+        }
+}
+
+SimManager.prototype.setTabs = function() {
+    var tabs_ = document.getElementById("tabs_");
+
+    var tabs_s = tabs_.getAttribute("tabs_s");
+    var tans_all = tabs_s.split(",");
+
+    var tabs = {};
+    for (var property in tans_all) {
+      ss = tans_all[property]; ss_ = ss.split(":"); ss__ = ss_[1].split(";")
+      tabs[ss_[0]] = [ss__[0], ss__[1]]
+    }
+
+    //alert(JSON.stringify(tabs))
+
+    var tabs_options = tabs_.getAttribute("tabs_options");
+    var tabs_options_all = tabs_options.split(",");
+
+    var tabs_options = {};
+    for (var property in tabs_options_all) {
+      ss = tabs_options_all[property]; ss_ = ss.split(":"); ss__ = ss_[1].split(";")
+      tabs_options[ss_[0]] = [ss__[0], ss__[1]]
+    }
+    //alert(JSON.stringify(tabs_options))
+
+    var tabs_m = tabs_.getAttribute("tabs_m");
+    var tans_all_m = tabs_m.split(",");
+
+    var tabs_management = {};
+    for (const property in tans_all_m) {
+      var ss = tans_all_m[property]; var ss_ = ss.split(":");var ss__ = ss_[1].split(";");
+      tabs_management[ss_[0]] = [ss__[0], ss__[1]];
+    }
+
+    //alert(JSON.stringify(tabs_management))
+
+
+    if (this.is_staff == 'True' || this.is_instructor == 'True'){
+      for(var name in tabs_management)
+      {s = "this.TabObjects[name] = new SimManagementTab(this, name, '"+tabs_management[name][0]+"', this.valuation_id, this.url_get_screens, '"+tabs_management[name][1]+"')" ;eval(s) }
+    }
+
+    if (this.is_staff == 'True' || this.is_options == 'True' || this.is_fsa == 'True'){
+      for(var name in tabs_options)
+      {s = "this.TabObjects[name] = new SimTab(this, name, tabs_options[name][0], this.valuation_id, this.url_get_screens, tabs_options[name][1])" ;eval(s)}
+    }
+
+    for(var name in tabs)
+    {s = "this.TabObjects[name] = new SimTab(this, name, tabs[name][0], this.valuation_id, this.url_get_screens, tabs[name][1])" ; eval(s)}
+
+}
+
+
+// == Math ==
+function sigmoid(t) {
+    return 1/(1+Math.pow(Math.E, -t));
+}
+
+// == Timer ==
+function startTime() {const today=new Date();let h=today.getHours();let m=today.getMinutes();
+  let s=today.getSeconds();m=checkTime(m);s=checkTime(s);
+  for(var i in vObj["ids_for_timer"]){
+        try{document.getElementById(vObj["ids_for_timer"][i]).innerHTML= h+":"+m+":"+s} catch(er){}
+        };setTimeout(startTime, 1000);
+}
+function checkTime(i) {if (i < 10) {i = "0" + i}; return i;}
+
+// ------------------------------------------------
+sm = new SimManager(valuation_id=0)
+// ------------------------------------------------
+
+
+});
+
+</script>
+
+<!--employeePayslipSelect, Function displays list of distributors/employees -->
+<script>
+    $(document).ready(function() {
+        $('#employeePayslipSelect').select2({
+            ajax: {
+                url: '/employee-list-api/',  // API URL for fetching paginated clients
+                dataType: 'json',
+                delay: 250,  // Add delay to reduce number of API requests
+                data: function (params) {
+                    return {
+                        q: params.term,  // Search term
+                        page: params.page || 1  // Pagination
+                    };
+                },
+                processResults: function (data) {
+                    // Map received data into Select2 format
+                    return {
+                        results: data.distributors.map(function(distributor) {
+                            return {
+                                id: distributor.id,
+                                text: `${distributor.name} (username: ${distributor.username}, ${distributor.email})`
+                            };
+                        }),
+                        pagination: {
+                            more: data.has_next  // Indicates if more pages are available
+                        }
+                    };
+                },
+                cache: true
+            },
+            placeholder: '------------- Select Distributor  ------------',
+            minimumInputLength: 1,  // Trigger search after typing 1 character
+        });
+    });
+</script>
+
+
+<!-- LoadPayslipByClients, Load client lands and payments based on the selected employee -->
+<script>
+// Load client lands and payments based on the selected employee
+function loadPayslipByClients(selectElement) {
+    var employeeId = selectElement.value;  // Get the selected employee ID
+    const url = `/employees-payslip-by-clients/${employeeId}/`;
+
+    if (employeeId) {
+        fetch(url)  // Fetch payment data and client lands for the selected employee
+            .then(response => response.json())
+            .then(data => {
+                var tableBody = document.getElementById("employeePayslipBody");
+                tableBody.innerHTML = '';  // Clear previous payment details
+
+                employee_clients = data.client_data;
+
+                if (employee_clients.length === 0) {
+                    var newRow = document.createElement("tr");
+                    newRow.innerHTML = `<tr><span style="color:red;font-weight:bold"> No Commission Earned from any Client. </span></tr>`;
+                    tableBody.appendChild(newRow);
+                    return;
+                }
+
+                // Populate existing payments for the selected employee
+                employee_clients.forEach(client => {
+                    var newRow = document.createElement("tr");
+
+                    // Create columns for the table
+                    var clientNameCell = document.createElement("td");
+                    clientNameCell.setAttribute('style', 'color:green;font-weight:bold');
+                    var totalPaidCell = document.createElement("td");
+                    totalPaidCell.setAttribute('style', 'color:blue;font-weight:bold');
+                    var addPaymentCell = document.createElement("td");
+
+                    // Fill in client name
+                    clientNameCell.textContent = client.client_land.client_name + ' paid:' + toCommas(client.client_land.total_amount_paid_by_client);
+
+                    // Fill in total amount paid by client
+                    totalPaidCell.textContent = 'Remaining Commission: '+ toCommas(client.client_land.commission);
+
+                    // Add a button for toggling the payment details
+                    var addPaymentButton = document.createElement("button");
+                    var icon_ = document.createElement("i");
+                    icon_.setAttribute("class", "fa fa-plus"); // Initially a plus icon
+                    addPaymentButton.appendChild(icon_);
+                    addPaymentButton.classList.add("btn", "btn-primary");
+                    addPaymentButton.setAttribute('client_land_id', client.client_land.land_id);
+
+                    // Store a state to keep track of whether payment details are shown or hidden
+                    var detailsVisible = false; // Start with details hidden
+
+                    addPaymentButton.onclick = function() {
+                        var client_land_id = client.client_land.land_id;
+                        var trBody = document.getElementById(client_land_id); // Row where payment details are shown
+
+                        if (detailsVisible) {
+                            // If details are visible, hide them
+                            trBody.innerHTML = ''; // Clear the details
+                            icon_.setAttribute("class", "fa fa-plus"); // Change icon back to plus
+                            detailsVisible = false; // Update state
+                        } else {
+                            // If details are hidden, load and show the payment details
+                            loadPayslipDetails(employeeId, client_land_id);
+                            icon_.setAttribute("class", "fa fa-minus"); // Change icon to minus
+                            detailsVisible = true; // Update state
+                        }
+                    };
+                    addPaymentCell.appendChild(addPaymentButton);
+
+                    // Append cells to the row
+                    newRow.appendChild(clientNameCell);
+                    newRow.appendChild(totalPaidCell);
+                    newRow.appendChild(addPaymentCell);
+
+                    // Append the row to the table body
+                    tableBody.appendChild(newRow);
+
+                    // Create a row where payment details will be inserted dynamically
+                    var PayslipDetailRow = document.createElement("tr");
+                    PayslipDetailRow.setAttribute('client_land_id', client.client_land.land_id);
+                    PayslipDetailRow.setAttribute('id', client.client_land.land_id);
+                    tableBody.appendChild(PayslipDetailRow);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching payment details:', error);
+            });
+    }
+}
+</script>
+
+<!--loadPayslipDetails, Load client lands and payments based on the selected employee-->
+<script>
+// Load client lands and payments based on the selected employee
+function loadPayslipDetails(employeeId, client_land_id) {
+
+    const url = `/get-employee-payslip-detail/${employeeId}/${client_land_id}/`;
+    if (employeeId) {
+        fetch(url)  // Fetch payment data and client lands for the selected employee
+            .then(response => response.json())
+            .then(data => {
+
+               var trBody = document.getElementById(client_land_id);
+                trBody.innerHTML = '';  // Clear previous payment details
+
+                //alert(JSON.stringify(data.client_data))
+
+                // Get the employee's clients data
+                employee_payment_records = data.client_data;
+
+                // Loop through each client in the data
+                employee_payment_records.forEach(client => {
+                    // For each payment record, create a new row
+
+                    //alert(JSON.stringify(client))
+                    var paymentFormRow = document.createElement("tr");
+                    // Create columns for the table
+                    var installmentInputCell = document.createElement("td");
+                    var paymentDateCell = document.createElement("td");
+                    var addPaymentCell = document.createElement("td");
+
+                    // Input field for distributor installment payment
+                    var installmentInput = document.createElement("input");
+                    installmentInput.type = "text";
+                    installmentInput.classList.add("form-control");
+                    installmentInput.setAttribute("oninput", "formatAmount(this)")
+                    installmentInput.name = `installment_${client.client_land_data.client_id}`;
+                    installmentInput.id = `installment_${client.client_land_data.client_id}`;
+                    installmentInput.placeholder = "Enter amount";
+                    installmentInputCell.appendChild(installmentInput);
+
+                    // Input field for payment date
+                    var paymentDateInput = document.createElement("input");
+                    paymentDateInput.type = "date";
+                    paymentDateInput.classList.add("form-control");
+                    paymentDateInput.name = `payment_date_${client.client_land_data.client_id}`;
+                    paymentDateInput.id = `payment_date_${client.client_land_data.client_id}`;
+                    paymentDateCell.appendChild(paymentDateInput);
+
+                    // Add a button for adding new payments
+                    var addPaymentButton = document.createElement("button");
+                    addPaymentButton.classList.add("btn", "btn-primary");
+                    addPaymentButton.textContent = "Add Payment";
+                    addPaymentButton.id = `distributorPaymentButton_${employeeId}`;
+                    addPaymentButton.onclick = function() {
+                        addPayment(client.client_land_data.client_id, employeeId, client.client_land_data.land_id, installmentInput.value, paymentDateInput.value);
+                    };
+                    addPaymentCell.appendChild(addPaymentButton);
+
+                    // Append cells to the row
+                    paymentFormRow.appendChild(installmentInputCell);
+                    paymentFormRow.appendChild(paymentDateCell);
+                    paymentFormRow.appendChild(addPaymentCell);
+
+                    // Append the row to the table body
+                    trBody.appendChild(paymentFormRow);
+
+                    var tableHeader = document.createElement("tr");
+                    tableHeader.setAttribute('style', 'color:purple;font-weight:bold')
+                    // Create columns for the table
+                    var DateCell = document.createElement("td");
+                    DateCell.innerHTML = 'Date'
+                    var commissionCell = document.createElement("td");
+                    commissionCell.innerHTML = 'Commission'
+                    var paymentCell = document.createElement("td");
+                    paymentCell.innerHTML = 'Payments'
+                    var balanceCell = document.createElement("td");
+                    balanceCell.innerHTML = 'Balance'
+
+                    // Append cells to the row
+                    tableHeader.appendChild(DateCell);
+                    tableHeader.appendChild(commissionCell);
+                    tableHeader.appendChild(paymentCell);
+                    tableHeader.appendChild(balanceCell);
+
+                    // Append the row to the table body
+                    trBody.appendChild(tableHeader);
+
+
+                    var payment_records = client.payment_records
+                    if(payment_records.length==0){
+                        var newRow = document.createElement("tr");
+                        newRow.innerHTML = `<td colspan="7" style="color:red;font-weight:bold"> No payment record. </td>`;
+                        trBody.appendChild(newRow);
+                        return;
+                    }
+
+                    payment_records.forEach((payment, index) => {
+                        var newRow = document.createElement("tr");
+
+                        newRow.innerHTML = `
+                            <td><input type="text" class="form-control form-control-sm" name="approved_by" value="${payment.date}" readonly></td>
+                            <td><input type="text" class="form-control form-control-sm" name="employee" value="${toCommas(payment.commission)}" readonly></td>
+                            <td><input type="text" class="form-control form-control-sm" name="amount_paid" value="${toCommas(payment.amount_paid)}" readonly></td>
+                            <td><input type="text" class="form-control form-control-sm" name="timestamp" value="${toCommas(payment.balance)}" readonly></td>
+                        `;
+
+                        // Edit and delete buttons are only enabled for the last payment record
+                        if (index === payment_records.length - 1) {
+                            newRow.innerHTML += `
+                                <td>
+                                    <button type="button" class="btn btn-warning btn-sm" onclick="editPayslip(this, '${employeeId}', '${payment.payment_record_id}', '${client.client_land_data.land_id}', '${client.client_land_data.client_id}', '${payment.amount_paid}', '${payment.date}')">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="delete_payment_record(this, '${employeeId}', '${payment.payment_record_id}', '${client.client_land_data.land_id}', '${client.client_land_data.client_id}')">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </td>
+                            `;
+                        } else {
+                            newRow.innerHTML += `
+                                <td>
+                                    <button type="button" class="btn btn-warning btn-sm" disabled>
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-danger btn-sm" disabled>
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </td>
+                            `;
+                        }
+
+                        trBody.appendChild(newRow);
+                    });
+                });
+
+            })
+            .catch(error => {
+                console.error('Error fetching payment details:', error);
+            });
+    }
+}
+
+</script>
+
+<!--addPayment, Function to handle adding a new payment-->
+<script>
+// Function to handle adding a new payment
+function addPayment(clientId, employeeId, land_id, amount, paymentDate) {
+
+    if (!amount || !paymentDate) {
+        alert("Please enter an amount and a payment date.");
+        return;
+    }
+    const url = `/approve-employee-payment/${employeeId}/${clientId}/${land_id}/`;  // URL to handle payment
+
+    var distributorSelect = document.querySelector('select[name="distributor_name"]'); // Get distributor select element
+
+    const formData = new FormData();
+    formData.append('amount_paid', amount);
+    formData.append('payment_date', paymentDate);
+
+    fetch(url, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),  // CSRF Token for Django
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            setTimeout(function(){
+                loadPayslipByClients(distributorSelect);  // Reload the table
+                showNotification('Payment recorded successfully!', 'success');
+            }, 1000); // Reload the page after 2 seconds
+        } else {
+
+            setTimeout(function(){
+                loadPayslipByClients(distributorSelect);  // Reload the table
+                showNotification('Error recording payment: ' + data.error, 'error');
+            }, 1000); // Reload the page after 2 seconds
+
+        }
+    })
+    .catch(error => {
+        console.error('Error recording payment:', error);
+    });
+}
+</script>
+
+<!--editPayslip function-->
+<script>
+function editPayslip(button, distributor_id, payment_record_id, land_id, client_id, amount, paymentDate) {
+    // Find the nearest row containing the inputs (you might need to adjust this logic based on your structure)
+    const row = button.closest('tr');
+
+    var installment_id = 'installment_'+client_id
+    var date_id = 'payment_date_'+client_id
+
+    // Find the installment input and payment date input in the current row
+    const installmentInput = document.getElementById(installment_id);
+
+    const paymentDateInput = document.getElementById(date_id);
+
+    // Populate the inputs with the current payment values
+    installmentInput.value = toCommas(amount);
+    paymentDateInput.value = paymentDate;
+
+    // Optionally, toggle the inputs to be editable (if they were disabled initially)
+    installmentInput.readOnly = false;
+    paymentDateInput.readOnly = false;
+
+
+    var distributor_btn = document.getElementById('distributorPaymentButton_'+distributor_id)
+    distributor_btn.innerHTML = 'Save'
+    distributor_btn.setAttribute("class", "btn btn-success")
+    distributor_btn.onclick = function() {
+         saveEditedPayslip(payment_record_id, client_id, distributor_id, land_id, installmentInput.value, paymentDateInput.value);
+    };
+
+}
+
+</script>
+
+<!--saveEditedPayslip function-->
+<script>
+function saveEditedPayslip(payment_record_id, client_id, distributor_id, land_id, amount, paymentDate) {
+
+    if (!amount || !paymentDate) {
+        alert("Please enter an amount and a payment date.");
+        return;
+    }
+    const url = `/edit-employee-payment-detail/${payment_record_id}/${distributor_id}/${client_id}/${land_id}/`;  // URL to handle payment
+
+    var distributorSelect = document.querySelector('select[name="distributor_name"]'); // Get distributor select element
+
+    const formData = new FormData();
+    formData.append('amount_paid', amount);
+    formData.append('payment_date', paymentDate);
+
+    fetch(url, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),  // CSRF Token for Django
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            setTimeout(function(){
+                loadPayslipByClients(distributorSelect);  // Reload the table
+                showNotification('Payment updated successfully', 'success');
+            }, 1000); // Reload the page after 2 seconds
+        } else {
+            showNotification('Error updating payment: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error recording payment:', error);
+    });
+}
+</script>
+
+<!--delete_employee_payment_record-->
+<script>
+    function delete_payment_record(element, distributor_id, payment_record_id, land_id, client_id) {
+
+    showConfirmationModal("Are you sure you want to delete this employee payment record?", function() {
+
+        var distributorSelect = document.querySelector('select[name="distributor_name"]'); // Get distributor select element
+
+        const url = `/delete-employee-payment-record/${payment_record_id}/${distributor_id}/${client_id}/${land_id}/`;  // Adjust the URL based on your backend route
+
+        fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),  // Include the CSRF token for security
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                setTimeout(function(){
+                    // Remove the row from the table
+                    var row = element.closest('tr');
+                    row.parentNode.removeChild(row);
+                    loadPayslipByClients(distributorSelect);
+                    showNotification('Payment record deleted successfully.', 'success');
+                }, 1000); // Optional delay for UX
+            } else {
+                showNotification('Error deleting payment record: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the payment record.');
+        });
+    });
+}
+</script>
+
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!--show content, monthly_sale, distributor_form, client_form, all_distributor, all_clients-->
+<script type="text/javascript">
+          function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+          }
+          $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+              if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+              }
+            }
+          });
+
+        $(document).ready(function () {
+
+            $('a.show_content').click(function(e){
+               e.preventDefault();
+                  page = $(this).data('page')
+                  $.post('{% url "realestates:show_content" %}',
+                    {
+                      page: page,
+                    },
+                    function(data){
+                        id = '#'+page
+                        $(id).empty().append(data)
+                    }
+                  );
+            });
+
+        });
+    </script>
+
+<!--Search Clients-->
+<script type="text/javascript">
+function search_client(event){
+
+      elm = event.target
+      page = elm.getAttribute('data-page')
+      //alert(page)
+      client_number = document.getElementById('search_client').value
+      //alert(client_number)
+      $.post('{% url "realestates:show_content" %}',
+        {
+          page: page,
+          client_number: client_number,
+        },
+        function(data){
+            id = '#'+page
+            $(id).empty().append(data)
+        }
+      );
+}
+
+</script>
+
+<!--Search distributor-->
+<script type="text/javascript">
+function search_distributor(event){
+
+      elm = event.target
+      page = elm.getAttribute('data-page')
+      //alert(page)
+      distributor_name = document.getElementById('search_distributor').value
+      //alert(distributor_name)
+      $.post('{% url "realestates:show_content" %}',
+        {
+          page: page,
+          distributor_name: distributor_name,
+        },
+        function(data){
+            id = '#'+page
+            $(id).empty().append(data)
+        }
+      );
+}
+
+</script>
+
+
+<!--GENERAL FUNCTIONS-->
+
+<!-- // Utility function to retrieve CSRF token for Django AJAX requests -->
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+<!--Add New Record and Remove Row Functions-->
+<script>
+function add_client_record() {
+    var table = document.getElementById("clientLandBody");
+    var newRow = document.getElementById("clientRecordRow").cloneNode(true);
+    newRow.querySelectorAll("input").forEach(input => input.value = '');  // Clear the cloned inputs
+    newRow.querySelector("select").selectedIndex = 0;  // Reset the client dropdown
+    table.appendChild(newRow);
+}
+
+function remove_row(button) {
+    var row = button.closest('tr');
+    row.remove();
+}
+</script>
+<!--// Utility function to format the date-->
+<script>
+// Utility function to format the date
+function formatDate(inputDate) {
+    // Parse the date into a JavaScript Date object
+    var date = new Date(inputDate);
+
+    // Format the date to YYYY-MM-DD
+    var year = date.getFullYear();
+    var month = ('0' + (date.getMonth() + 1)).slice(-2);  // Add leading zero for months < 10
+    var day = ('0' + date.getDate()).slice(-2);  // Add leading zero for days < 10
+
+    return `${year}-${month}-${day}`;
+}
+
+</script>
+<!--format Amount-->
+<script>
+    function formatAmount(input) {
+        // Remove existing commas and non-numeric characters from the input
+        let value = input.value.replace(/[^\d]/g, '');
+
+        // Add commas to the value
+        value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+        // Update the input value
+        input.value = value;
+    }
+</script>
+<!-- toCommas and removeCommas function -->
+<script>
+function removeCommas(value) {return value.replace(/,/g, '')}
+function toCommas(value) {value_=value;try{value_=value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");} catch(er){};return value_;}
+</script>
+<!-- End -->
+<!--showConfirmationModal-->
+<script>
+// Utility function to show the confirmation modal
+function showConfirmationModal(message, onConfirm) {
+    // Set the message for the confirmation modal
+    document.getElementById("confirmationModalMessage").textContent = message;
+
+    // Remove any previously attached click event to prevent multiple callbacks
+    const confirmButton = document.getElementById("confirmActionButton");
+    confirmButton.onclick = null;
+
+    // Attach the provided callback to the confirm button
+    confirmButton.onclick = function() {
+        onConfirm();
+        $('#confirmationModal').modal('hide'); // Hide the modal after confirming
+    };
+
+    // Show the modal
+    $('#confirmationModal').modal('show');
+}
+</script>
+<script>
+    function showNotification(message, type) {
+        const notificationPopup = document.getElementById("notificationPopup");
+        const notificationMessage = document.getElementById("notificationMessage");
+
+        // Set the message and type
+        notificationMessage.textContent = message;
+        notificationPopup.className = "notification-popup " + type;
+
+        // Display the popup
+        notificationPopup.style.display = "block";
+
+        // Automatically hide the popup after 3 seconds
+        setTimeout(() => {
+            notificationPopup.style.opacity = '0';
+        }, 3000);
+
+        // Reset popup visibility after fade-out
+        setTimeout(() => {
+            notificationPopup.style.display = "none";
+            notificationPopup.style.opacity = '1';
+        }, 3500);
+    }
+
+    function closeNotification() {
+        document.getElementById("notificationPopup").style.display = "none";
+    }
+</script>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

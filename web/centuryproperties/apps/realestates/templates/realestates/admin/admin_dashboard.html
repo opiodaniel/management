@@ -11,21 +11,6 @@
  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
-{% block SubNavbar %}
-    <div class="nav-item dropdown mr-4">
-        <a href="{% url 'realestates:register' %}" class="nav-item nav-link"><i class="fa fa-user-plus"></i></a>
-    </div>
-     <button onclick="clean_data_b(event)" type="button" class="btn btn-light btn-sm">Clean Database</button>
-<!--    <a href="{% url 'realestates:export_unapproved_payments' %}"><button class="btn btn-light btn-sm">Download Excel</button></a>-->
-    <a href="{% url 'realestates:get_employee_with_clients_and_payments' %}"><button class="btn btn-light btn-sm">Download Excel</button></a>
-    <div id="driver-uploader-detail"> <!--margin:0 auto;-->
-        <input id="driver-uploader-path"  type="file" class="filestyle" data-icon="true" data-buttonText="Browse" name="driver_file">
-        <br>
-        <span id="driver-uploader-success-alert" class='text-success' style="display:none">Success!</span>
-        <span id="driver-uploader-failure-alert" class='text-danger' style="display:none">Failed!</span>
-    </div>
-
-{% endblock SubNavbar %}
 
 {% block content %}
 
@@ -110,73 +95,75 @@
       <!--/ Card Border Shadow -->
 
       <!-- All Monthly Sales Start -->
-      <div class="col-12">
-            <div class="card">
-              <div class="card-header d-flex align-items-center justify-content-between">
-                <div class="card-title mb-0">
-                  <h5 class="m-0 me-2">All Monthly Sale</h5>
-                </div>
-              </div>
 
-              <div class="card-datatable table-responsive">
-                    <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
-                        <div class="table-responsive">
-                           <div id="table_content" class="table-responsive" style="max-height: 500px; overflow-y: auto;">
-                                <table class="table text-start align-middle table-bordered table-hover mb-0">
-                                    <thead>
-                                        <tr class="text-dark">
-                                            <th scope="col">Date</th>
-                                            <th scope="col">Amount</th>
-                                            <th scope="col">More info</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody style="cursor:pointer" class="text-dark">
-                                        {% for data in monthly_data %}
-                                        <tr onclick="showSubTable(this)">
-                                            <td>{{ data.date }}</td>
-                                            <td>{{ data.amount }}</td>
-                                            <td><i class="fas fa-info-circle"></i></td>
-                                        </tr>
-                                        <!-- Hidden sub-table -->
-                                        <tr class="sub-table-row" style="display:none;">
-                                            <td colspan="3">
-                                                <h5>Transactions made in {{ data.date }}</h5>
-                                                <div style="max-height: 200px; overflow-y: auto;">
-                                                    <table id="customer" class="table table-bordered">
-                                                        <thead class="thead-light">
-                                                            <tr>
-                                                                <th>Date</th>
-                                                                <th>Amount</th>
-                                                                <!--
-                                                                <th>Client</th>
-                                                                <th>Contact</th> -->
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {% for md in data.month_detail %}
-                                                            <tr>
-                                                                <td>{{ md.timestamp }}</td>
-                                                                <td>{{ md.amount_paid|add_commas }}</td>
-                                                                <!--
-                                                                <td>{{ md.client_land.client.name }}</td>
-                                                                <td>{{ md.client_land.client.phoneNumber1 }}</td> -->
-                                                            </tr>
-                                                            {% endfor %}
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                        <!-- Add more rows as needed -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-              </div>
-            </div>
-      </div>
+<!--      <div class="col-12">-->
+<!--            <div class="card">-->
+<!--              <div class="card-header d-flex align-items-center justify-content-between">-->
+<!--                <div class="card-title mb-0">-->
+<!--                  <h5 class="m-0 me-2">All Monthly Sale</h5>-->
+<!--                </div>-->
+<!--              </div>-->
+
+<!--              <div class="card-datatable table-responsive">-->
+<!--                    <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">-->
+<!--                        <div class="table-responsive">-->
+<!--                           <div id="table_content" class="table-responsive" style="max-height: 200px; overflow-y: auto;">-->
+<!--                                <table class="table text-start align-middle table-bordered table-hover mb-0">-->
+<!--                                    <thead>-->
+<!--                                        <tr class="text-dark">-->
+<!--                                            <th scope="col">Date</th>-->
+<!--                                            <th scope="col">Amount</th>-->
+<!--                                            <th scope="col">More info</th>-->
+<!--                                        </tr>-->
+<!--                                    </thead>-->
+<!--                                    <tbody style="cursor:pointer" class="text-dark">-->
+<!--                                        {% for data in monthly_data %}-->
+<!--                                        <tr onclick="showSubTable(this)">-->
+<!--                                            <td>{{ data.date }}</td>-->
+<!--                                            <td>{{ data.amount }}</td>-->
+<!--                                            <td><i class="fas fa-info-circle"></i></td>-->
+<!--                                        </tr>-->
+<!--                                        &lt;!&ndash; Hidden sub-table &ndash;&gt;-->
+<!--                                        <tr class="sub-table-row" style="display:none;">-->
+<!--                                            <td colspan="3">-->
+<!--                                                <h5>Transactions made in {{ data.date }}</h5>-->
+<!--                                                <div style="max-height: 200px; overflow-y: auto;">-->
+<!--                                                    <table id="customer" class="table table-bordered">-->
+<!--                                                        <thead class="thead-light">-->
+<!--                                                            <tr>-->
+<!--                                                                <th>Date</th>-->
+<!--                                                                <th>Amount</th>-->
+<!--                                                                &lt;!&ndash;-->
+<!--                                                                <th>Client</th>-->
+<!--                                                                <th>Contact</th> &ndash;&gt;-->
+<!--                                                            </tr>-->
+<!--                                                        </thead>-->
+<!--                                                        <tbody>-->
+<!--                                                            {% for md in data.month_detail %}-->
+<!--                                                            <tr>-->
+<!--                                                                <td>{{ md.timestamp }}</td>-->
+<!--                                                                <td>{{ md.amount_paid|add_commas }}</td>-->
+<!--                                                                &lt;!&ndash;-->
+<!--                                                                <td>{{ md.client_land.client.name }}</td>-->
+<!--                                                                <td>{{ md.client_land.client.phoneNumber1 }}</td> &ndash;&gt;-->
+<!--                                                            </tr>-->
+<!--                                                            {% endfor %}-->
+<!--                                                        </tbody>-->
+<!--                                                    </table>-->
+<!--                                                </div>-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
+<!--                                        {% endfor %}-->
+<!--                                        &lt;!&ndash; Add more rows as needed &ndash;&gt;-->
+<!--                                    </tbody>-->
+<!--                                </table>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--      </div> -->
+
       <!-- Monthly Sales Start End -->
 
       <!--bar Graph of Employees with Approved client  -->

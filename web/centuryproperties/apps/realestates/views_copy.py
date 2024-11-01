@@ -578,6 +578,207 @@ def employee_clients_made_payment(request, employee_id):
 
     return render(request, 'realestates/admin/employee_clients_made_payment.html', context)
 
+# ========= NOT USED ==============
+# EDIT EMPLOYEE PAYMENT
+@login_required
+def edit_employee_payment(request, employee_id, client_id, client_land_id, record_id):
+
+    try:
+        employee = request.user.employee
+    except Employees.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to view this page.")
+
+    if not employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
+
+    if request.method == 'POST':
+        amount_paid = request.POST.get('amount_paid', '0').replace(',', '')
+        try:
+            amount_paid = int(amount_paid)
+        except ValueError:
+            messages.error(request, "Invalid amount entered.")
+            return redirect('realestates:employee_clients_made_payment', employee_id=employee_id)
+
+        employee = get_object_or_404(Employees, id=employee_id)
+        client = get_object_or_404(Client, id=client_id)
+        client_land = get_object_or_404(ClientLand, id=client_land_id)
+
+        try:
+            commission = Commission.objects.get(employee=employee, client=client, client_land=client_land)
+            total_commission = commission.total_commission
+        except Commission.DoesNotExist:
+            total_commission = 0
+
+        amount_already_paid = \
+        EmployeePaymentRecord.objects.filter(employee=employee, client=client, client_land=client_land).aggregate(
+            Sum('amount_paid'))['amount_paid__sum'] or 0
+        remaining_commission = total_commission - amount_already_paid
+
+        if amount_paid > remaining_commission:
+            messages.error(request, f"Amount to be paid exceeds the remaining commission of {'{:,}'.format(remaining_commission)}.")
+        else:
+
+            payment_record = get_object_or_404(EmployeePaymentRecord, id=record_id)
+            payment_record.amount_paid = amount_paid
+            payment_record.save()
+            messages.success(request, "Payment record updated successfully.")
+        return redirect('realestates:employee_clients_made_payment', employee_id=employee_id)
+
+    messages.error(request, "Invalid request.")
+    return redirect('realestates:employee_clients_made_payment', employee_id=employee_id)
+
+# ========= NOT USED ==============
+# ========= CONFIRM EMPLOYEE PAYMENT =========
+@require_POST
+@login_required
+def approve_employee_payment(request, employee_id, client_id, client_land_id):
+    if not request.user.employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
+
+    if request.method == "POST":
+        amount_paid_str = request.POST.get('amount_paid', '0').replace(',', '')
+        amount_paid = int(amount_paid_str)
+        employee = get_object_or_404(Employees, id=employee_id)
+        client = get_object_or_404(Client, id=client_id)
+        client_land = get_object_or_404(ClientLand, id=client_land_id)
+
+        try:
+            commission = Commission.objects.get(employee=employee, client=client, client_land=client_land)
+            total_commission = commission.total_commission
+        except Commission.DoesNotExist:
+            total_commission = 0
+
+        amount_already_paid = EmployeePaymentRecord.objects.filter(employee=employee, client=client, client_land=client_land).aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+        remaining_commission = total_commission - amount_already_paid
+
+        if amount_paid > remaining_commission:
+            messages.error(request, f"Amount to be paid exceeds the remaining commission of {'{:,}'.format(remaining_commission)}.")
+        else:
+            # Proceed with the payment
+            EmployeePaymentRecord.objects.create(
+                employee=employee,
+                client=client,
+                client_land=client_land,
+                total_commission=total_commission,
+                amount_paid=amount_paid,
+                balance=remaining_commission - amount_paid
+            )
+            messages.success(request, f"Successfully paid {'{:,}'.format(amount_paid)} to {employee.user.get_full_name()} for client {client.name}.")
+
+        return redirect('realestates:employee_clients_made_payment', employee_id=employee.id)
+
+    return redirect('realestates:employee_clients_made_payment', employee_id=employee_id)
+
+
+# ========== CLIENT LIST ============
+@login_required
+def client_list(request):
+
+    if not request.user.employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
+
+    admin_id = request.user.id
+
+    profile_pic_url = ""
+    try:
+        admin = Employees.objects.get(id=request.user.id)
+        if admin.profile_pic:
+            profile_pic_url = admin.profile_pic.url
+    except Employees.DoesNotExist:
+        admin = None
+
+    company_logo_url = ""
+    try:
+        company = Company.objects.get(id=1)
+        if company.company_logo:
+            company_logo_url = company.company_logo.url
+    except Company.DoesNotExist:
+        company = None
+
+    expiry_date = timezone.now().now().date() - timedelta(days=7)
+    # Filter clients who have not exceeded the expiry date
+    # active_clients = Client.objects.filter(date__date__gte=expiry_date).order_by('-date')
+
+    active_clients = Client.objects.all().order_by('-date')
+
+    all_clients = active_clients
+
+    # Handle search query
+    query = request.GET.get('q')
+    if query:
+        all_clients = all_clients.filter(phoneNumber1__icontains=query)  # Adjust field ('name') based on search criteria
+    # Apply pagination
+    paginator = Paginator(all_clients, 15)  # Display 50 clients per page
+    page_number = request.GET.get('page')
+    try:
+        clients = paginator.page(page_number)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page
+        clients = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results
+        clients = paginator.page(paginator.num_pages)
+
+    print(clients)
+
+    context = {
+        'clients': clients,
+        'admin_id': admin_id,
+        'company_logo_url': company_logo_url,
+        'profile_pic_url': profile_pic_url,
+    }
+
+    return render(request, 'realestates/admin/client_list.html', context)
+
+
+def get_client_details(request):
+    client_id = request.GET.get('client_id')
+    client = get_object_or_404(Client, id=client_id)
+    employee_name = client.employee.user.get_full_name() if client.employee else 'No employee assigned'
+    edit_url = reverse('realestates:edit_client', args=[client_id])
+
+    return JsonResponse({'employee_name': employee_name, 'edit_url': edit_url})
+
+
+def distributor_list(request):
+    query = request.GET.get('search', '')  # Get search query from the request
+
+    if query:
+        # Split the query into words, assuming the user might type a full name or part of it
+        query_parts = query.split()
+
+        # If there are two parts in the query, treat it as a potential full name search
+        if len(query_parts) == 2:
+            first_name_query, last_name_query = query_parts
+            employee_list = Employees.objects.filter(
+                is_administrator=False,
+                is_show=True
+            ).filter(
+                Q(user__first_name__icontains=query) |
+                Q(user__last_name__icontains=query) |
+                (Q(user__first_name__icontains=first_name_query) & Q(user__last_name__icontains=last_name_query))
+            )
+        else:
+            # If only one part, search across both first_name and last_name for a match
+            employee_list = Employees.objects.filter(
+                is_administrator=False,
+                is_show=True
+            ).filter(
+                Q(user__first_name__icontains=query) |
+                Q(user__last_name__icontains=query)
+            )
+    else:
+        employee_list = Employees.objects.filter(
+            is_administrator=False,
+            is_show=True
+        )
+
+    paginator = Paginator(employee_list, 10)  # Show 10 employees per page
+
+    page_number = request.GET.get('page')
+    employees = paginator.get_page(page_number)
+
+    return render(request, 'realestates/admin/distributor_list.html', {'employees': employees, 'query': query})
 
 
 def delete_employee(request, pk):
@@ -655,6 +856,196 @@ def change_password(request):
         return render(request, 'realestates/registration/change_password.html', args)
 
 
+# ============ ATTACH LAND TO CLIENT ==================
+@login_required
+def attach_land_to_client(request, client_id):
+
+    try:
+        employee = request.user.employee
+    except Employees.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to view this page.")
+
+    if not employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
+
+    admin_id = request.user.id
+
+    profile_pic_url = ""
+    try:
+        admin = Employees.objects.get(id=request.user.id)
+        if admin.profile_pic:
+            profile_pic_url = admin.profile_pic.url
+    except Employees.DoesNotExist:
+        admin = None
+
+    company_logo_url = ""
+    try:
+        company = Company.objects.get(id=1)
+        if company.company_logo:
+            company_logo_url = company.company_logo.url
+    except Company.DoesNotExist:
+        company = None
+
+    client = get_object_or_404(Client, id=client_id)
+    if request.method == 'POST':
+        landform = LandForm(request.POST)
+        if landform.is_valid():
+            land = landform.save(commit=False)
+            land.available = False
+            land.save()
+            ClientLand.objects.create(client=client, land=land, payment_complete=False)
+            messages.success(request, 'Land successfully attached to the client.')
+            return redirect('realestates:attach_land_to_client', client_id=client.id)
+        else:
+            messages.error(request, 'There were errors in the form. Please correct them and try again.')
+    else:
+        landform = LandForm()
+
+    client_lands = ClientLand.objects.filter(client=client)
+
+    context = {
+        'admin_id': admin_id,
+        'company_logo_url': company_logo_url,
+        'profile_pic_url': profile_pic_url,
+        'client': client,
+        'landform': landform,
+        'client_lands': client_lands,
+    }
+    return render(request, 'realestates/admin/attach_land_to_client.html', context)
+
+
+# ============ RECORDING CLIENT PAYMENT ==================
+@login_required
+def record_payment(request, client_id):
+
+    try:
+        employee = request.user.employee
+    except Employees.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to view this page.")
+
+    if not employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
+
+    admin_id = request.user.id
+
+    profile_pic_url = ""
+    try:
+        admin = Employees.objects.get(id=request.user.id)
+        if admin.profile_pic:
+            profile_pic_url = admin.profile_pic.url
+    except Employees.DoesNotExist:
+        admin = None
+
+    company_logo_url = ""
+    try:
+        company = Company.objects.get(id=1)
+        if company.company_logo:
+            company_logo_url = company.company_logo.url
+    except Company.DoesNotExist:
+        company = None
+
+    client = get_object_or_404(Client, id=client_id)
+    client_lands = ClientLand.objects.filter(client=client)
+
+    selected_client_land = None
+    transactions = Payment.objects.none()
+    total_amount_paid = 0
+    balance = 0
+
+    if request.method == 'POST':
+        selected_client_land_id = request.POST.get('client_land')
+        if selected_client_land_id:
+            selected_client_land = get_object_or_404(ClientLand, id=selected_client_land_id)
+            form = PaymentForm(request.POST)
+            if form.is_valid():
+                payment = form.save(commit=False)
+                payment.client_land = selected_client_land
+                payment.approved_by = request.user.employee if request.user.employee.is_administrator else None
+                payment.employee = payment.client_land.client.employee
+                payment.save()
+                return redirect('realestates:record_payment', client_id=client.id)
+        else:
+            initial_data = {'approved_by': request.user.employee if request.user.employee.is_administrator else None}
+            form = PaymentForm(initial=initial_data)
+    else:
+        selected_client_land_id = request.GET.get('client_land')
+        # print(selected_client_land_id, selected_client_land)
+        if selected_client_land_id:
+            selected_client_land = get_object_or_404(ClientLand, id=selected_client_land_id)
+        initial_data = {'approved_by': request.user.employee if request.user.employee.is_administrator else None}
+        form = PaymentForm(initial=initial_data)
+
+    # print(selected_client_land_id, selected_client_land)
+    if selected_client_land:
+        transactions = Payment.objects.filter(client_land=selected_client_land)
+        total_amount_paid = transactions.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+        balance = selected_client_land.land.price - total_amount_paid
+
+    context = {
+        'admin_id': admin_id,
+        'company_logo_url': company_logo_url,
+        'profile_pic_url': profile_pic_url,
+        'client': client,
+        'client_lands': client_lands,
+        'selected_client_land': selected_client_land,
+        'form': form,
+        'transactions': transactions,
+        'total_amount_paid': total_amount_paid,
+        'balance': balance,
+    }
+    return render(request, 'realestates/admin/record_payment.html', context)
+
+
+# ============ EDIT PAYMENT MADE BY CLIENT =================
+@login_required
+def edit_payment(request, payment_id):
+
+    try:
+        employee = request.user.employee
+    except Employees.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to view this page.")
+
+    if not employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
+
+    payment = get_object_or_404(Payment, id=payment_id)
+    client = payment.client_land.client
+
+    if request.method == 'POST':
+        form = PaymentForm(request.POST, instance=payment)
+        # print(form.errors)
+        if form.is_valid():
+            form.save()
+            return redirect('realestates:record_payment', client_id=client.id)
+    else:
+        form = PaymentForm(instance=payment)
+
+    context = {
+        'form': form,
+        'payment': payment
+    }
+    return render(request, 'realestates/admin/edit_payment.html', context)
+
+
+# ============ DELETE PAYMENT RECORD MADE BY CLIENT =================
+def delete_payment_record(request, pk):
+    if request.method == 'DELETE':
+        payment_record = get_object_or_404(Payment, pk=pk)
+        payment_record.delete()
+        return JsonResponse({'status': 'success'}, status=200)
+    return JsonResponse({'status': 'error'}, status=400)
+
+# ============== ADD NEW LAND INTO THE SYSTEM ================
+@login_required
+def add_land(request):
+    if request.method == 'POST':
+        form = LandForm(request.POST)
+        if form.is_valid():
+            land = form.save()
+            return JsonResponse({'status': 'success'})
+        else:
+            return JsonResponse({'status': 'error', 'errors': form.errors})
+    return JsonResponse({'status': 'invalid method'}, status=405)
 
 
 # # ============== ADD NEW LAND INTO THE SYSTEM ================
@@ -704,6 +1095,102 @@ def delete_land(request, land_id):
     return render(request, 'realestates/admin/confirm_delete.html', {'form': form, 'land': land})
 
 
+# ============= CLIENTS WITH LAND(MADE COMPLETE PAYMENT FOR THE LAND) ==============
+@login_required
+def clients_with_lands(request):
+
+    try:
+        employee = request.user.employee
+    except Employees.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to view this page.")
+
+    if not employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
+
+    admin_id = request.user.id
+
+    profile_pic_url = ""
+    try:
+        admin = Employees.objects.get(id=request.user.id)
+        if admin.profile_pic:
+            profile_pic_url = admin.profile_pic.url
+    except Employees.DoesNotExist:
+        admin = None
+
+    company_logo_url = ""
+    try:
+        company = Company.objects.get(id=1)
+        if company.company_logo:
+            company_logo_url = company.company_logo.url
+    except Company.DoesNotExist:
+        company = None
+
+    clients = Client.objects.filter(client_lands__payment_complete=True).distinct().order_by('-date')
+
+    # Handle search query
+    search_query = request.GET.get('search', '')
+    if search_query:
+        clients = clients.filter(phoneNumber1__icontains=search_query)
+
+    paginator = Paginator(clients, 10)  # Show 10 clients per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'admin_id': admin_id,
+        'company_logo_url': company_logo_url,
+        'profile_pic_url': profile_pic_url,
+    }
+
+    return render(request, 'realestates/admin/clients_with_lands.html', context)
+
+
+# ============== TRANSACTION HISTORY FOR THE CLIENTS WHO ALREADY BOUGHT LAND ===============
+@login_required
+def land_transaction_history(request, land_id):
+
+    try:
+        employee = request.user.employee
+    except Employees.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to view this page.")
+
+    if not employee.is_administrator:
+        return redirect(reverse('realestates:employee_dashboard'))
+
+    admin_id = request.user.id
+
+    profile_pic_url = ""
+    try:
+        admin = Employees.objects.get(id=request.user.id)
+        if admin.profile_pic:
+            profile_pic_url = admin.profile_pic.url
+    except Employees.DoesNotExist:
+        admin = None
+
+    company_logo_url = ""
+    try:
+        company = Company.objects.get(id=1)
+        if company.company_logo:
+            company_logo_url = company.company_logo.url
+    except Company.DoesNotExist:
+        company = None
+
+    client_land = get_object_or_404(ClientLand, id=land_id)
+    transactions = Payment.objects.filter(client_land=client_land)
+    total_amount_paid = transactions.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+    context = {
+        'client_land': client_land,
+        'transactions': transactions,
+        'total_amount_paid': total_amount_paid,
+        'admin_id': admin_id,
+        'company_logo_url': company_logo_url,
+        'profile_pic_url': profile_pic_url,
+
+    }
+    return render(request, 'realestates/admin/land_transaction_history.html',
+                  context)
 
 
 # ================ Admin Settings. uploading excel data, cleaning database, and downloading excel data ==============
@@ -1575,6 +2062,32 @@ def get_data_link(request):
     dic = {'status': 'ok', "dic": dic}
     # print('core view 9055 get_data_link dic_= ', dic)
     return JsonResponse(dic)
+
+
+@login_required
+def client_payment(request):
+    if request.method == 'POST':
+        reassign_form = ReassignClientForm(request.POST)
+        admin_client_form = AdminClientForm(request.POST)
+
+        if reassign_form.is_valid():
+            # Process the valid reassign form data
+            client = reassign_form.cleaned_data['client']
+            new_employee = reassign_form.cleaned_data['new_employee']
+            client.employee = new_employee
+            client.save()
+
+            return redirect('realestates:client_payment')  # Replace with your success page
+
+    else:
+        admin_client_form = AdminClientForm(request.POST)
+        reassign_form = ReassignClientForm()
+
+    context = {
+        'reassign_form': reassign_form,
+        'admin_client_form': admin_client_form,
+    }
+    return render(request, 'realestates/admin/client_payment.html', context)
 
 
 @login_required

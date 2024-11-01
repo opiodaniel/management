@@ -28,7 +28,7 @@ DATABASES['default'] = dj_database_url.parse(database_url)
 
 settings = os.environ.get('DJANGO_SETTINGS_MODULE')
 
-MEDIA_ROOT = MEDIA_ROOT = '/home/opio/projects/management/web/centuryproperties/media/'
+MEDIA_ROOT = '/home/opio/projects/management/web/centuryproperties/media/'
 
 
 

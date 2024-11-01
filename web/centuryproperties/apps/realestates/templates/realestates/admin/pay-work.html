@@ -1,0 +1,1187 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Real Estates Ltd</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <meta name="robots" content="index,follow,all">
+    <meta name="msapplication-TileColor" content="#eceff1">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="google-site-verification" content="1NKy94ZSBrapf9w9BU4mJdhW__UB__qbGWa1V2aWoUs" />
+    <link rel="stylesheet" href="/static/cms.base.css" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/main.a399bc1a5519.css">
+    <link rel="apple-touch-icon" sizes="120x120" href="/static/images/apple-touch-icon.e3f5be308427.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.b0adf6b91841.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.bd459d491a1e.png">
+    <link rel="manifest" href="/static/images/site.57775445aa3a.webmanifest">
+    <link rel="mask-icon" href="/static/images/safari-pinned-tab.00983a824cb5.svg" color="#f72c30">
+    <link rel="shortcut icon" href="/static/images/favicon.bc906d84c4a9.ico">
+    <link href="/static/general.css" rel="stylesheet">
+
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <link href="/static/simulation_style.css" rel="stylesheet">
+    <link href="/static/globsim.css" rel="stylesheet">
+    <style>
+      .h1_hide {
+          font-size: 0;
+          width: 1px;
+          height: 1px;
+          display: inline-block;
+          overflow: hidden;
+          position: absolute!important;
+          border: 0!important;
+          padding: 0!important;
+          margin: 0!important;
+          clip: rect(1px,1px,1px,1px);
+        }
+  </style>
+
+    <style>
+        body {font-family: Arial;}
+
+        /* Style the tab */
+        .tab {
+          overflow: hidden;
+          border: 1px solid #ccc;
+          background-color: #f1f1f1;
+        }
+
+        /* Style the buttons inside the tab */
+        .tab button {
+          background-color: inherit;
+          float: left;
+          border: none;
+          outline: none;
+          cursor: pointer;
+          padding: 5px 10px;
+          transition: 0.3s;
+          font-size: 17px;
+        }
+
+        /* Change background color of buttons on hover */
+        .tab button:hover {
+          background-color: #ddd;
+        }
+
+        /* Create an active/current tablink class */
+        .tab button.active {
+          background-color: #ccc;
+        }
+
+        /* Style the tab content */
+        .tabcontent {
+          display: none;
+          padding: 6px 12px;
+          border: 1px solid #ccc;
+          border-top: none;
+        }
+    </style>
+    <style>
+        .value {
+         width:110px;
+         padding-right:3px;
+         text-align: right;
+        }
+
+        .account {
+          padding-left:5px; padding-right:5px;
+          text-align: left;
+        }
+
+        data {
+          font-family: Arial, Helvetica, sans-serif;
+          border-collapse: collapse;
+        }
+
+        .data td {
+          padding-top: 1px;
+          padding-bottom: 1px;
+          text-align: left;
+          border: 1px solid #ddd;
+        }
+
+        .data tr {
+          padding-top: 1px;
+          padding-bottom: 1px;
+          border: 1px solid #ddd;
+        }
+
+        .data th {
+          text-align: center;
+          padding-top: 1px;
+          padding-bottom: 1px;
+          background-color: blue;
+          color: white;
+          border: 1px solid #ddd;
+        }
+        .data tr:nth-child(even){background-color: lightblue}
+    </style>
+    <style>
+        .chosen {color: blue}
+    </style>
+    <style>
+    .button {
+      background-color: #ddd;
+      border: none;
+      color: black;
+      padding: 5px 10px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 16px;
+    }
+
+    .button:hover {
+      background-color: #f1f1f1;
+    }
+    </style>
+    <!-- designing the name of the company  -->
+    <style>
+      .pink-blue-gradient-text {
+          background-image: radial-gradient(circle, #144ee3, #f35792);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        .blue-pink-gradient-text {
+          background-image: radial-gradient(circle, #f35792, #144ee3);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        a {
+          text-decoration: none;
+        }
+    </style>
+
+   <!-- https://getbootstrap.com/docs/5.1/components/navbar/  -->
+   <!--https://www.w3schools.com/bootstrap4/tryit.asp?filename=trybs_nav_pills_toggleable&stacked=h-->
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/2.3.0/luxon.min.js" integrity="sha512-2j5fkjQ4q5ceXgfxi+kqrU2Oz234MrpyywZsQz1F5OGnfat7mOhjRr0oz5cpQ+YwwWB+hhDBSyxNGuL/tKWMFw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@0.2.1"></script>
+  <script src="/static/js/chartjs/chartjs-chart-financial.js" crossorigin="anonymous"></script>
+
+  <script src="/static/js/academycity/corporatevaluation/basic_pop_windows_v85.js" crossorigin="anonymous"></script>
+  <script>var ef = '';</script>
+
+    <script type="text/javascript" src="/static/sec_interactive/js/jquery-1.4.3.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/sec_interactive/css/interactive.css" />
+    <link rel="stylesheet" type="text/css" href="/static/sec_interactive/css/report.css" />
+    <link rel="stylesheet" type="text/css" href="/static/sec_interactive/css/print.css" media="print" />
+    <link rel="stylesheet" type="text/css" href="/static/sec_interactive/css/xbrlViewerStyle.css" />
+    <style type="text/css">li.octave {border-top: 1px solid black;}</style>
+    <!--
+    [if lt IE 8]>
+    <style type="text/css">
+    li.accordion a {display:inline-block;}
+    li.accordion a {display:block;}
+    </style>
+    <![endif]
+    -->
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+</head>
+
+<body id="body_base0">
+
+<div id="modal-exclude">
+    <!--    beginning of top nav -->
+    <div class="navbar-brand mx-4 mb-3 mt-2 d-flex align-items-center">
+        <a href="/pay">
+            <img class="rounded-circle" src="{% static 'estate/img/com_logo.jpeg' %}" alt="" style="width: 80px; margin-left:-10px; margin-right: 10px;">
+        </a>
+        <div>
+            <h5 class="text-info mb-0" style="text-align:left">
+                <span class="blue-pink-gradient-text">Century Properties</span><br>
+                <span style="margin-left:60px;" class="pink-blue-gradient-text">&amp;</span><br>
+                <span class="pink-blue-gradient-text">Real Estates Ltd</span>
+            </h5>
+        </div>
+    </div>
+    <!--    end of top nav  -->
+
+    <div class="body-content">
+        <div class="homepage">
+            <!--tabes click-->
+            <div>
+                <div style="color:white;background-color:darkblue">
+                    <span>Century Properties & Real Estates Ltd - Record System </span><span style="color:gold" id="main_page_time"></span>
+                </div>
+                <!-- Location for tabs.  The management tabs has to be entered manually  -->
+                <div id="tab_titles" class="tab">
+                </div>
+                <div id="tab_contents"  style="padding-left:30px">
+
+                        <div id="inputs" class="tabcontent"  style="background-color:lightcyan">
+                            <!-- pick a company and year of valuation -->
+                            <div>
+                                <table>
+                                    <tr>
+                                        <td>Clients:</td>
+                                        <td>
+                                            <select class="select2" name="client_name" id="clientSelect" onchange="loadClientLands(this)" required>
+                                                <option value="">------------- Select Client  ------------</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Client Land:</td>
+                                        <td>
+                                            <select class="select2" style="padding: 4px;line-height: 1.5;height: auto;" name="client_land"  onchange="loadSelectedLand(event)" required>
+                                                <option value="">--------- Select Client Land --------</option>
+                                            </select>
+                                            <input type="button" value="Add Land" class="btn btn-primary" onclick="openCreateLandModal(event)" style="line-height: 15px;">
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <br/>
+                            <div id="rp_by_countries_" style="display:block">
+                                <form id="clientPaymentForm" method="POST">
+                                    {% csrf_token %}
+                                    <div style="display: flex; gap: 10px;">
+                                       <span id="land-price" style="display:none"></span>
+                                        <span id="total-paid" style="display:none"></span>
+                                        <span id="balance" style="display:none"></span>
+                                    </div>
+                                    <table class="data" id="clientPaymentTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Client Land</th>
+                                                <th>Amount Paid</th>
+                                                <th>Approved</th>
+                                                <th>Approved By</th>
+                                                <th>Employee</th>
+                                                <th>Timestamp</th>
+                                                <th>Edit</th>
+                                                <th style="padding:0px">
+                                                    <button class="btn" type="button" onclick="add_payment_record(loggedInUser, employeesList)" style="color:white">
+                                                        <i class="fa fa-plus"></i>
+                                                    </button>
+                                                </th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody id="clientPaymentBody">
+                                            <!-- Existing Payments Will be Dynamically Inserted Here -->
+                                        </tbody>
+                                    </table>
+                                </form>
+                            </div>
+
+                        </div>
+                        <div id="fsa"    class="tabcontent data"  style="padding-left:20px;width:100%">
+                          <!-- Nav pills -->
+                          <ul class="nav nav-pills" role="tablist">
+                            <li class="nav-item"><a id="fsa_balance_sheet" class="nav-link active" data-toggle="pill" href="#balance_sheet">Balance Sheet</a></li>
+                            <li class="nav-item"><a id="fsa_income_statement" class="nav-link" data-toggle="pill" href="#income_statement">Income Statement</a></li>
+                            <li class="nav-item"><a id="fsa_vertical" class="nav-link" data-toggle="pill" href="#vertical">Vertical</a></li>
+                            <li class="nav-item"><a id="fsa_horizontal" class="nav-link" data-toggle="pill" href="#horizontal">Horizontal</a></li>
+                            <li class="nav-item"><a id="fsa_ratio" class="nav-link" data-toggle="pill" href="#ratio_analysis">Ratio</a></li>
+                          </ul>
+                          <!-- Tab panes -->
+                          <div class="tab-content">
+                            <div id="balance_sheet" class="tab-pane">balance_sheet</div>
+
+                            <div id="income_statement" class="tab-pane">income_statement</div>
+
+                            <div id="vertical" class="tab-pane">vertical</div>
+
+                            <div id="horizontal" class="tab-pane fade">horizontal</div>
+
+                            <div id="ratio_analysis" class="tab-pane fade data active">Ratio</div>
+                          </div>
+                        </div>
+
+
+
+
+                    <div id="sec" class="tabcontent">
+                        <div id="valuationsetup_xbrl_data"></div>
+                        <div id="navigation_table"></div>
+                    </div>
+
+                    <div id="calculations" class="tabcontent" style="padding-left:20px;width:100%">
+                      <!-- Nav pills -->
+                      <ul class="nav nav-pills" role="tablist">
+                        <li class="nav-item"><a id="calc_cost_of_debt" class="nav-link" data-toggle="pill" href="#tab_cost_of_debt">Cost of Debt</a></li>
+                        <li class="nav-item"><a id="calc_cost_of_equity" class="nav-link" data-toggle="pill" href="#tab_cost_of_equity">Cost of Equity</a></li>
+                        <li class="nav-item"><a id="calc_estimated_roic" class="nav-link" data-toggle="pill" href="#tab_estimated_roic">Estimated ROIC</a></li>
+                        <li class="nav-item"><a id="calc_effective_tax_rate" class="nav-link" data-toggle="pill" href="#tab_effective_tax_rate">Effective tax rate</a></li>
+                        <li class="nav-item"><a id="calc_risk_premium" class="nav-link" data-toggle="pill" href="#tab_risk_premium" onclick="set_risk_premium_()">Risk Premium</a></li>
+                      </ul>
+                      <!-- Tab panes -->
+                      <div class="tab-content">
+                        <div id="tab_cost_of_debt" class="container tab-pane">
+                                <table class="data" style="width:30%">
+                                    <thead><tr><th>Parameter</th><th>Value</th><th></th></tr></thead>
+                                    <tr><td class="account">Risk Free</td><td id="cofd_rf" style="text-align:right;"></td><td>%</td></tr>
+                                    <tr><td class="account">EBIT</td><td id="cofd_ebit" style="text-align:right;"></td><td></td></tr>
+                                    <tr><td class="account">Interest Expense</td>
+                                        <td id="cofd_interest_expense" style="text-align:right;"></td></tr>
+                                    <tr><td class="account">Interest Coverage</td>
+                                        <td id="cofd_interest_coverage" style="text-align:right;"></td><td></td></tr>
+                                    <tr><td class="account">Estimated Bond Rating</td>
+                                        <td id="cofd_estimated_bond_rating" style="text-align:right;"></td><td></td></tr>
+                                    <tr><td class="account">Estimated Company Default Spread</td>
+                                        <td id="cofd_estimated_company_default_spread" style="text-align:right;"></td><td>%</td></tr>
+                                    <tr><td class="account">Estimated County Default Spread</td>
+                                        <td id="cofd_estimated_county_default_spread" style="text-align:right;"></td><td>%</td></tr>
+                                    <tr><td class="account">Estimated Cost of Debt</td>
+                                        <td id="cofd_estimated_cost_of_debt" style="text-align:right;"></td><td>%</td></tr>
+                                </table>
+                        </div>
+
+                        <div id="tab_cost_of_equity" class="container tab-pane">
+                                  <table class="data" style="width:25%">
+                                      <thead><tr><th>Parameter</th><th>Value</th><th></th></tr></thead>
+                                      <tr><td class="account">Risk Free</td>
+                                          <td id="cofe_rf" style="text-align:right;">0</td><td>%</td></tr>
+                                      <tr><td class="account">Unlevred Beta</td>
+                                          <td id="cofe_ub" style="text-align:right;">0</td><td></td></tr>
+                                      <tr><td class="account">Beta</td>
+                                          <td id="cofe_b" style="text-align:right;">0</td><td></td></tr>
+                                      <tr><td class="account">Mature marker risk premium</td>
+                                          <td id="cofe_rp" style="text-align:right;">0</td><td>%</td>
+                                      </tr>
+                                      <tr><td class="account">Adj. Default Spread</td>
+                                          <td id="cofe_ads" style="text-align:right;">0</td><td>%</td></tr>
+                                      <tr><td class="account">Volatility ratio</td>
+                                          <td id="cofe_vr" style="text-align:right;">1.5000</td></tr>
+                                      <tr><td class="account">Total Country Risk</td>
+                                          <td id="cofe_tcr" style="text-align:right;">0</td><td>%</td></tr>
+                                      <tr><td class="account">Cost of Equity</td>
+                                          <td id="cofe_" style="text-align:right;">0</td><td>%</td></tr>
+                                  </table>
+                        </div>
+
+                        <div id="tab_estimated_roic" class="container tab-pane">
+                                <span style="color:blue; font-size: 20px;"># of Periods for estimation:</span>
+                                <input id="roic_effective_tax_rate_periods" type="text" value="5" oninput="on_change_num_of_estimation_periods(event)" style="width:55px"/>
+                                <table class="data" id="estimated_roic" class="w3-table-all w3-hoverable" style="width:100%">
+                                 </table>
+                        </div>
+
+                        <div id="tab_effective_tax_rate" class="container tab-pane">
+                                <span style="color:blue; font-size: 20px;"># of Periods for estimation:</span>
+                                <input id="roic_effective_tax_rate_periods_" type="text" value="5" oninput="on_change_num_of_estimation_periods(event)" style="width:55px"/>
+                              <table class="data" id="effective_tax_rate" class="w3-table-all w3-hoverable" style="width:100%">
+                              </table>
+                        </div>
+
+                        <div id="tab_risk_premium" class="container tab-pane" style="width:100%;">
+
+                            <div id="chart_components" style="width:100%;">
+                            </div>
+                            <div id="chart_average" style="width:100%;">
+                            </div>
+                            <div id="chart_b" style="width:100%;">
+                            </div>
+                            <div id="chart_geometric" style="width:100%;">
+                            </div>
+                            <div id="risk_premium_data">
+                                Calculating Risk Premium.  Please wait.
+                            </div>
+                        </div>
+
+                      </div>
+                    <br/><br/><br/><br/>
+
+                    </div>
+                    <div id="valuation" class="tabcontent" style="padding-left:20px;width:100%">
+                        <span style="padding:10px; color:blue">
+                            <font size="5">Parameters effecting the valuation:</font>
+                        </span>
+                        <table style="background-color:lightblue">
+                            <tr>
+                                <td>WACC (%): </td><td style="padding-left:5px"><input id="wacc_" type="text" value="6" oninput="input_dcf(event)" style="width:55px;line-height:10px;text-align:right;"/></td>
+                                <td>EBIT (<span id="valuation_year_">1</span>):</td><td><input id="cf1_ebit" type="text" value="1000" oninput="input_dcf(event)" style="width:80px;line-height:10px;text-align:right;"/></td>
+                                <td>Short Term Growth(%):</td><td><input id="stgrowth_" type="text" value="5" oninput="input_dcf(event)" style="width:55px;line-height:10px;text-align:right;"/></td>
+                                <td>Long Term Growth(%):</td><td><input id="ltgrowth_" type="text" value="2" oninput="input_dcf(event)" style="width:55px;line-height:10px;text-align:right;"/></td>
+                            </tr>
+                            <tr>
+                                <td>Effective tax rate(%): </td><td style="padding-left:5px"><input id="effective_tax_rate_" type="text" value="0" oninput="input_dcf(event)" style="width:55px;line-height:10px;text-align:right;"/></td>
+                                <td>Marginal tax rate(%):</td><td style="padding-left:5px"><input id="marginal_tax_rate_" type="text" value="0" oninput="input_dcf(event)" style="width:55px;line-height:10px;text-align:right;"/></td>
+                                <td>ROIC (short term %):</td><td style="padding-left:5px"><input id="roic_st_" type="text" value="0" oninput="input_dcf(event)" style="width:55px;line-height:10px;text-align:right;"/></td>
+                                <td>ROIC (long term %) :</td><td style="padding-left:5px"><input id="roic_lt_" type="text" value="0" oninput="input_dcf(event)" style="width:55px;line-height:10px;text-align:right;"/></td>
+                            </tr>
+                            <tr>
+                                <td># of S.T. period</td><td style="padding-left:5px"><input id="duration_of_st_period_" type="text" value="5" oninput="input_dcf(event)" style="width:55px;line-height:10px;text-align:right;"/></td>
+                                <td></td><td></td>
+                                <td>Re-investment rate (ST %):</td>
+                                <td><input id="re_investment_rate_short_term_" type="text" value="0" oninput="input_dcf(event)" style="width:55px;line-height:10px;text-align:right;"/></td>
+                                <td>Re-investment rate (LT %):</td><td style="padding-left:5px"><input id="re_investment_rate_long_term_" type="text" value="0" oninput="input_dcf(event)" style="width:55px;line-height:10px;text-align:right;"/></td>
+                            </tr>
+                        </table>
+                        <br/>
+
+                        <div>
+                            <table id="dcf_framework" class="data">
+                            </table>
+                        </div>
+                        <br/><br/>
+                        <br/><br/><br/><br/>
+                    </div>
+
+                    <div id="sp_forecast_actual" class="tabcontent">
+                        <div id="result"></div>
+                        <input type="text" id="search_input" onkeyup="search_function()" n="2" placeholder="Search for Tickers.." title="Type in a name">
+                        <button onclick='start_streamer(event)'>Price Streams</button>
+                        <div id="sp_forecast_actual_data" class="data"></div>
+                    </div>
+
+                    <div id="valuationtodo" class="container tabcontent" >
+                        <button onclick="add_task(event)">Add Task</button>
+                    <table id="tasks" class="data" onchange="input_valuation_todo(event)">
+                        <thead>
+                            <tr>
+                                <th>Priority</th><th>subject</th><th>description</th><th>is_active</th>
+                            </tr>
+                        </thead>
+
+                    </table>
+                        <br/><br/><br/><br/><br/>
+                    </div>
+
+                    <div id="valuationmethodology" class="tabcontent container"></div>
+
+                    <div id="valuationadmin" class="tabcontent">
+                    <!--    Accounting -->
+                        <table>
+                            <tr>
+                                <td>
+                                    <table>
+                                        <tr><td>
+                                            <label for="myCheck">Update Data For Companies:</label>
+                                            <input type="checkbox" id="update_data_for_companies" onclick="update_data_for_companies()">
+                                        </td></tr>
+                                        <tr><td>
+                                            <label for="myCheck">Update Quarterly Data:</label>
+                                            <input type="checkbox" id="update_data_for_companiesq" onclick="update_data_for_companiesq(event)">
+                                        </td></tr>
+                                    </table><br/>
+                                </td>
+                                <td>
+                                    <h4>Fill cube data</h4>
+                                    <table>
+                                        <tr>
+                                            <td onclick="analysis_setup_attribute(event)">
+                                                <button fun="update_chart_of_accounts" style="width: 50px;">CofA</button>
+                                                <button fun="update_companies" style="width: 50px;">Com</button>
+                                                <button fun="update_time" style="width: 50px;">Time</button>
+                                                <button fun="update_fact_table" style="width: 50px;">Fact</button>
+                                                <button fun="get_data_for_ticker" style="width: 50px;">Pivot</button>
+                                            </td><td>
+                                                <input id="bi_attribute_name" type="text" value="ticker" size="4" placeholder="attribute name"/>
+                                                <input id="bi_attribute_value" type="text" value="AAPL" size="4" placeholder="attribute value"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td>
+                                    <div id="result_message">result_message</div>
+                                </td>
+                            </tr>
+                        </table>
+                        <hr/>
+                        <h4>AcademyCityXBRL</h4>
+                        <table>
+                            <tbody obj="AcademyCityXBRL" attributes_id="tdameritrade_attributes" message_id="result_message_academycityxbrl">
+                            <tr id="buttons" onclick="activate_obj_function(event)">
+                                <td>
+                                    <button fun="run_all_pages" style="width: 120px;">run_all_pages</button><br/>
+                                    This is an example of how to use the object GetAllUrlsProcessed.<br/>
+                                    To download several pages at the same time and process them.
+                                </td>
+                            </tr>
+                            <tr id="tdameritrade_attributes">
+                                <td>
+                                    <input type="text" value="ticker" size="4" placeholder="name"/>
+                                    <input type="text" value="AAPL" size="4" placeholder="value"/>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div id="result_message_academycityxbrl"></div><br/>
+
+                        <hr/>
+                        <table>
+                            <tr>
+                                <td>
+                                    <button onclick="tdameritrade_setup_w_attribute(event)" fun="get_option_statistics_for_ticker" style="width: 122px;">
+                                                optionForTicker</button>
+                                </td>
+                            </tr>
+                                    <tr>
+                                        <td>
+                                            <button onclick="tdameritrade_setup_w_attribute(event)" fun="get_quote" style="width: 122px;">get_quote</button>
+                                        </td>
+                                    </tr>
+                        </table>
+
+                        <hr/>
+                        <h5>S&P Functions</h5>
+                        <table>
+                            <tr>
+                                <td>
+                                    <button onclick="admin_setup(event)" fun="get_earning_forecast_sp500_view" style="width: 250px;">
+                                        get_earning_forecast_sp500_view
+                                    </button>
+                                </td>
+                            </tr>
+                        </table>
+                        <br/><br/><br/><br/>
+                    </div>
+                    <div id="valuationsetup" class="tabcontent"></div>
+                </div>
+
+                <br/><br/><br/>
+            </div>
+            <span id="tabs_"
+                tabs_s="valuation:Valuation;local,calculations:Schedules;local,calculations:Schedules;local,fsa:FSA;local,inputs:Inputs;local"
+                tabs_m="valuationsetup:Setup;pull_screen,valuationadmin:Admin;pull_screen,valuationmethodology:Methodology;pull_screen,valuationtodo:To Do;pull_screen,sec:SEC;local"
+                tabs_options = "sp_forecast_actual:S&P500;local" user_id = "607">
+            </span>
+            <span id="is_staff" is_staff="True" is_instructor="True"  is_options="False" is_fsa="False"></span>
+            <div id="log_info"></div>
+        </div>
+    </div>
+    <!--    beginning of footer -->
+
+<!--    end of footer  -->
+</div>
+<!-- end of body content-->
+
+<!-- Modal for adding new land -->
+<div class="modal fade" id="addLandModal" tabindex="-1" aria-labelledby="addLandModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addLandModalLabel">Add New Land</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="addLandForm" method="POST" action="">
+        {% csrf_token %}
+        <div class="modal-body">
+          {{ land_form.as_p }} <!-- Render your LandForm here -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save Land</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<p id="demo"></p>
+
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
+         integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+ <script src="/static/js/reconnecting-websocket.js"></script>
+<script src="/static/vendor/jquery/jquery.min.js"></script>
+<script src="/static/js/npm/cookie/js.cookie.min.js"></script>
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+
+
+<script>
+    $(document).ready(function() {
+        $('#clientSelect').select2({
+            ajax: {
+                url: '/client-list-api/',  // API URL for fetching paginated clients
+                dataType: 'json',
+                delay: 250,  // Add delay to reduce number of API requests
+                data: function (params) {
+                    return {
+                        q: params.term,  // Search term
+                        page: params.page || 1  // Pagination
+                    };
+                },
+                processResults: function (data) {
+                    // Map received data into Select2 format
+                    return {
+                        results: data.clients.map(function(client) {
+                            return {
+                                id: client.id,
+                                text: `${client.name} (Phone: ${client.phone_number1}, ${client.phone_number2})`
+                            };
+                        }),
+                        pagination: {
+                            more: data.has_next  // Indicates if more pages are available
+                        }
+                    };
+                },
+                cache: true
+            },
+            placeholder: '------------- Select Client  ------------',
+            minimumInputLength: 1,  // Trigger search after typing 1 character
+        });
+    });
+</script>
+
+<script>
+    // Pass the data from Django to your JavaScript
+    var loggedInUser = "{{ logged_in_user }}";
+    var employeesList = [
+        {% for employee in employees %}
+        {
+            id: "{{ employee.id }}",
+            name: "{{ employee.user.get_full_name }}"
+        },
+        {% endfor %}
+    ];
+    var defaultEmployeeId = "{{ default_employee.id }}" || null;
+
+    // Call the add_payment_record function when needed
+    function add_payment_record() {
+        add_payment_record(loggedInUser, employeesList, defaultEmployeeId);
+    }
+</script>
+
+
+<script>
+
+var defaultEmployeeId = null;
+var defaultEmployeeName = '';
+var selectedLandId = null;
+
+// Load client lands and payments based on the selected client
+function loadClientLands(selectElement) {
+    var clientId = selectElement.value;  // Get the selected client ID
+    const url = `/client-payment-info/${clientId}/`;
+
+    if (clientId) {
+        fetch(url)  // Fetch payment data and client lands for the selected client
+            .then(response => response.json())
+            .then(data => {
+                var tableBody = document.getElementById("clientPaymentBody");
+                var landSelect = document.querySelector('select[name="client_land"]');
+                tableBody.innerHTML = '';  // Clear previous payment details
+                landSelect.innerHTML = '<option value="">------------- Select Client Land ----------</option>'; // Clear previous lands
+
+                // Populate client lands dropdown
+                data.client_lands.forEach(land => {
+                    var landOption = document.createElement('option');
+                    landOption.setAttribute('data-client-id', `${land.client_id}`);
+                    landOption.value = `${land.land_id}`;
+                    landOption.textContent = `${land.plot_number}`;
+                    landSelect.appendChild(landOption);
+                });
+
+                // Populate existing payments for the selected client
+                data.payments.forEach(payment => {
+                    var newRow = document.createElement("tr");
+                    newRow.innerHTML = `
+                        <td>${payment.client_land}</td>
+                        <td><input type="text" name="amount_paid" value="${payment.amount_paid.toLocaleString()}" readonly></td>
+                        <td><input type="checkbox" name="approved" ${payment.approved ? 'checked' : ''} disabled></td>
+                        <td><input type="text" name="approved_by" value="${payment.approved_by}" readonly></td>
+                        <td><input type="text" name="employee" value="${payment.employee}" readonly></td>
+                        <td><input type="text" name="timestamp" value="${payment.timestamp}" readonly></td>
+                        <td>
+                            <button type="button" class="btn btn-danger" onclick="remove_row(this)">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(newRow);
+                });
+
+                // Store employee details for adding new records
+                defaultEmployeeId = data.employee_id;
+                defaultEmployeeName = data.employee_name;
+
+                var span_land_price = document.getElementById('land-price')
+                span_land_price.setAttribute('style', 'display:none;')
+
+                var span_total_paid = document.getElementById('total-paid')
+                span_total_paid.setAttribute('style', 'display:none;')
+
+                var span_balance = document.getElementById('balance')
+                span_balance.setAttribute('style', 'display:none;')
+
+            })
+            .catch(error => {
+                console.error('Error fetching payment details:', error);
+            });
+    }
+}
+
+// Update the client land when a specific land is selected
+function loadSelectedLand(event) {
+    var selectedLandId = event.target.value;  // Capture the selected land ID
+     // Get the selected option element
+    var selectedOption = event.target.options[event.target.selectedIndex];
+    // Retrieve the client_id from the custom attribute
+    var clientId = selectedOption.getAttribute('data-client-id');
+        url_link_ = `/client-payment-info/${clientId}?land_id=` + selectedLandId
+     // Make an AJAX request to get the payment details for the selected land
+        fetch(url_link_)
+            .then(response => response.json())
+            .then(data => {
+                var tableBody = document.getElementById("clientPaymentBody");
+                tableBody.innerHTML = '';  // Clear the existing rows
+
+                // Populate the table with filtered payment data
+                data.payments.forEach(payment => {
+                    var newRow = document.createElement("tr");
+                    newRow.innerHTML = `
+                        <td>${payment.client_land}</td>
+                        <td><input type="text" name="amount_paid" value="${payment.amount_paid.toLocaleString()}" readonly></td>
+                        <td><input type="checkbox" name="approved" ${payment.approved ? 'checked' : ''} disabled></td>
+                        <td><input type="text" name="approved_by" value="${payment.approved_by}" readonly></td>
+                        <td><input type="text" name="employee" value="${payment.employee}" readonly></td>
+                        <td><input type="text" name="timestamp" value="${payment.timestamp}" readonly></td>
+                        <td>
+                            <button type="button" class="btn btn-danger" onclick="remove_row(this)">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(newRow);
+                    var span_land_price = document.getElementById('land-price')
+                    span_land_price.setAttribute('style', 'display:block;color:blue;font-size:20px')
+                    span_land_price.innerHTML = 'Land Price: '+ `${payment.land_price.toLocaleString()}`
+
+                    var span_total_paid = document.getElementById('total-paid')
+                    span_total_paid.setAttribute('style', 'display:block;color:green;font-size:20px')
+                    span_total_paid.innerHTML = 'Paid: '+ `${payment.total_amount_paid.toLocaleString()}`
+
+                    var span_balance = document.getElementById('balance')
+                    span_balance.setAttribute('style', 'display:block;color:red;font-size:20px')
+                    span_balance.innerHTML = 'Balance: '+ `${payment.balance.toLocaleString()}`
+                });
+            })
+            .catch(error => console.error('Error fetching payment data:', error));
+}
+
+
+// Function to handle adding a new payment record, auto-filling the client land based on the selection
+function add_payment_record() {
+
+    // Get the select element and its selected value
+    var landSelect = document.querySelector('select[name="client_land"]');
+    var selectedLandValue = landSelect.value;  // Get the value of the selected land
+
+    // Check if a valid client land is selected
+    if (!selectedLandValue) {
+        alert('Please select a client land first.');
+        return;  // Exit the function if no client land is selected
+    }
+
+    var tableBody = document.getElementById("clientPaymentBody");
+    var newRow = document.createElement("tr");
+    newRow.setAttribute("onchange", "input_value(event)")
+    // Get the selected client land text to display in the row
+    var selectedLandText = document.querySelector('select[name="client_land"]').options[document.querySelector('select[name="client_land"]').selectedIndex].text;
+    //alert(selectedLandText)
+    // Preselected employee data (these should come from the server based on the selected client)
+    var selectedEmployeeId = defaultEmployeeId;  // The current employee ID owning the client
+    //alert(selectedEmployeeId)
+    var employeeOptions = `
+        <select name="employee" style="padding: 5px;line-height: 1.5;height: auto;" required>
+            <option value="">-- Select Employee --</option>
+            {% for employee in employees %}
+                <option value="{{ employee.id }}" ${selectedEmployeeId == {{ employee.id }} ? 'selected' : ''}>
+                    {{ employee }}
+                </option>
+            {% endfor %}
+        </select>
+    `;
+
+    // Append the new row with inputs for amount paid, approved checkbox, and employee select dropdown
+    newRow.innerHTML = `
+        <td>${selectedLandText}</td>
+        <td><input type="text" oninput="formatAmount(this)" name="amount_paid" required></td>
+        <td><input type="checkbox" name="approved" checked></td>
+        <td><input type="text" name="approved_by" value="${defaultEmployeeName}" readonly></td>
+        <td>${employeeOptions}</td> <!-- Auto-select the current employee -->
+        <td><input type="date" style="padding:2px" name="timestamp" required></td>
+        <td>
+            <button type="button" class="btn btn-danger" onclick="remove_row(this)">
+                <i class="fa fa-trash"></i>
+            </button>
+        </td>
+    `;
+
+    // Add the new row to the table body
+    tableBody.appendChild(newRow);
+}
+
+
+// Function to open the modal to create new land
+// Function to open the modal and set the form action to include client_id
+function openCreateLandModal(event) {
+    var clientId = document.getElementById("clientSelect").value;  // Get the selected client ID
+    if (clientId) {
+        // Update the form action to attach the land to the selected client
+        document.getElementById("addLandForm").action = `/create_client_land/${clientId}/`;  // Dynamically update the URL
+        $('#addLandModal').modal('show');  // Show the modal
+    } else {
+        alert('Please select a client first.');
+    }
+}
+
+// Optional: You can also close the modal after successful submission
+function closeModal() {
+    $('#addLandModal').modal('hide');
+}
+
+</script>
+
+
+<script>
+function add_client_record() {
+    var table = document.getElementById("clientLandBody");
+    var newRow = document.getElementById("clientRecordRow").cloneNode(true);
+    newRow.querySelectorAll("input").forEach(input => input.value = '');  // Clear the cloned inputs
+    newRow.querySelector("select").selectedIndex = 0;  // Reset the client dropdown
+    table.appendChild(newRow);
+}
+
+function remove_row(button) {
+    var p = prompt('Type yes to close this row','No')
+    if(p!='yes'){
+     return;
+    }
+    var row = button.closest('tr');
+    row.remove();
+}
+</script>
+
+
+<script>
+    function formatAmount(input) {
+        // Remove existing commas and non-numeric characters from the input
+        let value = input.value.replace(/[^\d]/g, '');
+
+        // Add commas to the value
+        value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+        // Update the input value
+        input.value = value;
+    }
+</script>
+
+<script>
+var csrfToken = Cookies.get('csrftoken');
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
+  $.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+      if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      }
+    }
+  });
+
+
+function input_value(event) {
+    const row = event.target.closest('tr');
+
+    // Get values from the row
+    const clientLand = row.querySelector('td:nth-child(1)').textContent;  // Client Land text
+    const amountPaid = row.querySelector('td:nth-child(2) input[name="amount_paid"]').value;
+    const approved = row.querySelector('td:nth-child(3) input[name="approved"]').checked;
+    const approvedBy = row.querySelector('td:nth-child(4) input[name="approved_by"]').value;
+    const employee = row.querySelector('td:nth-child(5) select[name="employee"]').value;  // Employee select value
+    const timestamp = row.querySelector('td:nth-child(6) input[name="timestamp"]').value;
+
+    // Define the URL for the backend (assuming the client_id is part of the form or context)
+    const clientId = document.querySelector('#clientSelect').value;  // Assuming the client select dropdown exists
+    const url_link = `/update_client_land/${clientId}/`;
+
+    // Prepare the data to send to the server
+    const payload = {
+        clientLand: clientLand,
+        amountPaid: amountPaid,
+        approved: approved,
+        approvedBy: approvedBy,
+        employee: employee,
+        timestamp: timestamp
+    };
+
+
+    // Send the data using fetch() for a POST request
+    fetch(url_link, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,  // Include CSRF token for security
+        },
+        body: JSON.stringify(payload)
+    }).then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert('Payment record updated successfully!');
+        } else {
+            alert('Error updating payment record: ' + data.message);
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+        alert(error);
+    });
+}
+
+</script>
+
+
+<!-- PARAMETERS IN vObj -->
+<script>
+var vObj = new Object();
+vObj["ids_for_timer"] = ["main_page_time", "orders_timer"]
+//--
+set_framework()
+</script>
+
+<script>
+var csrftoken = Cookies.get('csrftoken');
+function csrfSafeMethod(method) {
+// these HTTP methods do not require CSRF protection
+return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+beforeSend: function(xhr, settings) {
+  if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+  }
+}
+});
+
+$(document).ready(function(){
+
+post_ajax_create_action = function (verb_="", app_="", model_, obj_slug_=null, pkey_=null) {
+  $.post(link_create_action,
+    {
+      verb: verb_,
+      app: app_,
+      model: model_,
+      obj_slug: obj_slug_,
+      pkey: pkey_
+    },
+    function(data){
+        alert(data["status"])
+    }
+  );
+}
+
+
+// ================================================
+//  SimTab object
+function SimTab(parent, name, title, valuation_id, url_get_screens, screen_update)
+{
+ this.parent = parent; this.name = name; this.title = title; this.VALUATION_ID = valuation_id;
+ this.screen_update = screen_update; this.NAV = null; this.CONTENT = null;
+ // --
+ this.callback_functions = []; this.need_update_screen = 1; this.CONTENTObjects = {}; this.is_show_first = true;
+ //--
+
+  e = document.createElement("button");e.setAttribute("class", "tablinks ");e.setAttribute("id", "tab-"+name);
+  e.setAttribute("obj_name", name); e.innerHTML = title;
+
+  this.parent.tabTitles.insertBefore(e, this.parent.tabTitles.childNodes[0])
+
+  e.addEventListener("click", function(){
+    event.preventDefault();
+    obj_name = this.getAttribute('obj_name');
+    obj = parent.TabObjects[obj_name]
+    is_show_first = obj.is_show_first
+
+      //post_ajax_create_action('globsim__change_to_tab__' + obj.title)
+      var i, tabcontent, tablinks; tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {tabcontent[i].style.display = "none";}
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {tablinks[i].className = tablinks[i].className.replace(" active", "");}
+      document.getElementById(obj_name).style.display = "block"; this.className += " active";
+  }.bind(e, event, parent ));
+
+  this.tabTitle = e; this.tabDoc = ed;
+}
+
+
+// =========== Tabs management for admin ==========================
+// -- SimManagementTab object --
+function SimManagementTab(parent, name, title, valuation_id, url_get_screens, screen_update)
+{
+ //alert(JSON.stringify(parent))
+ this.parent = parent; this.name = name; this.title = title; this.VALUATION_ID = valuation_id;
+ this.screen_update = screen_update; this.NAV = null; this.CONTENT = null;
+ // --
+ this.callback_functions = [];
+ //--
+  if (this.screen_update == 'pull_screen')
+  {
+    ed = document.createElement("div"); ed.setAttribute("class", "tabcontent");
+    ed.setAttribute("id", this.name); this.parent.tabContents.appendChild(ed);
+  } else{try{ed = document.getElementById(this.name);} catch (er) {alert('Error1: ' + er)}}
+
+  // --
+  e = document.createElement("button");e.setAttribute("class", "tablinks ");e.setAttribute("id", "tab-"+name);
+  e.setAttribute("obj_name", name); e.innerHTML = title;
+
+  //alert(e.outerHTML);
+  this.parent.tabTitles.insertBefore(e, this.parent.tabTitles.childNodes[0])
+
+
+  e.addEventListener("click", function(){
+    //alert(event.target.outerHTML)
+    event.preventDefault(); obj_name = this.getAttribute('obj_name'); obj = parent.TabObjects[obj_name];
+
+    // --
+    //obj.title_click(obj); obj.parent.titleWasClicked();
+    // --
+      //post_ajax_create_action('globsim__change_to_tab__' + obj.title)
+      var i, tabcontent, tablinks; tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {tabcontent[i].style.display = "none";}
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {tablinks[i].className = tablinks[i].className.replace(" active", "");}
+      document.getElementById(obj_name).style.display = "block"; this.className += " active";
+  }.bind(e, event, parent ));
+
+ this.tabTitle = e; this.tabDoc = ed;
+
+ //try{
+ // name_ = this.name.toLowerCase(); content_ = name_ + "_content"; nav_ = name_ + "_nav"
+ // this.NAV = document.getElementById(nav_)
+ // this.CONTENT = document.getElementById(content_)
+// } catch(err) {}
+
+
+}
+
+
+
+
+// =========== Tabs management ==========================
+// -- SimManager --
+function SimManager(valuation_id)
+{
+    this.is_staff = document.getElementById("is_staff").getAttribute("is_staff");
+    this.is_instructor = document.getElementById("is_staff").getAttribute("is_instructor");
+    this.is_options = document.getElementById("is_staff").getAttribute("is_options");
+    this.is_fsa = document.getElementById("is_staff").getAttribute("is_fsa");
+    this.valuation_id = valuation_id;
+    this.url_get_screens = '/en/corporatevaluation/get_screens/';
+    this.name = "Corporate Valuation";
+    this.tabTitles = document.getElementById("tab_titles");
+    this.tabContents = document.getElementById("tab_contents");
+    this.TabObjects = {};
+    this.setTabs();
+    try{
+      var event = new Event("click", {bubbles: true});
+      this.TabObjects["inputs"].tabTitle.dispatchEvent(event);
+    } catch (err) {alert(err)}
+
+    startTime();
+}
+
+SimManager.prototype.titleWasClicked = function() {
+        for (t in this.TabObjects)
+        {
+          alert(t)
+          this.TabObjects[t].tabTitleWasClicked()
+        }
+}
+
+SimManager.prototype.setTabs = function() {
+    var tabs_ = document.getElementById("tabs_");
+
+    var tabs_s = tabs_.getAttribute("tabs_s");
+    var tans_all = tabs_s.split(",");
+
+    var tabs = {};
+    for (var property in tans_all) {
+      ss = tans_all[property]; ss_ = ss.split(":"); ss__ = ss_[1].split(";")
+      tabs[ss_[0]] = [ss__[0], ss__[1]]
+    }
+
+    //alert(JSON.stringify(tabs))
+
+    var tabs_options = tabs_.getAttribute("tabs_options");
+    var tabs_options_all = tabs_options.split(",");
+
+    var tabs_options = {};
+    for (var property in tabs_options_all) {
+      ss = tabs_options_all[property]; ss_ = ss.split(":"); ss__ = ss_[1].split(";")
+      tabs_options[ss_[0]] = [ss__[0], ss__[1]]
+    }
+    //alert(JSON.stringify(tabs_options))
+
+    var tabs_m = tabs_.getAttribute("tabs_m");
+    var tans_all_m = tabs_m.split(",");
+
+    var tabs_management = {};
+    for (const property in tans_all_m) {
+      var ss = tans_all_m[property]; var ss_ = ss.split(":");var ss__ = ss_[1].split(";");
+      tabs_management[ss_[0]] = [ss__[0], ss__[1]];
+    }
+
+    //alert(JSON.stringify(tabs_management))
+
+
+    if (this.is_staff == 'True' || this.is_instructor == 'True'){
+      for(var name in tabs_management)
+      {s = "this.TabObjects[name] = new SimManagementTab(this, name, '"+tabs_management[name][0]+"', this.valuation_id, this.url_get_screens, '"+tabs_management[name][1]+"')" ;eval(s) }
+    }
+
+    if (this.is_staff == 'True' || this.is_options == 'True' || this.is_fsa == 'True'){
+      for(var name in tabs_options)
+      {s = "this.TabObjects[name] = new SimTab(this, name, tabs_options[name][0], this.valuation_id, this.url_get_screens, tabs_options[name][1])" ;eval(s)}
+    }
+
+    for(var name in tabs)
+    {s = "this.TabObjects[name] = new SimTab(this, name, tabs[name][0], this.valuation_id, this.url_get_screens, tabs[name][1])" ; eval(s)}
+
+}
+
+
+// == Math ==
+function sigmoid(t) {
+    return 1/(1+Math.pow(Math.E, -t));
+}
+
+// == Timer ==
+function startTime() {const today=new Date();let h=today.getHours();let m=today.getMinutes();
+  let s=today.getSeconds();m=checkTime(m);s=checkTime(s);
+  for(var i in vObj["ids_for_timer"]){
+        try{document.getElementById(vObj["ids_for_timer"][i]).innerHTML= h+":"+m+":"+s} catch(er){}
+        };setTimeout(startTime, 1000);
+}
+function checkTime(i) {if (i < 10) {i = "0" + i}; return i;}
+
+// ------------------------------------------------
+sm = new SimManager(valuation_id=0)
+// ------------------------------------------------
+
+
+});
+
+</script>
+<script data-cms src="/static/bundle.toolbar.min.js" type="text/javascript"></script>
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+</body>
+</html>

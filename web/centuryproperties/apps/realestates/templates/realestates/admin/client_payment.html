@@ -6,6 +6,8 @@
    Re-Assign/Record Payment
 {% endblock %}
 
+{% block add_css %}
+{% endblock %}
 
 {% block content %}
 
@@ -85,11 +87,39 @@
               <div id="form-errors"></div>
               <form id="add-client-form" method="post" action="{% url 'realestates:admin_add_client' %}">
                 {% csrf_token %}
-                {{ admin_client_form.as_p }}
-                <button style="width:120px;" type="submit" class="btn btn-warning btn-sm mb-3">
-                    Add Client
-                </button>
-              </form>
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        {{ admin_client_form.name.label_tag }}<br>
+                        {{ admin_client_form.name }}
+                    </div>
+                    <div class="col-12 mb-3">
+                        {{ admin_client_form.phoneNumber1.label_tag }}<br>
+                        {{ admin_client_form.phoneNumber1 }}
+                    </div>
+                    <div class="col-12 mb-3">
+                        {{ admin_client_form.phoneNumber2.label_tag }}<br>
+                        {{ admin_client_form.phoneNumber2 }}
+                    </div>
+                    <div class="col-12 mb-3">
+                        {{ admin_client_form.location.label_tag }}<br>
+                        {{ admin_client_form.location }}
+                    </div>
+
+                    <div class="form-group mb-3">
+                        {{ admin_client_form.employee.label_tag }}<br>
+                        <div class="input-group">
+                          {{ admin_client_form.employee }}
+                          <div class="input-group-append">
+                          </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-warning btn-sm mb-3 w-100">
+                            Add Client
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
   </div>

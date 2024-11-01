@@ -1,0 +1,143 @@
+<div class="container-xxl flex-grow-1 container-p-y">
+    <!-- Basic Layout & Basic with Icons -->
+    <div class="row">
+       <!-- Basic with Icons -->
+      <div class="col-xxl">
+        <div class="card mb-6">
+          <div class="card-header d-flex align-items-center justify-content-between">
+            <h5 class="mb-0">Distributor Form</h5> <small class="text-muted float-end">Merged input group</small>
+          </div>
+          <div class="card-body">
+            <div id="form-success"></div>
+            <div id="form-errors"></div>
+            <form id="add-distributor-form" method="post" action="{% url 'realestates:admin_add_distributor' %}">
+              {% csrf_token %}
+              <div class="row mb-6">
+                <label class="col-sm-2 col-form-label" for="basic-icon-default-fullname">UserName</label>
+                <div class="col-sm-10">
+                  <div class="input-group input-group-merge">
+                    <span id="basic-icon-default-fullname2" class="input-group-text"><i class="fa fa-user" style="font-weight:bold" aria-hidden="true"></i></span>
+                    {{ form.username }}
+                  </div>
+                </div>
+              </div>
+              <div class="row mb-6">
+                <label class="col-sm-2 col-form-label" for="basic-default-email">Email</label>
+                <div class="col-sm-10">
+                  <div class="input-group input-group-merge">
+                    {{ form.email }}
+                    <span class="input-group-text" id="basic-default-email2">@x.com</span>
+                  </div>
+                  <div class="form-text"> You can use letters, numbers &amp; periods </div>
+                </div>
+              </div>
+              <div class="row mb-6">
+                <label class="col-sm-2 col-form-label" for="basic-icon-default-email">F.Name</label>
+                <div class="col-sm-10">
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="fa fa-user" style="font-weight:bold" aria-hidden="true"></i></span>
+                    {{ form.first_name }}
+                  </div>
+                </div>
+              </div>
+              <div class="row mb-6">
+                <label class="col-sm-2 col-form-label" for="basic-icon-default-phone">L.Name</label>
+                <div class="col-sm-10">
+                  <div class="input-group input-group-merge">
+                    <span id="basic-icon-default-phone2" class="input-group-text"><i class="fa fa-user" style="font-weight:bold" aria-hidden="true"></i></span>
+                     {{ form.last_name }}
+                  </div>
+                </div>
+              </div>
+              <div class="row mb-6">
+                <label class="col-sm-2 col-form-label" for="{{ admin_client_form.employee.id_for_label }}">Password1</label>
+                <div class="col-sm-10">
+                  <div class="input-group input-group-merge">
+                    <span id="basic-icon-default-message2" class="input-group-text"><i class="fa fa-key" style="font-weight:bold" aria-hidden="true"></i></span>
+                    {{ form.password1 }}
+                      <span class="input-group-text"><i class="fa fa-eye-slash" aria-hidden="true" id="togglePassword1"></i></span>
+                    </div>
+                </div>
+              </div>
+              <div class="row mb-6">
+                <label class="col-sm-2 col-form-label" for="{{ admin_client_form.employee.id_for_label }}">Password2</label>
+                <div class="col-sm-10">
+                  <div class="input-group input-group-merge">
+                    <span id="basic-icon-default-message2" class="input-group-text"><i class="fa fa-key" style="font-weight:bold" aria-hidden="true"></i></span>
+                    {{ form.password2 }}
+                      <span class="input-group-text"><i class="fa fa-eye-slash" aria-hidden="true" id="togglePassword2"></i></span>
+                  </div>
+                </div>
+              </div>
+              <div class="row justify-content-end">
+                <div class="col-sm-10 mt-1">
+                  <button type="submit" class="btn btn-primary">Send</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <!-- Basic with Icons -->
+      <div class="col-xxl"></div>
+    </div>
+</div>
+
+<!-- Add new distributor -->
+<script>
+  $(document).ready(function() {
+    $('#add-distributor-form').on('submit', function(event) {
+      event.preventDefault(); // Prevent form from submitting normally
+      var form = $(this);
+      var formData = form.serialize(); // Collect form data
+      var url = form.attr('action')
+      $.ajax({
+        url: form.attr('action'), // Form action URL (where the form is being submitted)
+        type: 'POST',
+        data: formData,
+        dataType: 'json',
+        success: function(response) {
+          if (response.success) {
+            $('#form-success').html('<div class="alert alert-success">' + response.message + '</div>');
+            $('#form-errors').html(''); // Clear previous errors
+            form[0].reset(); // Reset the form on success
+          } else {
+            $('#form-errors').html('<div class="alert alert-danger">' + response.error + '</div>');
+          }
+        },
+        error: function(xhr, status, error) {
+          $('#form-errors').html('<div class="alert alert-danger">An error occurred. Please try again.</div>');
+        }
+      });
+    });
+  });
+</script>
+
+<!--Show password-->
+<script>
+        const togglePassword1 = document.querySelector("#togglePassword1");
+        const password1 =  document.getElementById("id_password1");
+        togglePassword1.addEventListener("click", function () {
+            // toggle the type attribute
+            const type = password1.getAttribute("type") === "password" ? "text" : "password";
+            password1.setAttribute("type", type);
+            // toggle the icon
+            this.classList.toggle("bi-eye");
+        });
+
+        const togglePassword2 = document.querySelector("#togglePassword2");
+        const password2 =  document.getElementById("id_password2");
+        togglePassword2.addEventListener("click", function () {
+            // toggle the type attribute
+            const type = password2.getAttribute("type") === "password" ? "text" : "password";
+            password2.setAttribute("type", type);
+            // toggle the icon
+            this.classList.toggle("bi-eye");
+        });
+
+        // prevent form submit
+        const form = document.querySelector("form");
+        form.addEventListener('submit', function (e) {
+            //e.preventDefault();
+        });
+</script>

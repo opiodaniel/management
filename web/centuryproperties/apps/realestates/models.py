@@ -6,10 +6,10 @@ from datetime import timedelta, datetime, date
 from django.core.validators import MinLengthValidator
 from django.db.models import Sum
 from django.dispatch import receiver
-from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import pre_save, post_save, post_delete
 from django.db import connection
 from django.core.exceptions import ValidationError
-
+from django.db import transaction
 
 class TruncateTableMixin:
     @classmethod
@@ -199,13 +199,13 @@ class Payment(TruncateTableMixin, models.Model):
     def save(self, *args, **kwargs):
         if self.pk:  # Check if this is an update
             old_instance = Payment.objects.get(pk=self.pk)
-            print('old_instance.amount_paid===', old_instance.amount_paid)
-            print('instance.amount_paid===', self.amount_paid)
+            # print('old_instance.amount_paid===', old_instance.amount_paid)
+            # print('instance.amount_paid===', self.amount_paid)
             amount_diff = self.amount_paid - old_instance.amount_paid
-            print('amount_diff==', amount_diff)
+            # print('amount_diff==', amount_diff)
         else:
             amount_diff = self.amount_paid
-            print('Nooo part amount_diff==', amount_diff)
+            # print('Nooo part amount_diff==', amount_diff)
 
         super().save(*args, **kwargs)
 
@@ -216,8 +216,46 @@ class Payment(TruncateTableMixin, models.Model):
         client_land.purchase_date = self.timestamp
         client_land.save()
 
+        # Update the client model's employee field to match the payment's employee
+        client = client_land.client
+        if self.employee and client.employee != self.employee:
+            client.employee = self.employee
+            client.save()
 
-class Commission(models.Model):
+        # Update the employee field in existing commissions
+        commissions = Commission.objects.filter(client=client, client_land=client_land)
+        for commission in commissions:
+            if commission.employee != self.employee:
+                # Simply update the employee field of the existing commission
+                commission.employee = self.employee
+                commission.save()
+
+    def delete(self, *args, **kwargs):
+        client_land = self.client_land
+
+        # Deduct the amount of this payment from the total amount paid
+        client_land.total_amount_paid -= self.amount_paid
+        client_land.remaining_amount = client_land.land.price - client_land.total_amount_paid
+
+        # Check if there are remaining payments for this ClientLand
+        remaining_payments = Payment.objects.filter(client_land=client_land).exclude(pk=self.pk).exists()
+
+        if not remaining_payments:
+            # If no remaining payments, reset the amounts
+            client_land.total_amount_paid = 0
+            client_land.remaining_amount = client_land.land.price
+            client_land.payment_complete = False
+            client_land.land.available = True  # Mark the land as available again
+            client_land.land.save()
+
+        # Save the updated client_land
+        client_land.save()
+
+        # Delete the payment record
+        super().delete(*args, **kwargs)
+
+
+class Commission(TruncateTableMixin, models.Model):
     employee = models.ForeignKey(Employees, on_delete=models.CASCADE, related_name='commissions', null=True)
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='commissions', null=True)
     client_land = models.ForeignKey(ClientLand, on_delete=models.CASCADE, related_name='commission_payments', null=True)
@@ -279,6 +317,35 @@ def update_commission(sender, instance, created, **kwargs):
 
         # Clean up the old_payment_amounts dictionary
         old_payment_amounts.pop(instance.pk, None)
+
+# Signal to adjust commission on payment deletion
+@receiver(post_delete, sender=Payment)
+def adjust_commission_on_delete(sender, instance, **kwargs):
+    if instance.approved and instance.client_land.client.employee:
+        try:
+            commission = Commission.objects.get(
+                employee=instance.client_land.client.employee,
+                client=instance.client_land.client,
+                client_land=instance.client_land
+            )
+
+            # Check if there are any remaining payments for this ClientLand
+            remaining_payments_exist = Payment.objects.filter(
+                client_land=instance.client_land
+            ).exists()
+
+            if remaining_payments_exist:
+                # If there are remaining payments, adjust the commission
+                commission_reduction = instance.amount_paid * 0.1
+                commission.total_commission -= commission_reduction
+                commission.save()
+            else:
+                # If no remaining payments, delete the commission
+                commission.delete()
+
+        except Commission.DoesNotExist:
+            # In case there is no commission record (shouldn't normally happen)
+            pass
 
 
 class EmployeePaymentRecord(TruncateTableMixin, models.Model):

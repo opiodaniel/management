@@ -94,12 +94,12 @@ class EmployeeLoginForm(AuthenticationForm):
 
 
 class RegistrationForm(UserCreationForm):
-    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control'}))
-    first_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
-    last_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
-    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
-    password1 = forms.Field(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-    password2 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder':'opdan2025@gmail.com'}))
+    first_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder':'opio'}))
+    last_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder':'daniel'}))
+    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder':'opio'}))
+    password1 = forms.Field(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder':'password1'}))
+    password2 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder':'password2'}))
 
     def clean_username(self):
         username = self.cleaned_data['username']
@@ -285,13 +285,13 @@ class EditEmployeePaymentForm(forms.ModelForm):
 
 # ===========  form for the admin to enter clients who do not exist in the system =============
 class AdminClientForm(forms.ModelForm):
-    name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
-    phoneNumber1 = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    name = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Daniel Opio'}))
+    phoneNumber1 = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder':'0781218116'}))
     phoneNumber2 = forms.CharField(
         required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder':'0762179510'})
     )
-    location = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    location = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Kampala'}))
     is_archived = forms.BooleanField(required=False, widget=forms.HiddenInput())
     employee = forms.ModelChoiceField(
         queryset=Employees.objects.all(),
