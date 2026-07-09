@@ -3,10 +3,6 @@ import dj_database_url
 
 DEBUG = False
 
-ADMINS = (
-    ('Opio Daniel', 'danielopio540@gmail.com'),
-)
-
 ALLOWED_HOSTS = ['*']
 
 

@@ -6,7 +6,7 @@ import dj_database_url
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 # DEBUG = False
 ADMINS = (
-    ('Opio Daniel', 'danielopio540@gmail.com'),
+    ('', ''),
 )
 
 ALLOWED_HOSTS = ['*']

@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 WEB_DIR = os.path.dirname(BASE_DIR)                                      # web
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))                  # setting
 
-# print(BASE_DIR)
+print(BASE_DIR)
 
 env_path = load_dotenv(os.path.join(BASE_DIR, '.env'))
 load_dotenv(env_path)
